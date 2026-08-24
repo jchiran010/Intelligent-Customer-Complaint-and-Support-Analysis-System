@@ -1,0 +1,60 @@
+/* Responsive Utilities & Layout Adjustments */
+
+.df-layout-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.df-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--bg-primary);
+}
+
+.df-page-body {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Grid utilities */
+.df-grid-1 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+.df-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.df-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.df-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+  .df-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .df-grid-3, .df-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .df-page-body {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .df-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .df-btn {
+    width: 100%;
+  }
+
+  .df-card {
+    padding: 1rem;
+  }
+}
