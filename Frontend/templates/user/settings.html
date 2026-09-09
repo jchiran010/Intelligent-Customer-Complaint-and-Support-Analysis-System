@@ -147,7 +147,6 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Interactive card radio selection highlight
     const themeRadios = document.querySelectorAll('input[name="theme"]');
     const langRadios = document.querySelectorAll('input[name="language"]');
 
@@ -164,8 +163,20 @@
       });
     }
 
-    themeRadios.forEach(r => r.addEventListener('change', () => updateCardHighlights(themeRadios)));
-    langRadios.forEach(r => r.addEventListener('change', () => updateCardHighlights(langRadios)));
+    themeRadios.forEach(r => {
+      r.addEventListener('change', function() {
+        updateCardHighlights(themeRadios);
+        if (window.setAppTheme) {
+          window.setAppTheme(this.value);
+        }
+      });
+    });
+
+    langRadios.forEach(r => {
+      r.addEventListener('change', function() {
+        updateCardHighlights(langRadios);
+      });
+    });
   });
 </script>
 {% endblock %}

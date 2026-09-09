@@ -146,6 +146,7 @@ def feedback_form():
     return render_template('user/feedback.html', complaint=complaint)
 
 @user_bp.route('/api/theme_lang', methods=['POST'])
+@user_bp.route('/api_theme_lang', methods=['POST'])
 def api_theme_lang():
     data = request.get_json() or {}
     theme = data.get('theme')

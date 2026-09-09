@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const currentLang = langToggle.getAttribute('data-lang') || 'en';
       const newLang = currentLang === 'en' ? 'ta' : 'en';
 
-      fetch('/user/api_theme_lang', {
+      fetch('/user/api/theme_lang', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lang: newLang })
