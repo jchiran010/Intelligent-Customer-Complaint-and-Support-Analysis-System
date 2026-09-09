@@ -53,7 +53,7 @@
             {% for c in complaints %}
               <tr class="complaint-row" data-ticket="{{ c.ticket_id }}" data-title="{{ c.title | lower }}" data-status="{{ c.status }}">
                 <td class="font-monospace fw-bold text-primary">{{ c.ticket_id }}</td>
-                <td>{% if current_lang == 'ta' %}{{ c.cat_ta }}{% else %}{{ c.cat_en }}{% endif %}</td>
+                <td class="text-color-custom fw-medium">{% if current_lang == 'ta' %}{{ c.cat_ta }}{% else %}{{ c.cat_en }}{% endif %}</td>
                 <td class="fw-semibold text-truncate text-color-custom" style="max-width: 250px;">{{ c.title }}</td>
                 <td>
                   {% if c.priority == 'critical' %}
@@ -79,7 +79,7 @@
                     <span class="status-badge pending"><i class="bi bi-clock-fill"></i>{{ t('status_pending') }}</span>
                   {% endif %}
                 </td>
-                <td class="small text-muted-custom">{{ c.created_at }}</td>
+                <td class="small text-secondary">{{ c.created_at[:16] }}</td>
                 <td class="text-end">
                   <a href="{{ url_for('complaint.details', complaint_id=c.id) }}" class="btn btn-outline-primary btn-sm rounded-3">
                     {{ t('view_details') }} <i class="bi bi-arrow-right-short"></i>

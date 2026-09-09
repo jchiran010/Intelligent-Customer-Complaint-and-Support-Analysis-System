@@ -54,9 +54,9 @@
   --bg-color: #0b0f19;            /* Midnight Blue background */
   --surface-bg: #0f172a;          /* Deep Navy card surface */
   --surface-hover: #1e293b;
-  --text-primary: #f8fafc;        /* High contrast light text */
-  --text-secondary: #cbd5e1;      /* Slightly lighter muted text */
-  --text-muted: #64748b;
+  --text-primary: #f8fafc;        /* High contrast pure light text */
+  --text-secondary: #94a3b8;      /* Clear, readable light slate */
+  --text-muted: #94a3b8;          /* High contrast readable muted text */
   --border-color: #1e293b;        /* Dark Navy borders */
   --input-bg: #0f172a;
   --input-border: #334155;
@@ -64,7 +64,7 @@
   --shadow-md: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
   --sidebar-bg: #070a13;          /* Darker Midnight Navy Sidebar */
-  --sidebar-text: #64748b;
+  --sidebar-text: #94a3b8;
   --sidebar-hover-bg: #0f172a;
   --header-bg: #0f172a;
   --scroll-thumb: #334155;
