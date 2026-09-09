@@ -8,9 +8,16 @@ import io
 report_bp = Blueprint('report', __name__, url_prefix='/report')
 
 @report_bp.route('/admin/export')
+@report_bp.route('/export')
+@report_bp.route('/export/csv')
+@report_bp.route('/export/pdf')
 @admin_required
 def admin_export():
     file_format = request.args.get('format', 'csv').lower()
+    if request.path.endswith('/pdf'):
+        file_format = 'pdf'
+    elif request.path.endswith('/csv'):
+        file_format = 'csv'
     category = request.args.get('category', '')
     priority = request.args.get('priority', '')
     status = request.args.get('status', '')

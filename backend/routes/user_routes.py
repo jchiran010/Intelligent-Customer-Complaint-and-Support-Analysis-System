@@ -170,6 +170,7 @@ def chatbot():
     return render_template('user/chatbot.html')
 
 @user_bp.route('/chatbot/query', methods=['POST'])
+@user_bp.route('/api/chatbot', methods=['POST'])
 @login_required
 def chatbot_query():
     data = request.get_json() or {}

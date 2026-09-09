@@ -88,6 +88,11 @@ def dashboard():
         trends=trends
     )
 
+@admin_bp.route('/complaints')
+@admin_required
+def complaints():
+    return redirect(url_for('complaint.list_all', **request.args))
+
 @admin_bp.route('/users')
 @admin_required
 def users():

@@ -9,6 +9,7 @@ from backend.services.translation_service import translate
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/auth/register', methods=['GET', 'POST'])
 def register():
     lang = session.get('lang', 'en')
     if request.method == 'POST':
@@ -52,6 +53,7 @@ def register():
     return render_template('auth/register.html')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/auth/login', methods=['GET', 'POST'])
 def login():
     lang = session.get('lang', 'en')
     if 'user_id' in session:
@@ -98,6 +100,7 @@ def logout():
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+@auth_bp.route('/auth/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     lang = session.get('lang', 'en')
     if request.method == 'POST':

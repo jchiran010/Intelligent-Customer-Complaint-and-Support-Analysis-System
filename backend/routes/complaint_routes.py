@@ -356,6 +356,8 @@ def api_analyze():
     Real-time text scanner to predict ticket category and priority.
     """
     data = request.get_json() or {}
-    text = data.get('text', '')
+    text = data.get('text') or data.get('description', '')
     analysis = analyze_complaint(text)
+    if 'category_id' in analysis:
+        analysis['predicted_category_id'] = analysis['category_id']
     return jsonify(analysis)
