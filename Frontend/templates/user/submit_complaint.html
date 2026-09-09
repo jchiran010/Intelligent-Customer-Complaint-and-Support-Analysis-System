@@ -1,0 +1,136 @@
+{% extends "common/base.html" %}
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <h3 class="fw-bold">{{ t('submit_complaint') }}</h3>
+    <p class="text-secondary-color">Detail your ticket below. The integrated NLP services evaluate keywords as you type to recommend classifications.</p>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Submit Form -->
+  <div class="col-lg-8">
+    <div class="bento-cell mb-0">
+      <form action="{{ url_for('complaint.submit') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate id="complaint-form">
+        
+        <!-- Subject -->
+        <div class="mb-3">
+          <label class="form-label-custom">{{ t('subject_label') }} <span class="text-danger">*</span></label>
+          <input type="text" name="title" class="form-control form-control-custom" placeholder="Brief subject header..." required>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4 position-relative">
+          <label class="form-label-custom">{{ t('description_label') }} <span class="text-danger">*</span></label>
+          <textarea id="complaint-description" name="description" class="form-control form-control-custom" rows="6" placeholder="Describe the incident. (Suggested parameters popup once 15+ characters are written)..." required></textarea>
+          
+          <div id="ai-scanner-badge" class="position-absolute end-0 bottom-0 mb-3 me-3 d-none font-monospace small text-primary bg-primary bg-opacity-10 px-2 py-1 rounded">
+            <!-- Loader logic -->
+          </div>
+        </div>
+
+        <!-- Intelligent Suggestions Panel -->
+        <div id="ai-suggestions-box" class="card border border-primary border-opacity-50 bg-primary bg-opacity-5 p-3 mb-4 d-none">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+              <h6 class="fw-bold text-primary mb-1"><i class="bi bi-cpu-fill me-2"></i>{{ t('suggestions_found') }}</h6>
+              <div class="small text-secondary-color">
+                Recommended Category: <b id="ai-suggested-category" class="text-primary">Payment</b> | 
+                Priority level: <span id="ai-suggested-priority" class="badge bg-secondary">Medium</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm px-3 fw-semibold" id="accept-suggestions-btn">
+              {{ t('accept_suggestions') }}
+            </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Category Select -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label-custom">{{ t('category_label') }} <span class="text-danger">*</span></label>
+            <select name="category_id" id="complaint-category" class="form-select form-control-custom" required>
+              <option value="" disabled selected>Select category...</option>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}">{% if current_lang == 'ta' %}{{ cat.name_ta }}{% else %}{{ cat.name_en }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Priority Select -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label-custom">{{ t('priority_label') }} <span class="text-danger">*</span></label>
+            <select name="priority" id="complaint-priority" class="form-select form-control-custom" required>
+              <option value="low">{{ t('priority_low') }}</option>
+              <option value="medium" selected>{{ t('priority_medium') }}</option>
+              <option value="high">{{ t('priority_high') }}</option>
+              <option value="critical">{{ t('priority_critical') }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Drag & Drop File Upload -->
+        <div class="mb-4">
+          <label class="form-label-custom">{{ t('attachment_label') }}</label>
+          <div id="drag-drop-area">
+            <i class="bi bi-cloud-arrow-up text-primary display-6 mb-2 d-block"></i>
+            <span id="file-label-text" class="text-muted-custom small">{{ t('drag_drop_text') }}</span>
+            <input type="file" id="file-attachment" name="attachment" class="d-none" accept=".png,.jpg,.jpeg,.pdf">
+          </div>
+        </div>
+
+        <!-- Submit buttons -->
+        <div class="d-flex justify-content-end gap-3 mt-4">
+          <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary px-4 py-2 rounded-3">Cancel</a>
+          <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-3">
+            <i class="bi bi-send-fill me-2"></i>{{ t('submit_btn') }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Guidelines Panel -->
+  <div class="col-lg-4 mt-4 mt-lg-0">
+    <div class="bento-cell h-100 mb-0">
+      <h5 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i>System Guidance</h5>
+      <p class="small text-secondary-color">Provide details when reporting issues. Example of routing rules based on text keyword matching:</p>
+      
+      <div class="accordion accordion-flush mt-3" id="guidelinesAccordion">
+        <div class="accordion-item bg-transparent border-color-custom">
+          <h2 class="accordion-header">
+            <button class="accordion-button bg-transparent text-color-custom collapsed small py-2 px-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#flush-one">
+              Payment &amp; Invoices
+            </button>
+          </h2>
+          <div id="flush-one" class="accordion-collapse collapse" data-bs-parent="#guidelinesAccordion">
+            <div class="accordion-body small text-muted-custom px-0 py-2">
+              Keywords: "double charge", "refund request", "payment deducted". Routes tickets to <b>Payment/Billing</b> and recommends <b>High/Critical</b> priority.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item bg-transparent border-color-custom">
+          <h2 class="accordion-header">
+            <button class="accordion-button bg-transparent text-color-custom collapsed small py-2 px-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#flush-two">
+              Software Bugs
+            </button>
+          </h2>
+          <div id="flush-two" class="accordion-collapse collapse" data-bs-parent="#guidelinesAccordion">
+            <div class="accordion-body small text-muted-custom px-0 py-2">
+              Keywords: "site crash", "load failure", "Chart.js error". Routes to <b>Technical Support</b>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/complaint.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row mb-3">
+  <div class="col-12">
+    <span class="text-primary fw-bold font-monospace text-uppercase" style="letter-spacing: 1px;">
+      {% if current_lang == 'ta' %}நிர்வாக கன்சோல்{% else %}Admin Console{% endif %}
+    </span>
+  </div>
+</div>
+
+<!-- Bento-style Admin Grid Layout -->
+<div class="bento-grid">
+  
+  <!-- Cell 1: Welcome Greeting & Platform Stats (Large Wide Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 8;">
+    <div class="d-flex align-items-center h-100 py-1">
+      <div>
+        <h2 class="fw-bold mb-2">
+          {% if current_lang == 'ta' %}செயல்பாட்டு மையம்{% else %}Operations Center{% endif %}
+        </h2>
+        <p class="text-secondary-color mb-0">
+          {% if current_lang == 'ta' %}
+            கணினி செயல்திறன் செயல்பாட்டில் உள்ளது. வாடிக்கையாளர் திருப்தி (CSAT) மதிப்பீடு <b class="text-warning">{{ stats.csat_score }}%</b> மற்றும் சராசரி தீர்வு காலம் <b class="text-info">{{ stats.avg_res_time }} மணிநேரம்</b>.
+          {% else %}
+            System performance is operational. Customer Satisfaction (CSAT) rating is <b class="text-warning">{{ stats.csat_score }}%</b> with an average resolution duration of <b class="text-info">{{ stats.avg_res_time }} hours</b>.
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cell 2: Total Registered Users (Medium Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 4; background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, transparent 100%);">
+    <div class="d-flex flex-column justify-content-between h-100">
+      <span class="text-muted-custom small fw-bold text-uppercase">
+        {% if current_lang == 'ta' %}மொத்த வாடிக்கையாளர்கள்{% else %}Total Customers{% endif %}
+      </span>
+      <div class="d-flex align-items-center justify-content-between mt-2">
+        <h2 class="metric-value mb-0 fw-bold text-primary animate-counter" data-target="{{ stats.total_users }}">{{ stats.total_users }}</h2>
+        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3">
+          <i class="bi bi-people-fill fs-4"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cell 3: Total Tickets (Small Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 2;">
+    <span class="text-muted-custom small fw-bold text-uppercase">
+      {% if current_lang == 'ta' %}மொத்த டிக்கெட்டுகள்{% else %}Total Tickets{% endif %}
+    </span>
+    <h3 class="metric-value mb-1 fw-bold text-color-custom animate-counter" data-target="{{ stats.total_complaints }}">{{ stats.total_complaints }}</h3>
+  </div>
+
+  <!-- Cell 4: Pending (Small Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 2;">
+    <span class="text-muted-custom small fw-bold text-uppercase">
+      {% if current_lang == 'ta' %}நிலுவையில் உள்ளவை{% else %}Pending{% endif %}
+    </span>
+    <h3 class="metric-value mb-1 fw-bold text-danger animate-counter" data-target="{{ stats.pending }}">{{ stats.pending }}</h3>
+  </div>
+
+  <!-- Cell 5: In Progress (Small Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 2;">
+    <span class="text-muted-custom small fw-bold text-uppercase">
+      {% if current_lang == 'ta' %}செயல்பாட்டில் உள்ளவை{% else %}In Progress{% endif %}
+    </span>
+    <h3 class="metric-value mb-1 fw-bold text-info animate-counter" data-target="{{ stats.in_progress }}">{{ stats.in_progress }}</h3>
+  </div>
+
+  <!-- Cell 6: Resolved (Small Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 2;">
+    <span class="text-muted-custom small fw-bold text-uppercase">
+      {% if current_lang == 'ta' %}தீர்க்கப்பட்டவை{% else %}Resolved{% endif %}
+    </span>
+    <h3 class="metric-value mb-1 fw-bold text-success animate-counter" data-target="{{ stats.resolved }}">{{ stats.resolved }}</h3>
+  </div>
+
+  <!-- Cell 7: Critical/High (Small Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 2;">
+    <span class="text-muted-custom small fw-bold text-uppercase">
+      {% if current_lang == 'ta' %}உயர் முன்னுரிமை{% else %}High Priority{% endif %}
+    </span>
+    <h3 class="metric-value mb-1 fw-bold text-warning animate-counter" data-target="{{ stats.high_priority }}">{{ stats.high_priority }}</h3>
+  </div>
+
+  <!-- Cell 8: Avg CSAT (Small Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 2;">
+    <span class="text-muted-custom small fw-bold text-uppercase">
+      {% if current_lang == 'ta' %}திருப்தி விகிதம்{% else %}Satisfaction{% endif %}
+    </span>
+    <h3 class="metric-value mb-1 fw-bold text-warning">{{ stats.csat_score }}%</h3>
+  </div>
+
+  <!-- Cell 9: Trends Chart (Half Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 6;">
+    <h5 class="fw-bold mb-4">
+      <i class="bi bi-graph-up-arrow text-primary me-2"></i>
+      {% if current_lang == 'ta' %}புகார் போக்குகள் (கடந்த 7 நாட்கள்){% else %}Complaint Submission Trends (Last 7 Days){% endif %}
+    </h5>
+    <div style="height: 280px;">
+      <canvas id="adminTrendsChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Cell 10: Category Doughnut Chart (Quarter Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 3;">
+    <h5 class="fw-bold mb-4">
+      <i class="bi bi-pie-chart-fill text-primary me-2"></i>
+      {% if current_lang == 'ta' %}வகைகள்{% else %}Categories{% endif %}
+    </h5>
+    <div style="height: 280px;">
+      <canvas id="categoryChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Cell 11: Priority Distribution Bar Chart (Quarter Cell) -->
+  <div class="bento-cell col-12" style="grid-column: span 3;">
+    <h5 class="fw-bold mb-4">
+      <i class="bi bi-bar-chart-fill text-primary me-2"></i>
+      {% if current_lang == 'ta' %}முன்னுரிமைகள்{% else %}Priorities{% endif %}
+    </h5>
+    <div style="height: 280px;">
+      <canvas id="priorityChart"></canvas>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const isDark = theme === 'dark';
+
+    // 1. Line Chart: Trends
+    const trendsCtx = document.getElementById('adminTrendsChart').getContext('2d');
+    const trendDates = [];
+    const trendCounts = [];
+    
+    {% for t in trends %}
+      trendDates.push("{{ t.date }}");
+      trendCounts.push({{ t.count }});
+    {% endfor %}
+
+    if (trendDates.length === 0) {
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        trendDates.push(d.toISOString().split('T')[0]);
+        trendCounts.push(0);
+      }
+    }
+
+    if (window.createTrendChart) {
+      window.createTrendChart(trendsCtx, trendDates, trendCounts, isDark);
+    }
+
+    // 2. Doughnut Chart: Category Distribution
+    const catCtx = document.getElementById('categoryChart').getContext('2d');
+    const catLabels = [];
+    const catCounts = [];
+    
+    {% for c in cat_distribution %}
+      catLabels.push("{% if current_lang == 'ta' %}{{ c.name_ta }}{% else %}{{ c.name_en }}{% endif %}");
+      catCounts.push({{ c.count }});
+    {% endfor %}
+
+    if (window.createCategoryChart) {
+      window.createCategoryChart(catCtx, catLabels, catCounts, isDark);
+    }
+
+    // 3. Bar Chart: Priority Distribution
+    const prioCtx = document.getElementById('priorityChart').getContext('2d');
+    const prioLabels = ["{% if current_lang == 'ta' %}மிக முக்கியம்{% else %}Critical{% endif %}", 
+                        "{% if current_lang == 'ta' %}உயர்{% else %}High{% endif %}", 
+                        "{% if current_lang == 'ta' %}நடுத்தரம்{% else %}Medium{% endif %}", 
+                        "{% if current_lang == 'ta' %}குறைந்த{% else %}Low{% endif %}"];
+    const prioCounts = [0, 0, 0, 0];
+    
+    {% for p in priority_distribution %}
+      if ("{{ p.priority }}" === "critical") prioCounts[0] = {{ p.count }};
+      else if ("{{ p.priority }}" === "high") prioCounts[1] = {{ p.count }};
+      else if ("{{ p.priority }}" === "medium") prioCounts[2] = {{ p.count }};
+      else if ("{{ p.priority }}" === "low") prioCounts[3] = {{ p.count }};
+    {% endfor %}
+
+    if (window.createPriorityChart) {
+      window.createPriorityChart(prioCtx, prioLabels, prioCounts, isDark);
+    }
+  });
+</script>
+{% endblock %}

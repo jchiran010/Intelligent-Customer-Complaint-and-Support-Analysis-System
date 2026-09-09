@@ -1,0 +1,66 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <h3 class="fw-bold">{{ t('system_settings') }}</h3>
+    <p class="text-secondary-color">Manage global configurations, database scopes, and mail integrations.</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="bento-cell">
+      <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-sliders me-2"></i>Global Configurations</h5>
+      
+      <form action="{{ url_for('admin.settings') }}" method="POST">
+        
+        <!-- DB Config options -->
+        <div class="mb-4">
+          <label class="form-label-custom">Platform Database Engine</label>
+          <div class="row g-3 mt-1">
+            <div class="col-sm-6">
+              <div class="bento-cell p-3 border border-color-custom bg-opacity-25" style="box-shadow: none;">
+                <input class="form-check-input me-2" type="radio" name="db_type" id="db-sqlite" value="sqlite" checked disabled>
+                <label class="form-check-label fw-semibold" for="db-sqlite">
+                  <i class="bi bi-database me-2 text-info"></i>SQLite (Local Dev)
+                </label>
+              </div>
+            </div>
+            
+            <div class="col-sm-6">
+              <div class="bento-cell p-3 border border-color-custom bg-opacity-25" style="box-shadow: none;">
+                <input class="form-check-input me-2" type="radio" name="db_type" id="db-mysql" value="mysql" disabled>
+                <label class="form-check-label fw-semibold" for="db-mysql">
+                  <i class="bi bi-database-fill me-2 text-primary"></i>MySQL 8 (Production)
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-text small text-muted">Engines toggling is locked to local environment parameters in .env file.</div>
+        </div>
+
+        <hr class="my-4 border-color-custom">
+        
+        <!-- Max Upload sizes -->
+        <div class="mb-3">
+          <label class="form-label-custom">Maximum Document Upload Limit (Bytes)</label>
+          <input type="text" class="form-control form-control-custom text-muted" value="5,242,880 (5 Megabytes)" disabled>
+        </div>
+
+        <!-- SMTP server configs preview -->
+        <div class="mb-4">
+          <label class="form-label-custom">Email Server Status (SMTP)</label>
+          <div class="p-3 bg-light-custom rounded border small">
+            <div>SMTP HOST: <b class="text-color-custom">smtp.gmail.com:587</b></div>
+            <div class="mt-2 text-muted">Fallbacks logs: Outbound notifications write alerts to <b class="text-primary font-monospace">backend/instance/mock_emails.log</b> when SMTP credentials are not set.</div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary px-5 py-2 fw-semibold rounded-3" onclick="window.showToast('System configuration changes saved.')">
+          Save Configuration
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

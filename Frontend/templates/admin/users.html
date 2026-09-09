@@ -1,0 +1,77 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <h3 class="fw-bold">{{ t('users') }}</h3>
+    <p class="text-secondary-color">Review platform client accounts and toggle activation flags to restrict access.</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="bento-cell">
+      <div class="table-responsive">
+        <table class="table table-custom align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer Profile</th>
+              <th>Mobile</th>
+              <th>Access Role</th>
+              <th>System Status</th>
+              <th>Created Date</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr>
+                <td class="font-monospace fw-bold">{{ u.id }}</td>
+                <td>
+                  <div class="fw-bold text-color-custom" style="font-size: 0.95rem;">{{ u.name }}</div>
+                  <div class="text-muted small" style="font-size: 0.8rem;">{{ u.email }}</div>
+                </td>
+                <td class="font-monospace">{{ u.mobile or 'N/A' }}</td>
+                <td>
+                  <span class="badge {% if u.role == 'admin' %}bg-primary{% else %}bg-secondary{% endif %} text-uppercase">
+                    {{ u.role }}
+                  </span>
+                </td>
+                <td>
+                  {% if u.is_active %}
+                    <span class="status-badge resolved"><i class="bi bi-shield-check"></i>Active</span>
+                  {% else %}
+                    <span class="status-badge closed"><i class="bi bi-shield-slash"></i>Deactivated</span>
+                  {% endif %}
+                </td>
+                <td class="small text-muted-custom">{{ u.created_at[:16] }}</td>
+                <td class="text-end">
+                  <!-- Block self deactivation -->
+                  {% if u.id != session.user_id %}
+                    <form action="{{ url_for('admin.toggle_user', user_id=u.id) }}" method="POST" class="d-inline-block">
+                      <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-success{% endif %} fw-bold rounded-3">
+                        {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                      </button>
+                    </form>
+                  {% else %}
+                    <span class="small text-muted italic">Owner Profile</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-people-fill text-muted"></i></div>
+                    <h5>No Customers Found</h5>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

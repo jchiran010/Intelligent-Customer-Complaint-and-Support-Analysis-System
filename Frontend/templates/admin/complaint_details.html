@@ -1,0 +1,155 @@
+{% extends "common/base.html" %}
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h3 class="fw-bold">Manage Ticket: <span class="font-monospace text-primary">{{ complaint.ticket_id }}</span></h3>
+      <p class="text-secondary-color">Assign support categories, escalate priority, change status, and log actions notes.</p>
+    </div>
+    <a href="{{ url_for('complaint.list_all') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-2"></i>Back to List
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Left Column: Details and Triage parameters -->
+  <div class="col-lg-7">
+    <!-- Complaint Info Card -->
+    <div class="bento-cell mb-4">
+      <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-ticket-detailed me-2"></i>Complaint Info</h5>
+      
+      <div class="mb-3">
+        <label class="form-label-custom">Subject</label>
+        <h5 class="fw-bold text-color-custom">{{ complaint.title }}</h5>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+          <label class="form-label-custom">Submitted By</label>
+          <div class="text-color-custom fw-semibold">{{ complaint.user_name }}</div>
+          <div class="text-muted-custom small">{{ complaint.user_email }}</div>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label-custom">Submission Date</label>
+          <div class="text-color-custom fw-semibold">{{ complaint.created_at }}</div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label-custom">Detailed Description</label>
+        <div class="p-3 bg-light-custom rounded border text-color-custom" style="white-space: pre-wrap; background-color: rgba(var(--primary-rgb), 0.01);">{{ complaint.description }}</div>
+      </div>
+
+      <div class="mb-0">
+        <label class="form-label-custom">Attachment Document</label>
+        {% if complaint.attachment_path %}
+          <div class="d-flex align-items-center p-3 rounded border border-color-custom">
+            {% if complaint.attachment_path.endswith('.pdf') %}
+              <i class="bi bi-file-earmark-pdf-fill text-danger display-6 me-3"></i>
+            {% else %}
+              <i class="bi bi-file-earmark-image-fill text-primary display-6 me-3"></i>
+            {% endif %}
+            <div class="flex-grow-1 min-width-0">
+              <div class="fw-semibold text-truncate small text-color-custom">{{ complaint.attachment_path.split('/')[-1] }}</div>
+              <small class="text-muted">Attached Supporting Document</small>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('static', filename=complaint.attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ url_for('static', filename=complaint.attachment_path) }}" download class="btn btn-sm btn-primary">
+                <i class="bi bi-download"></i>
+              </a>
+            </div>
+          </div>
+        {% else %}
+          <p class="small text-muted-custom italic mb-0">{{ t('no_attachment') }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Update Log Action Form -->
+    <div class="bento-cell">
+      <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-gear-fill me-2"></i>Update Log Parameters</h5>
+      
+      <form action="{{ url_for('complaint.update', complaint_id=complaint.id) }}" method="POST">
+        
+        <div class="row">
+          <!-- Update Category -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label-custom">Category Classification</label>
+            <select name="category_id" class="form-select form-control-custom">
+              {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if complaint.category_id == cat.id %}selected{% endif %}>
+                  {% if current_lang == 'ta' %}{{ cat.name_ta }}{% else %}{{ cat.name_en }}{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Update Priority -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label-custom">Escalate Priority</label>
+            <select name="priority" class="form-select form-control-custom">
+              <option value="low" {% if complaint.priority == 'low' %}selected{% endif %}>{{ t('priority_low') }}</option>
+              <option value="medium" {% if complaint.priority == 'medium' %}selected{% endif %}>{{ t('priority_medium') }}</option>
+              <option value="high" {% if complaint.priority == 'high' %}selected{% endif %}>{{ t('priority_high') }}</option>
+              <option value="critical" {% if complaint.priority == 'critical' %}selected{% endif %}>{{ t('priority_critical') }}</option>
+            </select>
+          </div>
+
+          <!-- Update Status -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label-custom">Status Badge</label>
+            <select name="status" class="form-select form-control-custom">
+              <option value="pending" {% if complaint.status == 'pending' %}selected{% endif %}>{{ t('status_pending') }}</option>
+              <option value="in_progress" {% if complaint.status == 'in_progress' %}selected{% endif %}>{{ t('status_in_progress') }}</option>
+              <option value="under_review" {% if complaint.status == 'under_review' %}selected{% endif %}>{{ t('status_under_review') }}</option>
+              <option value="resolved" {% if complaint.status == 'resolved' %}selected{% endif %}>{{ t('status_resolved') }}</option>
+              <option value="closed" {% if complaint.status == 'closed' %}selected{% endif %}>{{ t('status_closed') }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Note Textarea -->
+        <div class="mb-4">
+          <label class="form-label-custom">Triage Action Note / Resolution detail</label>
+          <textarea name="update_note" class="form-control form-control-custom" rows="3" placeholder="Explain the operation step or resolving actions taken... (Logs timeline and sends email alert to user)"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary px-5 py-2 fw-semibold rounded-3">
+          Save Ticket Updates
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Column: Timeline -->
+  <div class="col-lg-5">
+    <div class="bento-cell h-100 mb-0">
+      <h5 class="fw-bold mb-4"><i class="bi bi-clock-history text-primary me-2"></i>{{ t('timeline_title') }}</h5>
+      
+      <div class="timeline-list">
+        {% for log in timeline %}
+          <div class="timeline-step {% if log.status == complaint.status %}active{% else %}completed{% endif %}">
+            <div class="timeline-bullet"></div>
+            <div class="small text-muted font-monospace mb-1" style="font-size: 0.75rem;">{{ log.created_at }}</div>
+            <h6 class="fw-bold text-color-custom mb-1">
+              {% if current_lang == 'ta' %}{{ log.title_ta }}{% else %}{{ log.title_en }}{% endif %}
+            </h6>
+            <p class="small text-muted-custom mb-0">
+              {% if current_lang == 'ta' %}{{ log.description_ta }}{% else %}{{ log.description_en }}{% endif %}
+            </p>
+            <small class="text-muted mt-1 d-block" style="font-size: 0.7rem;">Agent: {{ log.updated_by_name }}</small>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center py-5">
+  <div class="bento-cell text-center" style="max-width: 500px;">
+    <!-- Large Error Graphic/Icon -->
+    <div class="empty-state-icon text-danger mb-4">
+      <i class="bi bi-exclamation-octagon-fill"></i>
+    </div>
+    
+    <h2 class="fw-bold mb-2">
+      {% if error_code == 404 %}
+        Page Not Found
+      {% elif error_code == 500 %}
+        Internal Server Error
+      {% else %}
+        System Error
+      {% endif %}
+    </h2>
+    
+    <p class="text-muted-custom mb-4 px-3">
+      {% if error_code == 404 %}
+        The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+      {% elif error_code == 500 %}
+        Something went wrong on our servers while processing this page. Please try again later.
+      {% else %}
+        {{ error_message or "An unexpected issue was encountered. Contact system administrators if it persists." }}
+      {% endif %}
+    </p>
+    
+    <a href="{{ url_for('login_redirect') }}" class="btn btn-primary px-4 py-2 fw-semibold">
+      <i class="bi bi-house-door me-2"></i>Return to Dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}
+{% block guest_content %}
+<div class="d-flex flex-column align-items-center justify-content-center min-vh-100" style="background-color: #0b0f19;">
+  <div class="bento-cell text-center text-white border-secondary bg-dark bg-opacity-70" style="max-width: 500px; padding: 40px; border-radius: 20px;">
+    <div class="text-danger display-1 mb-4">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    
+    <h2 class="fw-bold mb-3">System Access Error</h2>
+    <p class="text-white-50 mb-4">
+      {{ error_message or "Authentication credentials or roles are unauthorized to review this section." }}
+    </p>
+    
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary px-5 py-3 fw-bold">
+      <i class="bi bi-lock-fill me-2"></i>Go to Sign In
+    </a>
+  </div>
+</div>
+{% endblock %}

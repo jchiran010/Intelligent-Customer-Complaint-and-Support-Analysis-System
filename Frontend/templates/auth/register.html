@@ -1,0 +1,90 @@
+{% extends "common/base.html" %}
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+{% block guest_content %}
+<div class="auth-split-container">
+  
+  <!-- Left Side Graph/Info -->
+  <div class="auth-graphic-side">
+    <div style="z-index: 2; max-width: 460px;">
+      <div class="mb-4" style="width: 100px; height: 100px;">
+        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="System Logo" width="100%" height="100%">
+      </div>
+      <h2 class="fw-bold mb-3">SECURE USER REGISTRATION</h2>
+      <p class="text-white-50 fs-5 mb-5">Create your secure user portal account to submit complaints, download PDF reports, track tracking timelines, and utilize the support bot.</p>
+      
+      <ul class="list-unstyled text-white-50 small mt-4">
+        <li class="mb-3"><i class="bi bi-patch-check-fill text-success me-2"></i>Automated category routing via NLP</li>
+        <li class="mb-3"><i class="bi bi-patch-check-fill text-success me-2"></i>Real-time in-app and email status tracking alerts</li>
+        <li><i class="bi bi-patch-check-fill text-success me-2"></i>Star feedback rating configurations</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Right Side Registration Form -->
+  <div class="auth-form-side">
+    <div class="auth-form-card" style="margin-top: 30px; margin-bottom: 30px;">
+      <div class="text-center mb-4">
+        <!-- Logo displayed on all screen sizes -->
+        <div class="mb-3" style="width: 60px; height: 60px; margin: 0 auto;">
+          <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="100%" height="100%">
+        </div>
+        <h3 class="fw-bold text-color-custom">{{ t('register_btn') }}</h3>
+        <p class="text-muted-custom small">Sign up with your credentials</p>
+      </div>
+
+      <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate id="register-form">
+        
+        <!-- Name -->
+        <div class="mb-3">
+          <label class="form-label-custom">{{ t('name_label') }}</label>
+          <input type="text" name="name" class="form-control form-control-custom" placeholder="John Doe" required>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label-custom">{{ t('email_label') }}</label>
+          <input type="email" name="email" class="form-control form-control-custom" placeholder="john@company.com" required>
+        </div>
+
+        <!-- Mobile -->
+        <div class="mb-3">
+          <label class="form-label-custom">{{ t('mobile_label') }}</label>
+          <input type="tel" name="mobile" class="form-control form-control-custom" placeholder="9876543210" pattern="[0-9]{10}" required>
+          <div class="form-text small text-muted">Enter a valid 10-digit mobile number.</div>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label class="form-label-custom">{{ t('password_label') }}</label>
+          <input type="password" id="reg-password" name="password" class="form-control form-control-custom" placeholder="Choose a secure password" required>
+          <!-- Password strength indicators -->
+          <div class="password-strength-meter">
+            <div id="password-strength-fill" class="password-strength-fill"></div>
+          </div>
+          <span id="password-strength-text" class="small text-muted mt-1 d-block font-monospace" style="font-size: 0.75rem;">Strength: Empty</span>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-4">
+          <label class="form-label-custom">{{ t('confirm_password_label') }}</label>
+          <input type="password" id="reg-confirm-password" name="confirm_password" class="form-control form-control-custom" placeholder="Repeat your password" required>
+          <div id="password-mismatch-feedback" class="text-danger small mt-1 d-none font-monospace">Passwords do not match.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm mb-3" id="submit-reg-btn">
+          {{ t('register_btn') }}
+        </button>
+
+        <div class="text-center">
+          <a href="{{ url_for('auth.login') }}" class="text-muted-custom small text-decoration-none">{{ t('login_link') }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

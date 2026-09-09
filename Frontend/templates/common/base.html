@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" data-theme="{{ current_theme }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Support Analysis System</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/logo.svg') }}">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Custom Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Split Core Stylesheets -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  
+  <!-- Theme script executed immediately to prevent content flash -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  
+  {% block styles %}{% endblock %}
+</head>
+<body>
+
+  {% if session.get('user_id') %}
+    <!-- Authenticated Layout Shell -->
+    <div id="app-container">
+      
+      <!-- Collapsible Sidebar -->
+      <nav id="sidebar">
+        <div class="logo-section">
+          <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="36" height="36">
+          <span class="fw-bold fs-5 text-white">SupportSaaS</span>
+        </div>
+        
+        <ul class="nav-menu">
+          {% if session.get('role') == 'admin' %}
+            <!-- Admin Blueprints links -->
+            <li class="nav-item {% if request.path == url_for('admin.dashboard') %}active{% endif %}">
+              <a href="{{ url_for('admin.dashboard') }}" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>{{ t('dashboard') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('complaint.list_all') %}active{% endif %}">
+              <a href="{{ url_for('complaint.list_all') }}" class="nav-link">
+                <i class="bi bi-ticket-detailed"></i>
+                <span>{{ t('complaints') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('admin.users') %}active{% endif %}">
+              <a href="{{ url_for('admin.users') }}" class="nav-link">
+                <i class="bi bi-people"></i>
+                <span>{{ t('users') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('admin.categories') %}active{% endif %}">
+              <a href="{{ url_for('admin.categories') }}" class="nav-link">
+                <i class="bi bi-tags"></i>
+                <span>{{ t('categories') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('admin.analytics') %}active{% endif %}">
+              <a href="{{ url_for('admin.analytics') }}" class="nav-link">
+                <i class="bi bi-graph-up-arrow"></i>
+                <span>{{ t('analytics') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('admin.reports') %}active{% endif %}">
+              <a href="{{ url_for('admin.reports') }}" class="nav-link">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>{{ t('reports') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('admin.settings') %}active{% endif %}">
+              <a href="{{ url_for('admin.settings') }}" class="nav-link">
+                <i class="bi bi-sliders"></i>
+                <span>{{ t('system_settings') }}</span>
+              </a>
+            </li>
+          {% else %}
+            <!-- User Blueprints links -->
+            <li class="nav-item {% if request.path == url_for('user.dashboard') %}active{% endif %}">
+              <a href="{{ url_for('user.dashboard') }}" class="nav-link">
+                <i class="bi bi-grid-1x2"></i>
+                <span>{{ t('dashboard') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('complaint.submit') %}active{% endif %}">
+              <a href="{{ url_for('complaint.submit') }}" class="nav-link">
+                <i class="bi bi-plus-square"></i>
+                <span>{{ t('submit_complaint') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('complaint.my_complaints') %}active{% endif %}">
+              <a href="{{ url_for('complaint.my_complaints') }}" class="nav-link">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>{{ t('my_complaints') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('notification.index') %}active{% endif %}">
+              <a href="{{ url_for('notification.index') }}" class="nav-link">
+                <i class="bi bi-bell"></i>
+                <span>{{ t('notifications') }}</span>
+              </a>
+            </li>
+            <li class="nav-item {% if request.path == url_for('user.chatbot') %}active{% endif %}">
+              <a href="{{ url_for('user.chatbot') }}" class="nav-link">
+                <i class="bi bi-robot"></i>
+                <span>{{ t('ai_support') }}</span>
+              </a>
+            </li>
+          {% endif %}
+          
+          <li class="nav-item {% if request.path == url_for('user.profile') %}active{% endif %}">
+            <a href="{{ url_for('user.profile') }}" class="nav-link">
+              <i class="bi bi-person-gear"></i>
+              <span>{{ t('profile') }}</span>
+            </a>
+          </li>
+          <li class="nav-item {% if request.path == url_for('user.settings') %}active{% endif %}">
+            <a href="{{ url_for('user.settings') }}" class="nav-link">
+              <i class="bi bi-sliders2"></i>
+              <span>{{ t('settings') }}</span>
+            </a>
+          </li>
+          <li class="nav-item mt-auto mb-4">
+            <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>{{ t('logout') }}</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Shell Content -->
+      <div id="main-wrapper">
+        
+        <!-- Navbar Header -->
+        <header id="top-header">
+          <div class="d-flex align-items-center gap-3">
+            <button id="sidebar-toggle" class="btn btn-outline-secondary border-0 btn-sm">
+              <i class="bi bi-justify fs-5"></i>
+            </button>
+            <span class="h5 mb-0 fw-semibold text-color-custom">{{ t('admin_panel') if session.role == 'admin' else t('user_portal') }}</span>
+          </div>
+
+          <!-- Utility items -->
+          <div class="d-flex align-items-center gap-3">
+            <!-- Language Switcher Toggle -->
+            <button id="lang-toggle" class="btn btn-outline-secondary border-0 btn-sm font-monospace" data-lang="{{ current_lang }}">
+              {% if current_lang == 'en' %}தமிழ்{% else %}EN{% endif %}
+            </button>
+
+            <!-- Theme Switcher Toggle -->
+            <button id="theme-toggle" class="btn btn-outline-secondary border-0 btn-sm">
+              <i class="bi {% if current_theme == 'dark' %}bi-sun-fill text-warning{% else %}bi-moon-fill text-primary{% endif %}"></i>
+            </button>
+
+            <!-- Notification Badge Dropdown -->
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary border-0 btn-sm position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell"></i>
+                <span id="notification-badge" class="d-none">0</span>
+              </button>
+              <ul id="notification-dropdown-list" class="dropdown-menu dropdown-menu-end shadow border-0 py-0" style="width: 280px; font-size: 0.9rem;">
+                <li><a class="dropdown-item text-center text-muted py-2" href="/notification/">Loading...</a></li>
+              </ul>
+            </div>
+
+            <div class="vr mx-1"></div>
+            
+            <span class="d-none d-md-inline-block fw-medium text-muted-custom">{{ current_user }}</span>
+            <span class="badge {% if session.role == 'admin' %}bg-primary{% else %}bg-secondary{% endif %} capitalize">{{ session.role }}</span>
+          </div>
+        </header>
+
+        <!-- Dynamic Body Page Content -->
+        <main class="container-fluid p-4">
+          <!-- Flush Alerts -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          {% block content %}{% endblock %}
+        </main>
+        
+      </div>
+    </div>
+  {% else %}
+    <!-- Guest Layout (Splash, Login, Register, Forgot Password) -->
+    <div class="container-fluid p-0">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050;">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block guest_content %}{% endblock %}
+    </div>
+  {% endif %}
+
+  <!-- Toast notification container -->
+  <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
+
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Split Core Scripts -->
+  <script src="{{ url_for('static', filename='js/language.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+  
+  {% block scripts %}{% endblock %}
+</body>
+</html>

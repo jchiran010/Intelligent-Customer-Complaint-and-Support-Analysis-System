@@ -1,0 +1,72 @@
+/* variables.css: Semantic theme tokens and palette variables */
+
+:root {
+  /* Branding color variables */
+  --primary-color: #2563eb;       /* Electric Blue */
+  --primary-hover: #1d4ed8;       /* Darker Electric Blue */
+  --primary-rgb: 37, 99, 235;
+  --secondary-color: #475569;     /* Slate */
+  
+  /* Status Accent Colors */
+  --success-color: #10b981;       /* Emerald Green */
+  --success-rgb: 16, 185, 129;
+  
+  --warning-color: #f59e0b;       /* Amber */
+  --warning-rgb: 245, 158, 11;
+  
+  --danger-color: #ef4444;        /* Crimson Red */
+  --danger-rgb: 239, 68, 68;
+  
+  --info-color: #06b6d4;          /* Cyan */
+  --info-rgb: 6, 182, 212;
+
+  --transition-speed: 0.3s;
+  --transition-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+  --border-radius-sm: 6px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 20px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 78px;
+
+  /* LIGHT MODE DEFAULT */
+  --bg-color: #f8fafc;            /* Soft off-white */
+  --surface-bg: #ffffff;          /* Clean white card surface */
+  --surface-hover: #f1f5f9;
+  --text-primary: #0f172a;        /* Deep Navy text */
+  --text-secondary: #475569;      /* Slate text */
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;        /* Soft borders */
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --sidebar-bg: #0f172a;          /* Dark Navy Sidebar */
+  --sidebar-text: #94a3b8;
+  --sidebar-hover-bg: #1e293b;
+  --header-bg: #ffffff;
+  --scroll-thumb: #cbd5e1;
+  --bento-glow: rgba(37, 99, 235, 0.05);
+}
+
+/* DARK MODE OVERRIDES */
+[data-theme="dark"] {
+  --bg-color: #0b0f19;            /* Midnight Blue background */
+  --surface-bg: #0f172a;          /* Deep Navy card surface */
+  --surface-hover: #1e293b;
+  --text-primary: #f8fafc;        /* High contrast light text */
+  --text-secondary: #cbd5e1;      /* Slightly lighter muted text */
+  --text-muted: #64748b;
+  --border-color: #1e293b;        /* Dark Navy borders */
+  --input-bg: #0f172a;
+  --input-border: #334155;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  --sidebar-bg: #070a13;          /* Darker Midnight Navy Sidebar */
+  --sidebar-text: #64748b;
+  --sidebar-hover-bg: #0f172a;
+  --header-bg: #0f172a;
+  --scroll-thumb: #334155;
+  --bento-glow: rgba(37, 99, 235, 0.15);
+}

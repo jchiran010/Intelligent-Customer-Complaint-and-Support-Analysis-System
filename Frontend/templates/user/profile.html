@@ -1,0 +1,115 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <h3 class="fw-bold">{{ t('profile') }}</h3>
+    <p class="text-secondary-color">Edit your account info, adjust language parameters, or update display themes.</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="bento-cell">
+      <form action="{{ url_for('user.profile') }}" method="POST" class="needs-validation" novalidate id="profile-form">
+        
+        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-person-circle me-2"></i>Account Details</h5>
+        
+        <!-- Name -->
+        <div class="mb-3">
+          <label class="form-label-custom">{{ t('name_label') }}</label>
+          <input type="text" name="name" class="form-control form-control-custom" value="{{ user.name }}" required>
+        </div>
+
+        <div class="row g-3">
+          <!-- Email (disabled) -->
+          <div class="col-sm-6 mb-3">
+            <label class="form-label-custom">{{ t('email_label') }}</label>
+            <input type="email" class="form-control form-control-custom bg-transparent border-color-custom text-muted" value="{{ user.email }}" readonly disabled>
+          </div>
+
+          <!-- Mobile -->
+          <div class="col-sm-6 mb-3">
+            <label class="form-label-custom">{{ t('mobile_label') }}</label>
+            <input type="tel" name="mobile" class="form-control form-control-custom" value="{{ user.mobile or '' }}" pattern="[0-9]{10}" required>
+          </div>
+        </div>
+
+        <hr class="my-4 border-color-custom">
+        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-gear-fill me-2"></i>Preferences &amp; Customizations</h5>
+
+        <!-- Theme preference -->
+        <div class="mb-4">
+          <label class="form-label-custom">Display Theme Mode</label>
+          <div class="d-flex gap-3 mt-1">
+            <div class="form-check bento-cell p-3 m-0 flex-grow-1 border border-color-custom bg-opacity-25" style="box-shadow: none;">
+              <input class="form-check-input ms-0 me-2" type="radio" name="theme" id="theme-light-radio" value="light" {% if user.theme == 'light' %}checked{% endif %}>
+              <label class="form-check-label fw-semibold text-color-custom" for="theme-light-radio">
+                <i class="bi bi-sun-fill me-2 text-warning"></i>Light Mode
+              </label>
+            </div>
+            
+            <div class="form-check bento-cell p-3 m-0 flex-grow-1 border border-color-custom bg-opacity-25" style="box-shadow: none;">
+              <input class="form-check-input ms-0 me-2" type="radio" name="theme" id="theme-dark-radio" value="dark" {% if user.theme == 'dark' %}checked{% endif %}>
+              <label class="form-check-label fw-semibold text-color-custom" for="theme-dark-radio">
+                <i class="bi bi-moon-fill me-2 text-primary"></i>Dark Mode
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Language preference -->
+        <div class="mb-4">
+          <label class="form-label-custom">System Interface Language</label>
+          <select name="language" class="form-select form-control-custom">
+            <option value="en" {% if user.language == 'en' %}selected{% endif %}>English (Default)</option>
+            <option value="ta" {% if user.language == 'ta' %}selected{% endif %}>தமிழ் (Tamil)</option>
+          </select>
+        </div>
+
+        <hr class="my-4 border-color-custom">
+        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-key-fill me-2"></i>Change Security Password</h5>
+
+        <div class="row g-3">
+          <div class="col-sm-6 mb-3">
+            <label class="form-label-custom">New Password</label>
+            <input type="password" id="profile-pwd" name="password" class="form-control form-control-custom" placeholder="Blank to keep current">
+          </div>
+
+          <div class="col-sm-6 mb-4">
+            <label class="form-label-custom">Confirm Password</label>
+            <input type="password" id="profile-conf-pwd" name="confirm_password" class="form-control form-control-custom" placeholder="Repeat new password">
+            <div id="profile-pwd-mismatch" class="text-danger small mt-1 d-none font-monospace">Passwords do not match.</div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary px-5 py-2 fw-semibold rounded-3" id="profile-submit-btn">
+          {{ t('save_changes') }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const pwdInput = document.getElementById('profile-pwd');
+    const confInput = document.getElementById('profile-conf-pwd');
+    const mismatchText = document.getElementById('profile-pwd-mismatch');
+    const submitBtn = document.getElementById('profile-submit-btn');
+
+    if (pwdInput && confInput && mismatchText && submitBtn) {
+      function checkPwd() {
+        if (pwdInput.value !== confInput.value && pwdInput.value !== '') {
+          mismatchText.classList.remove('d-none');
+          submitBtn.disabled = true;
+        } else {
+          mismatchText.classList.add('d-none');
+          submitBtn.disabled = false;
+        }
+      }
+      confInput.addEventListener('input', checkPwd);
+      pwdInput.addEventListener('input', checkPwd);
+    }
+  });
+</script>
+{% endblock %}

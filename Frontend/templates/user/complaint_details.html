@@ -1,0 +1,149 @@
+{% extends "common/base.html" %}
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h3 class="fw-bold">{{ t('complaint_info') }}: <span class="font-monospace text-primary">{{ complaint.ticket_id }}</span></h3>
+      <p class="text-secondary-color">Track live status updates and timelines of this ticket.</p>
+    </div>
+    
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('complaint.my_complaints') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to List
+      </a>
+      <a href="{{ url_for('report.user_export_ticket', complaint_id=complaint.id) }}" class="btn btn-outline-primary">
+        <i class="bi bi-file-earmark-pdf-fill me-2"></i>{{ t('export_pdf') }}
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  
+  <!-- Left Column: Details -->
+  <div class="col-lg-7">
+    <div class="bento-cell mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-secondary font-monospace">{{ t('ticket_id') }}: {{ complaint.ticket_id }}</span>
+        
+        <div>
+          <!-- Status -->
+          {% if complaint.status == 'resolved' %}
+            <span class="status-badge resolved"><i class="bi bi-check-circle-fill"></i>{{ t('status_resolved') }}</span>
+          {% elif complaint.status == 'in_progress' %}
+            <span class="status-badge in_progress"><i class="bi bi-hourglass-split"></i>{{ t('status_in_progress') }}</span>
+          {% elif complaint.status == 'under_review' %}
+            <span class="status-badge under_review"><i class="bi bi-eye-fill"></i>{{ t('status_under_review') }}</span>
+          {% elif complaint.status == 'closed' %}
+            <span class="status-badge closed"><i class="bi bi-lock-fill"></i>{{ t('status_closed') }}</span>
+          {% else %}
+            <span class="status-badge pending"><i class="bi bi-clock-fill"></i>{{ t('status_pending') }}</span>
+          {% endif %}
+          
+          <!-- Priority -->
+          {% if complaint.priority == 'critical' %}
+            <span class="priority-indicator critical ms-1">{{ t('priority_critical') }}</span>
+          {% elif complaint.priority == 'high' %}
+            <span class="priority-indicator high ms-1">{{ t('priority_high') }}</span>
+          {% elif complaint.priority == 'medium' %}
+            <span class="priority-indicator medium ms-1">{{ t('priority_medium') }}</span>
+          {% else %}
+            <span class="priority-indicator low ms-1">{{ t('priority_low') }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <h4 class="fw-bold mb-3 text-color-custom">{{ complaint.title }}</h4>
+      <div class="small text-muted-custom mb-4">
+        Category: <b>{% if current_lang == 'ta' %}{{ complaint.cat_ta }}{% else %}{{ complaint.cat_en }}{% endif %}</b> | 
+        Submitted: <b>{{ complaint.created_at }}</b>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label-custom">Description</label>
+        <div class="p-3 bg-light-custom rounded border text-color-custom" style="white-space: pre-wrap; min-height: 120px; background-color: rgba(var(--primary-rgb), 0.01);">{{ complaint.description }}</div>
+      </div>
+
+      <!-- Attachment doc -->
+      <div class="mb-0">
+        <label class="form-label-custom">Attachment</label>
+        {% if complaint.attachment_path %}
+          <div class="d-flex align-items-center p-3 rounded border border-color-custom">
+            {% if complaint.attachment_path.endswith('.pdf') %}
+              <i class="bi bi-file-earmark-pdf-fill text-danger display-6 me-3"></i>
+            {% else %}
+              <i class="bi bi-file-earmark-image-fill text-primary display-6 me-3"></i>
+            {% endif %}
+            <div class="flex-grow-1 min-width-0">
+              <div class="fw-semibold text-truncate small text-color-custom">{{ complaint.attachment_path.split('/')[-1] }}</div>
+              <small class="text-muted">Attached Supporting Document</small>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('static', filename=complaint.attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ url_for('static', filename=complaint.attachment_path) }}" download class="btn btn-sm btn-primary">
+                <i class="bi bi-download"></i>
+              </a>
+            </div>
+          </div>
+        {% else %}
+          <p class="small text-muted-custom italic mb-0">{{ t('no_attachment') }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Feedback Redirect Trigger -->
+    {% if complaint.status == 'resolved' and not complaint.feedback_rating %}
+      <div class="bento-cell border border-success border-opacity-50">
+        <h5 class="fw-bold text-success mb-3"><i class="bi bi-patch-check-fill me-2"></i>Ticket Resolution Provided</h5>
+        <p class="small text-muted-custom">This ticket is currently solved. Please complete a customer experience review to close it.</p>
+        <a href="{{ url_for('user.feedback_form', complaint_id=complaint.id) }}" class="btn btn-success px-4 py-2 mt-2 fw-semibold">
+          <i class="bi bi-chat-left-heart-fill me-2"></i>Provide Feedback &amp; Close Ticket
+        </a>
+      </div>
+    {% elif complaint.feedback_rating %}
+      <!-- Rating view -->
+      <div class="bento-cell border-color-custom">
+        <h5 class="fw-bold text-color-custom mb-3"><i class="bi bi-chat-heart-fill text-danger me-2"></i>Your Feedback Review</h5>
+        <div class="mb-2">
+          Rating: 
+          <span class="text-warning">
+            {% for i in range(1, 6) %}
+              <i class="bi {% if i <= complaint.feedback_rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+            {% endfor %}
+          </span>
+          <span class="small font-monospace">({{ complaint.feedback_rating }}/5)</span>
+        </div>
+        <p class="small text-muted-custom mb-0"><b>Comments:</b> {{ complaint.feedback_comments or "No comments submitted." }}</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Right Column: Timeline -->
+  <div class="col-lg-5">
+    <div class="bento-cell h-100 mb-0">
+      <h5 class="fw-bold mb-4"><i class="bi bi-clock-history text-primary me-2"></i>{{ t('timeline_title') }}</h5>
+      
+      <div class="timeline-list">
+        {% for log in timeline %}
+          <div class="timeline-step {% if log.status == complaint.status %}active{% else %}completed{% endif %}">
+            <div class="timeline-bullet"></div>
+            <div class="small text-muted font-monospace mb-1" style="font-size: 0.75rem;">{{ log.created_at }}</div>
+            <h6 class="fw-bold text-color-custom mb-1">
+              {% if current_lang == 'ta' %}{{ log.title_ta }}{% else %}{{ log.title_en }}{% endif %}
+            </h6>
+            <p class="small text-muted-custom mb-0">
+              {% if current_lang == 'ta' %}{{ log.description_ta }}{% else %}{{ log.description_en }}{% endif %}
+            </p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

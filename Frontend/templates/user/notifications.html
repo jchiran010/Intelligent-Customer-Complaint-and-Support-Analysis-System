@@ -1,0 +1,53 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <h3 class="fw-bold">{{ t('notifications') }}</h3>
+    <p class="text-secondary-color">Review system notifications and updates sent to your account.</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="bento-cell">
+      <div class="list-group list-group-flush">
+        {% for n in notifications %}
+          <div class="list-group-item bg-transparent text-color-custom py-3 border-color-custom d-flex justify-content-between align-items-start gap-3">
+            <div class="d-flex align-items-start gap-3">
+              <div class="p-2 rounded bg-opacity-10 
+                {% if n.type == 'status_change' %}bg-info text-info
+                {% elif n.type == 'ticket_created' %}bg-success text-success
+                {% else %}bg-primary text-primary{% endif %}">
+                {% if n.type == 'status_change' %}
+                  <i class="bi bi-arrow-repeat fs-5"></i>
+                {% elif n.type == 'ticket_created' %}
+                  <i class="bi bi-ticket-perforated fs-5"></i>
+                {% else %}
+                  <i class="bi bi-bell fs-5"></i>
+                {% endif %}
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">
+                  {% if current_lang == 'ta' %}{{ n.title_ta }}{% else %}{{ n.title_en }}{% endif %}
+                </h6>
+                <p class="small text-muted-custom mb-0">
+                  {% if current_lang == 'ta' %}{{ n.message_ta }}{% else %}{{ n.message_en }}{% endif %}
+                </p>
+              </div>
+            </div>
+            <span class="small text-muted font-monospace" style="font-size: 0.75rem; white-space: nowrap;">
+              {{ n.created_at[:16] }}
+            </span>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon"><i class="bi bi-bell-slash"></i></div>
+            <h5>No Alerts Yet</h5>
+            <p class="text-muted-custom small">You don't have any unread system alerts.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

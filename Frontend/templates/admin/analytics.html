@@ -1,0 +1,85 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <h3 class="fw-bold">{{ t('analytics') }}</h3>
+    <p class="text-secondary-color">In-depth telemetries showing customer satisfaction, category resolution rates, and processing hour metrics.</p>
+  </div>
+</div>
+
+<div class="row">
+  
+  <!-- Left Side: Table stats -->
+  <div class="col-lg-7">
+    <div class="bento-cell">
+      <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-graph-up me-2"></i>Tag Performance Telemetry</h5>
+      
+      <div class="table-responsive">
+        <table class="table table-custom align-middle">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th class="text-center">Total Tickets</th>
+              <th class="text-center">Resolved</th>
+              <th class="text-center">Avg. Resolution Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in cat_stats %}
+              <tr>
+                <td class="fw-bold text-color-custom">
+                  {% if current_lang == 'ta' %}{{ cat.name_ta }}{% else %}{{ cat.name_en }}{% endif %}
+                </td>
+                <td class="text-center font-monospace">{{ cat.total }}</td>
+                <td class="text-center font-monospace text-success fw-bold">{{ cat.resolved }}</td>
+                <td class="text-center font-monospace">
+                  {% if cat.avg_hours %}
+                    <span class="text-info fw-bold">{{ cat.avg_hours | round(1) }} hours</span>
+                  {% else %}
+                    <span class="text-muted italic">N/A</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Star ratings distribution chart -->
+  <div class="col-lg-5">
+    <div class="bento-cell">
+      <h5 class="fw-bold mb-4 text-warning"><i class="bi bi-star-fill me-2"></i>CSAT Rating Distribution</h5>
+      <div style="height: 300px;">
+        <canvas id="csatDistributionChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const isDark = theme === 'dark';
+
+    const ctx = document.getElementById('csatDistributionChart').getContext('2d');
+    const ratingsLabels = ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'];
+    const ratingsCounts = [0, 0, 0, 0, 0];
+    
+    {% for r in csat_distribution %}
+      if ({{ r.rating }} >= 1 && {{ r.rating }} <= 5) {
+        ratingsCounts[{{ r.rating }} - 1] = {{ r.count }};
+      }
+    {% endfor %}
+
+    if (window.createCsatChart) {
+      window.createCsatChart(ctx, ratingsLabels, ratingsCounts, isDark);
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h3 class="fw-bold">{{ t('my_complaints') }}</h3>
+      <p class="text-secondary-color">Search and filter your registered support tickets.</p>
+    </div>
+    <a href="{{ url_for('complaint.submit') }}" class="btn btn-primary px-4 py-2 fw-semibold">
+      <i class="bi bi-plus-square me-2"></i>{{ t('submit_complaint') }}
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="bento-cell">
+      
+      <!-- Table Filters -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div class="input-group" style="max-width: 380px;">
+          <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-search"></i></span>
+          <input type="text" id="ticket-search-input" class="form-control form-control-custom border-start-0" placeholder="Search by Ticket ID or subject...">
+        </div>
+        
+        <div class="d-flex gap-2">
+          <select id="status-filter-select" class="form-select form-control-custom py-1" style="width: auto;">
+            <option value="">All Statuses</option>
+            <option value="pending">{{ t('status_pending') }}</option>
+            <option value="in_progress">{{ t('status_in_progress') }}</option>
+            <option value="under_review">{{ t('status_under_review') }}</option>
+            <option value="resolved">{{ t('status_resolved') }}</option>
+            <option value="closed">{{ t('status_closed') }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Complaints Data Grid Table -->
+      <div class="table-responsive">
+        <table class="table table-custom align-middle" id="complaints-table">
+          <thead>
+            <tr>
+              <th>{{ t('ticket_id') }}</th>
+              <th>{{ t('category_label') }}</th>
+              <th>{{ t('subject_label') }}</th>
+              <th>{{ t('priority_label') }}</th>
+              <th>{{ t('status') }}</th>
+              <th>{{ t('date_submitted') }}</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in complaints %}
+              <tr class="complaint-row" data-ticket="{{ c.ticket_id }}" data-title="{{ c.title | lower }}" data-status="{{ c.status }}">
+                <td class="font-monospace fw-bold text-primary">{{ c.ticket_id }}</td>
+                <td>{% if current_lang == 'ta' %}{{ c.cat_ta }}{% else %}{{ c.cat_en }}{% endif %}</td>
+                <td class="fw-semibold text-truncate text-color-custom" style="max-width: 250px;">{{ c.title }}</td>
+                <td>
+                  {% if c.priority == 'critical' %}
+                    <span class="priority-indicator critical">{{ t('priority_critical') }}</span>
+                  {% elif c.priority == 'high' %}
+                    <span class="priority-indicator high">{{ t('priority_high') }}</span>
+                  {% elif c.priority == 'medium' %}
+                    <span class="priority-indicator medium">{{ t('priority_medium') }}</span>
+                  {% else %}
+                    <span class="priority-indicator low">{{ t('priority_low') }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if c.status == 'resolved' %}
+                    <span class="status-badge resolved"><i class="bi bi-check-circle-fill"></i>{{ t('status_resolved') }}</span>
+                  {% elif c.status == 'in_progress' %}
+                    <span class="status-badge in_progress"><i class="bi bi-hourglass-split"></i>{{ t('status_in_progress') }}</span>
+                  {% elif c.status == 'under_review' %}
+                    <span class="status-badge under_review"><i class="bi bi-eye-fill"></i>{{ t('status_under_review') }}</span>
+                  {% elif c.status == 'closed' %}
+                    <span class="status-badge closed"><i class="bi bi-lock-fill"></i>{{ t('status_closed') }}</span>
+                  {% else %}
+                    <span class="status-badge pending"><i class="bi bi-clock-fill"></i>{{ t('status_pending') }}</span>
+                  {% endif %}
+                </td>
+                <td class="small text-muted-custom">{{ c.created_at }}</td>
+                <td class="text-end">
+                  <a href="{{ url_for('complaint.details', complaint_id=c.id) }}" class="btn btn-outline-primary btn-sm rounded-3">
+                    {{ t('view_details') }} <i class="bi bi-arrow-right-short"></i>
+                  </a>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-folder-x"></i></div>
+                    <h5>No Tickets Registered</h5>
+                    <p class="text-muted-custom small mb-4">You have not submitted any complaints yet.</p>
+                    <a href="{{ url_for('complaint.submit') }}" class="btn btn-primary">{{ t('submit_complaint') }}</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simple table filters mapping
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('ticket-search-input');
+    const statusSelect = document.getElementById('status-filter-select');
+    const rows = document.querySelectorAll('.complaint-row');
+
+    function executeFilter() {
+      const searchVal = searchInput.value.toLowerCase().trim();
+      const statusVal = statusSelect.value;
+
+      rows.forEach(row => {
+        const ticket = row.getAttribute('data-ticket').toLowerCase();
+        const title = row.getAttribute('data-title');
+        const status = row.getAttribute('data-status');
+
+        const matchesSearch = ticket.includes(searchVal) || title.includes(searchVal);
+        const matchesStatus = statusVal === "" || status === statusVal;
+
+        if (matchesSearch && matchesStatus) {
+          row.classList.remove('d-none');
+        } else {
+          row.classList.add('d-none');
+        }
+      });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', executeFilter);
+    if (statusSelect) statusSelect.addEventListener('change', executeFilter);
+  });
+</script>
+{% endblock %}

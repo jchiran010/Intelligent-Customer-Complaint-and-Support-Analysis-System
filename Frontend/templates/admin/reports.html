@@ -1,0 +1,114 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <h3 class="fw-bold">{{ t('reports') }}</h3>
+    <p class="text-secondary-color">Filter and export operational platform summaries to structured CSV sheets or styled ReportLab PDFs.</p>
+  </div>
+</div>
+
+<div class="row">
+  
+  <!-- Export Filter Area -->
+  <div class="col-lg-6">
+    <div class="bento-cell">
+      <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-file-earmark-arrow-down-fill me-2"></i>Export Configurations</h5>
+      
+      <form id="reports-export-form" method="GET" action="{{ url_for('report.admin_export') }}">
+        
+        <!-- Category Filter -->
+        <div class="mb-3">
+          <label class="form-label-custom">Category Tag Scope</label>
+          <select name="category" class="form-select form-control-custom">
+            <option value="">{{ t('filter_category') }}</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}">
+                {% if current_lang == 'ta' %}{{ cat.name_ta }}{% else %}{{ cat.name_en }}{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Priority Filter -->
+        <div class="mb-3">
+          <label class="form-label-custom">Priority Level Scope</label>
+          <select name="priority" class="form-select form-control-custom">
+            <option value="">{{ t('filter_priority') }}</option>
+            <option value="low">{{ t('priority_low') }}</option>
+            <option value="medium">{{ t('priority_medium') }}</option>
+            <option value="high">{{ t('priority_high') }}</option>
+            <option value="critical">{{ t('priority_critical') }}</option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="mb-4">
+          <label class="form-label-custom">Status Scope</label>
+          <select name="status" class="form-select form-control-custom">
+            <option value="">{{ t('filter_status') }}</option>
+            <option value="pending">{{ t('status_pending') }}</option>
+            <option value="in_progress">{{ t('status_in_progress') }}</option>
+            <option value="under_review">{{ t('status_under_review') }}</option>
+            <option value="resolved">{{ t('status_resolved') }}</option>
+            <option value="closed">{{ t('status_closed') }}</option>
+          </select>
+        </div>
+
+        <!-- Hidden format inputs -->
+        <input type="hidden" name="format" id="export-format-type" value="csv">
+
+        <!-- Buttons -->
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <button type="button" class="btn btn-outline-primary w-100 py-3 fw-bold" onclick="executeExport('csv')">
+              <i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>{{ t('export_csv') }}
+            </button>
+          </div>
+          <div class="col-sm-6">
+            <button type="button" class="btn btn-primary w-100 py-3 fw-bold" onclick="executeExport('pdf')">
+              <i class="bi bi-file-earmark-pdf-fill me-2"></i>{{ t('export_pdf') }}
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Description side -->
+  <div class="col-lg-6 mt-4 mt-lg-0">
+    <div class="bento-cell h-100 mb-0 bg-opacity-25" style="background-color: var(--surface-bg);">
+      <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-info-circle me-2"></i>Report Details</h5>
+      <p class="small text-muted-custom">Generated documents compile real-time summaries computed from active database values:</p>
+      
+      <ul class="small text-muted-custom mt-3">
+        <li class="mb-2"><b>CSV Export</b>: Excel-compatible list format ideal for structural migrations, external data auditing, and administrative sheets compilation.</li>
+        <li class="mb-2"><b>PDF Export</b>: Professionally formatted print summary including:
+          <ul>
+            <li class="mt-1">Document header branding</li>
+            <li class="mt-1">Primary performance index metrics (Total, Resolved, CSAT percentages, average timeframes)</li>
+            <li class="mt-1">Comprehensive listings matching chosen filters</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function executeExport(type) {
+    const form = document.getElementById('reports-export-form');
+    const inputFormat = document.getElementById('export-format-type');
+    
+    if (form && inputFormat) {
+      inputFormat.value = type;
+      form.submit();
+      
+      if (window.showToast) {
+        window.showToast(`Downloading platform ${type.toUpperCase()} report...`);
+      }
+    }
+  }
+</script>
+{% endblock %}

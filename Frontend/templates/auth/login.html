@@ -1,0 +1,109 @@
+{% extends "common/base.html" %}
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+{% block guest_content %}
+<div class="auth-split-container">
+  
+  <!-- Left Column: Branding & Floating Cards -->
+  <div class="auth-graphic-side">
+    <!-- Animated background particles -->
+    <div style="z-index: 2; max-width: 460px;">
+      <div class="mb-4" style="width: 100px; height: 100px;">
+        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="System Logo" width="100%" height="100%">
+      </div>
+      <h2 class="fw-bold mb-3">INTELLIGENT SUPPORT</h2>
+      <h4 class="text-primary fw-semibold mb-4">&amp; ANALYTICS PLATFORM</h4>
+      <p class="text-white-50 fs-5 mb-5">Analyze complaints using automated NLP classification, view visual tracking timelines, configure persistent bilingual dashboards, and export ReportLab PDF documents.</p>
+    </div>
+
+    <!-- Floating Dashboard Widgets -->
+    <div class="floating-element floating-card-1 d-none d-md-flex align-items-center gap-3">
+      <div class="bg-success bg-opacity-20 text-success rounded-circle p-2">
+        <i class="bi bi-cpu-fill fs-5"></i>
+      </div>
+      <div>
+        <div class="small fw-bold">Real-time NLP Router</div>
+        <div class="text-white-50" style="font-size: 0.75rem;">Category suggested instantly</div>
+      </div>
+    </div>
+
+    <div class="floating-element floating-card-2 d-none d-md-flex align-items-center gap-3">
+      <div class="bg-primary bg-opacity-20 text-primary rounded-circle p-2">
+        <i class="bi bi-shield-check fs-5"></i>
+      </div>
+      <div>
+        <div class="small fw-bold">Secure Access Shields</div>
+        <div class="text-white-50" style="font-size: 0.75rem;">Role-based controls verified</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Login Card -->
+  <div class="auth-form-side">
+    <div class="auth-form-card">
+      <div class="text-center mb-4">
+        <!-- Logo displayed on all screen sizes -->
+        <div class="mb-3" style="width: 60px; height: 60px; margin: 0 auto;">
+          <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="100%" height="100%">
+        </div>
+        <h3 class="fw-bold text-color-custom">{{ t('login_title') }}</h3>
+        <p class="text-muted-custom small">Sign in with email or Google account</p>
+      </div>
+
+      <form action="{{ url_for('auth.login') }}" method="POST" class="needs-validation" novalidate>
+        
+        <!-- Email Input -->
+        <div class="mb-3">
+          <label class="form-label-custom">{{ t('email_label') }}</label>
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+            <input type="email" name="email" class="form-control form-control-custom border-start-0" placeholder="name@company.com" required>
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="form-label-custom mb-0">{{ t('password_label') }}</label>
+            <a href="{{ url_for('auth.forgot_password') }}" class="text-primary small text-decoration-none">{{ t('forgot_password') }}</a>
+          </div>
+          <div class="input-group password-field-wrapper">
+            <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+            <input type="password" id="password-input" name="password" class="form-control form-control-custom border-start-0 border-end-0" placeholder="••••••••" required>
+            <button class="password-visibility-btn" type="button" id="password-toggle">
+              <i class="bi bi-eye-slash" id="password-toggle-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me / Toggles -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember-me">
+            <label class="form-check-label small text-muted-custom" for="remember-me">{{ t('remember_me') }}</label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm mb-3">
+          {{ t('login_btn') }}
+        </button>
+
+        <!-- Google OAuth Integration Button -->
+        <a href="{{ url_for('auth.google_login') }}" class="btn btn-google w-100 mb-4 py-2 border">
+          <img src="https://docs.pjreddie.com/media/google_logo.png" alt="Google" width="18" height="18" style="object-fit: contain;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg'">
+          <span>Continue with Google</span>
+        </a>
+
+        <div class="text-center mt-3">
+          <a href="{{ url_for('auth.register') }}" class="text-muted-custom small text-decoration-none">{{ t('register_link') }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

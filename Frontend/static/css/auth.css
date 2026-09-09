@@ -1,0 +1,135 @@
+/* auth.css: Split-screen layouts, digital flows, and visual illustrations */
+
+.auth-split-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+/* Left Graphic Side */
+.auth-graphic-side {
+  flex: 1;
+  background: linear-gradient(135deg, #0f172a 0%, #070a13 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px;
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-graphic-side::after {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%);
+  bottom: -200px;
+  left: -200px;
+  pointer-events: none;
+}
+
+/* Data flows and floating cards */
+.floating-element {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  animation: floatUpDown 6s ease-in-out infinite;
+}
+
+.floating-card-1 {
+  top: 15%;
+  right: 10%;
+  animation-delay: 0s;
+}
+
+.floating-card-2 {
+  bottom: 15%;
+  left: 10%;
+  animation-delay: 3s;
+}
+
+@keyframes floatUpDown {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+/* Form Side */
+.auth-form-side {
+  width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: var(--bg-color);
+  position: relative;
+  z-index: 10;
+  transition: background-color var(--transition-speed);
+}
+
+.auth-form-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Social Buttons */
+.btn-google {
+  background-color: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--border-radius-md);
+  padding: 12px 16px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.btn-google:hover {
+  background-color: var(--surface-hover);
+}
+
+/* Form indicators and password toggles */
+.password-field-wrapper {
+  position: relative;
+}
+
+.password-visibility-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 5;
+}
+
+.password-strength-meter {
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--border-color);
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.password-strength-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.password-strength-fill.weak { background-color: var(--danger-color); }
+.password-strength-fill.medium { background-color: var(--warning-color); }
+.password-strength-fill.strong { background-color: var(--success-color); }
