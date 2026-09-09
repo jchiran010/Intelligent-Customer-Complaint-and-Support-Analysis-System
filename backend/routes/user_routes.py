@@ -108,8 +108,26 @@ def profile():
 @user_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
-    # Redirect to profile since preference selectors are unified inside profile page
-    return redirect(url_for('user.profile'))
+    user_id = session['user_id']
+    lang = session.get('lang', 'en')
+
+    if request.method == 'POST':
+        theme = request.form.get('theme')
+        language = request.form.get('language')
+
+        if theme in ['light', 'dark']:
+            session['theme'] = theme
+            execute_query("UPDATE users SET theme = ? WHERE id = ?", (theme, user_id))
+            
+        if language in ['en', 'ta']:
+            session['lang'] = language
+            execute_query("UPDATE users SET language = ? WHERE id = ?", (language, user_id))
+
+        flash(translate('settings_updated', session.get('lang', 'en')), 'success')
+        return redirect(url_for('user.settings'))
+
+    user = query_db("SELECT theme, language FROM users WHERE id = ?", (user_id,), one=True)
+    return render_template('user/settings.html', user=user)
 
 @user_bp.route('/feedback')
 @login_required
