@@ -16,6 +16,15 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs(os.path.join(os.path.dirname(__file__), '..', 'reports'), exist_ok=True)
 
+    # Auto-initialize SQLite database if not present
+    if Config.DB_TYPE == 'sqlite' and not os.path.exists(Config.SQLITE_DB_ABS_PATH):
+        try:
+            from database.init_db import init_db
+            init_db()
+        except Exception as e:
+            print(f"Warning: Auto-init DB error: {e}")
+
+
 
     # Inject translations and themes globally to Jinja templates
     @app.context_processor

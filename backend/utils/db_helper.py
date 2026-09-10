@@ -25,6 +25,8 @@ def get_db_connection():
             raise ImportError("MySQL database requested but 'pymysql' package is not installed. Please run 'pip install pymysql' or switch config to sqlite.")
     else:
         # SQLite Connection
+        import os
+        os.makedirs(os.path.dirname(Config.SQLITE_DB_ABS_PATH), exist_ok=True)
         conn = sqlite3.connect(Config.SQLITE_DB_ABS_PATH)
         conn.row_factory = dict_factory
         # Enable Foreign Key constraints for SQLite

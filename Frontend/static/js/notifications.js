@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     `;
 
-    container.innerHTML += toastHtml;
+    container.insertAdjacentHTML('beforeend', toastHtml);
     const toastEl = document.getElementById(tId);
 
     if (window.bootstrap) {
