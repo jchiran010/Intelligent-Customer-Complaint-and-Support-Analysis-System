@@ -1,11 +1,11 @@
-# ?? Deployment Guide - Intelligent Customer Complaint & Support Analysis System
+# 🚀 Deployment Guide - Intelligent Customer Complaint & Support Analysis System
 
 This application is production-ready and can be deployed in **less than 2 minutes** to free cloud hosting platforms like **Render**, **Railway**, **Heroku**, or accessed instantly via secure public tunneling.
 
 ---
 
-## ?? 1. Live Public Demo URL (Active Now)
-- **Live Public URL**: [https://2da9ce2422583e.lhr.life](https://2da9ce2422583e.lhr.life)
+## 🌐 1. Live Public Demo URL (Active Now)
+- **Live Public URL**: [https://90ae8ea77ca24f.lhr.life](https://90ae8ea77ca24f.lhr.life)
 - **Local Host URL**: [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
 ### Default Login Accounts:
