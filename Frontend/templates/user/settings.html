@@ -2,16 +2,8 @@
 {% block content %}
 <div class="row">
   <div class="col-12 mb-4">
-    <h3 class="fw-bold">
-      {% if current_lang == 'ta' %}தீம் மற்றும் மொழி அமைப்புகள்{% else %}Theme &amp; Language Settings{% endif %}
-    </h3>
-    <p class="text-secondary-color">
-      {% if current_lang == 'ta' %}
-        உங்கள் பயன்பாட்டு இடைமுக தீம் மற்றும் மொழியைத் தனிப்பயனாக்குங்கள்.
-      {% else %}
-        Customize your application appearance and interface language preferences.
-      {% endif %}
-    </p>
+    <h3 class="fw-bold">{{ t('theme_language_settings') }}</h3>
+    <p class="text-secondary-color">{{ t('theme_language_subtitle') }}</p>
   </div>
 </div>
 
@@ -22,40 +14,35 @@
         
         <!-- 1. Display Theme Settings -->
         <h5 class="fw-bold mb-3 text-primary">
-          <i class="bi bi-palette-fill me-2"></i>
-          {% if current_lang == 'ta' %}காட்சி தீம் முறை{% else %}Display Theme Mode{% endif %}
+          <i class="bi bi-palette-fill me-2"></i>{{ t('display_theme_mode') }}
         </h5>
         <p class="small text-muted-custom mb-3">
-          {% if current_lang == 'ta' %}
-            இருண்ட பயன்முறை அல்லது வெளிச்ச பயன்முறைக்கு இடையில் மாறவும்.
-          {% else %}
-            Choose between Dark Mode (Midnight Navy) and Light Mode (Clean Slate).
-          {% endif %}
+          {{ t('light_mode_desc') }} &bull; {{ t('dark_mode_desc') }}
         </p>
 
         <div class="row g-3 mb-4">
           <!-- Light Theme Option -->
           <div class="col-sm-6">
-            <label class="theme-option-card w-100 {% if user.theme == 'light' %}active{% endif %}" for="theme-light-choice">
-              <input type="radio" name="theme" id="theme-light-choice" value="light" class="form-check-input m-0 me-2" {% if user.theme == 'light' %}checked{% endif %}>
+            <label class="theme-option-card w-100 {% if (user.theme or current_theme) == 'light' %}active{% endif %}" for="theme-light-choice">
+              <input type="radio" name="theme" id="theme-light-choice" value="light" class="form-check-input m-0 me-2" {% if (user.theme or current_theme) == 'light' %}checked{% endif %}>
               <div class="flex-grow-1">
                 <div class="fw-bold text-color-custom">
-                  <i class="bi bi-sun-fill text-warning me-2"></i>Light Mode
+                  <i class="bi bi-sun-fill text-warning me-2"></i>{{ t('light_mode') }}
                 </div>
-                <small class="text-muted-custom" style="font-size: 0.75rem;">Clean white &amp; high clarity</small>
+                <small class="text-muted-custom" style="font-size: 0.75rem;">{{ t('light_mode_desc') }}</small>
               </div>
             </label>
           </div>
 
           <!-- Dark Theme Option -->
           <div class="col-sm-6">
-            <label class="theme-option-card w-100 {% if user.theme == 'dark' or not user.theme %}active{% endif %}" for="theme-dark-choice">
-              <input type="radio" name="theme" id="theme-dark-choice" value="dark" class="form-check-input m-0 me-2" {% if user.theme == 'dark' or not user.theme %}checked{% endif %}>
+            <label class="theme-option-card w-100 {% if (user.theme or current_theme) == 'dark' or not user.theme %}active{% endif %}" for="theme-dark-choice">
+              <input type="radio" name="theme" id="theme-dark-choice" value="dark" class="form-check-input m-0 me-2" {% if (user.theme or current_theme) == 'dark' or not user.theme %}checked{% endif %}>
               <div class="flex-grow-1">
                 <div class="fw-bold text-color-custom">
-                  <i class="bi bi-moon-stars-fill text-primary me-2"></i>Dark Mode
+                  <i class="bi bi-moon-stars-fill text-primary me-2"></i>{{ t('dark_mode') }}
                 </div>
-                <small class="text-muted-custom" style="font-size: 0.75rem;">Deep navy &amp; low eye strain</small>
+                <small class="text-muted-custom" style="font-size: 0.75rem;">{{ t('dark_mode_desc') }}</small>
               </div>
             </label>
           </div>
@@ -65,25 +52,20 @@
 
         <!-- 2. Language Settings -->
         <h5 class="fw-bold mb-3 text-primary">
-          <i class="bi bi-translate me-2"></i>
-          {% if current_lang == 'ta' %}இடைமுக மொழி{% else %}Interface Language{% endif %}
+          <i class="bi bi-translate me-2"></i>{{ t('system_interface_language') }}
         </h5>
         <p class="small text-muted-custom mb-3">
-          {% if current_lang == 'ta' %}
-            அனைத்து பக்கங்கள் மற்றும் டாஷ்போர்டுகளுக்கு விருப்பமான மொழியைத் தேர்ந்தெடுக்கவும்.
-          {% else %}
-            Select your preferred language across all dashboards, menus, and reports.
-          {% endif %}
+          {{ t('interface_language_desc') }}
         </p>
 
         <div class="row g-3 mb-4">
           <!-- English Option -->
           <div class="col-sm-6">
-            <label class="theme-option-card w-100 {% if user.language == 'en' or not user.language %}active{% endif %}" for="lang-en-choice">
-              <input type="radio" name="language" id="lang-en-choice" value="en" class="form-check-input m-0 me-2" {% if user.language == 'en' or not user.language %}checked{% endif %}>
+            <label class="theme-option-card w-100 {% if (user.language or current_lang) == 'en' or not user.language %}active{% endif %}" for="lang-en-choice">
+              <input type="radio" name="language" id="lang-en-choice" value="en" class="form-check-input m-0 me-2" {% if (user.language or current_lang) == 'en' or not user.language %}checked{% endif %}>
               <div class="flex-grow-1">
                 <div class="fw-bold text-color-custom">
-                  🇬🇧 English (Default)
+                  {{ t('english_option') }}
                 </div>
                 <small class="text-muted-custom" style="font-size: 0.75rem;">English UI localization</small>
               </div>
@@ -92,11 +74,11 @@
 
           <!-- Tamil Option -->
           <div class="col-sm-6">
-            <label class="theme-option-card w-100 {% if user.language == 'ta' %}active{% endif %}" for="lang-ta-choice">
-              <input type="radio" name="language" id="lang-ta-choice" value="ta" class="form-check-input m-0 me-2" {% if user.language == 'ta' %}checked{% endif %}>
+            <label class="theme-option-card w-100 {% if (user.language or current_lang) == 'ta' %}active{% endif %}" for="lang-ta-choice">
+              <input type="radio" name="language" id="lang-ta-choice" value="ta" class="form-check-input m-0 me-2" {% if (user.language or current_lang) == 'ta' %}checked{% endif %}>
               <div class="flex-grow-1">
                 <div class="fw-bold text-color-custom">
-                  🇮🇳 தமிழ் (Tamil)
+                  {{ t('tamil_option') }}
                 </div>
                 <small class="text-muted-custom" style="font-size: 0.75rem;">முழுமையான தமிழ் இடைமுகம்</small>
               </div>
@@ -118,65 +100,28 @@
   <div class="col-lg-4 mt-4 mt-lg-0">
     <div class="bento-cell h-100 mb-0">
       <h5 class="fw-bold mb-3 text-primary">
-        <i class="bi bi-info-circle-fill me-2"></i>
-        {% if current_lang == 'ta' %}விரைவு மாற்றி{% else %}Quick Toggle{% endif %}
+        <i class="bi bi-info-circle-fill me-2"></i>{{ t('quick_toggle') }}
       </h5>
       <p class="small text-muted-custom">
-        {% if current_lang == 'ta' %}
-          மேல் தலைப்புப் பட்டியில் உள்ள பொத்தான்களைப் பயன்படுத்தி எந்தப் பக்கத்திலிருந்தும் தீம் மற்றும் மொழியை உடனடியாக மாற்றலாம்.
-        {% else %}
-          You can also toggle the theme and switch languages instantly from any page using the icons in the top navigation bar.
-        {% endif %}
+        {{ t('quick_toggle_desc') }}
       </p>
 
       <ul class="list-unstyled small text-muted-custom mt-3">
-        <li class="mb-2">
-          <i class="bi bi-sun-fill text-warning me-2"></i>
-          <b>{% if current_lang == 'ta' %}தீம் மாற்றி{% else %}Theme Toggle{% endif %}</b>: 
-          {% if current_lang == 'ta' %}சூரியன் / சந்திரன் ஐகானைக் கிளிக் செய்யவும்{% else %}Click the Sun/Moon icon on the top header{% endif %}
+        <li class="mb-3 d-flex align-items-start gap-2">
+          <i class="bi bi-sun-fill text-warning fs-5"></i>
+          <div>
+            <b>{{ t('theme_toggle_label') }}</b>: {{ t('theme_toggle_help') }}
+          </div>
         </li>
-        <li class="mb-2">
-          <i class="bi bi-translate text-info me-2"></i>
-          <b>{% if current_lang == 'ta' %}மொழி மாற்றி{% else %}Language Toggle{% endif %}</b>: 
-          {% if current_lang == 'ta' %}தமிழ் / EN பொத்தானைக் கிளிக் செய்யவும்{% else %}Click the தமிழ் / EN button on the top header{% endif %}
+        <li class="mb-3 d-flex align-items-start gap-2">
+          <i class="bi bi-translate text-info fs-5"></i>
+          <div>
+            <b>{{ t('lang_toggle_label') }}</b>: {{ t('lang_toggle_help') }}
+          </div>
         </li>
       </ul>
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const themeRadios = document.querySelectorAll('input[name="theme"]');
-    const langRadios = document.querySelectorAll('input[name="language"]');
-
-    function updateCardHighlights(radios) {
-      radios.forEach(radio => {
-        const card = radio.closest('.theme-option-card');
-        if (card) {
-          if (radio.checked) {
-            card.classList.add('active');
-          } else {
-            card.classList.remove('active');
-          }
-        }
-      });
-    }
-
-    themeRadios.forEach(r => {
-      r.addEventListener('change', function() {
-        updateCardHighlights(themeRadios);
-        if (window.setAppTheme) {
-          window.setAppTheme(this.value);
-        }
-      });
-    });
-
-    langRadios.forEach(r => {
-      r.addEventListener('change', function() {
-        updateCardHighlights(langRadios);
-      });
-    });
-  });
-</script>
 {% endblock %}
+

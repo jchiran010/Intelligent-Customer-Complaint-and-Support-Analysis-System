@@ -1,4 +1,4 @@
-/* theme.js: LocalStorage theme checks, toggler icons, and Chart.js integration */
+/* theme.js: LocalStorage theme checks, toggler icons, dynamic card highlights, and Chart.js integration */
 
 (function() {
   // Sync theme immediately on load
@@ -15,7 +15,7 @@
   }
 })();
 
-// Global function to set and synchronize theme across DOM, localStorage, and backend
+// Global function to set and synchronize theme across DOM, localStorage, forms, and backend
 window.setAppTheme = function(newTheme) {
   if (newTheme !== 'light' && newTheme !== 'dark') return;
   
@@ -31,6 +31,25 @@ window.setAppTheme = function(newTheme) {
       icon.className = 'bi bi-moon-fill text-primary';
     }
   }
+
+  // Synchronize on-page theme radio buttons and option cards
+  const themeRadios = document.querySelectorAll('input[name="theme"]');
+  themeRadios.forEach(radio => {
+    const isSelected = (radio.value === newTheme);
+    radio.checked = isSelected;
+    
+    // Highlight parent card if exists
+    const card = radio.closest('.theme-option-card, .form-check, .bento-cell');
+    if (card) {
+      if (card.classList.contains('theme-option-card')) {
+        if (isSelected) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      }
+    }
+  });
 
   // Update Chart.js if active
   if (window.Chart && typeof updateChartStyles === 'function') {
@@ -56,7 +75,7 @@ function updateChartStyles(theme) {
 
   Object.keys(Chart.instances).forEach(key => {
     const chartInstance = Chart.instances[key];
-    if (chartInstance.options.scales) {
+    if (chartInstance && chartInstance.options && chartInstance.options.scales) {
       if (chartInstance.options.scales.x) {
         chartInstance.options.scales.x.grid.color = gridColor;
         chartInstance.options.scales.x.ticks.color = textColor;
@@ -65,8 +84,8 @@ function updateChartStyles(theme) {
         chartInstance.options.scales.y.grid.color = gridColor;
         chartInstance.options.scales.y.ticks.color = textColor;
       }
+      chartInstance.update();
     }
-    chartInstance.update();
   });
 }
 
@@ -74,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const themeToggle = document.getElementById('theme-toggle');
   
   // Sync icon state on DOM ready
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('theme') || 'dark';
   const icon = document.querySelector('#theme-toggle i');
   if (icon) {
     if (currentTheme === 'dark') {
@@ -83,7 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
       icon.className = 'bi bi-moon-fill text-primary';
     }
   }
-  
+
+  // Bind top navbar theme toggle
   if (themeToggle) {
     themeToggle.addEventListener('click', function() {
       const activeTheme = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -91,4 +111,13 @@ document.addEventListener('DOMContentLoaded', function() {
       window.setAppTheme(targetTheme);
     });
   }
+
+  // Automatically attach instant theme switching listeners to any theme radios in pages (Profile, Settings, etc.)
+  const themeRadios = document.querySelectorAll('input[name="theme"]');
+  themeRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      window.setAppTheme(this.value);
+    });
+  });
 });
+

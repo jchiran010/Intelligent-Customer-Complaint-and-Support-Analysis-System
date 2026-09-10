@@ -3,7 +3,7 @@
 <div class="row">
   <div class="col-12 mb-4">
     <h3 class="fw-bold">{{ t('profile') }}</h3>
-    <p class="text-secondary-color">Edit your account info, adjust language parameters, or update display themes.</p>
+    <p class="text-secondary-color">{{ t('profile_subtitle') }}</p>
   </div>
 </div>
 
@@ -12,7 +12,7 @@
     <div class="bento-cell">
       <form action="{{ url_for('user.profile') }}" method="POST" class="needs-validation" novalidate id="profile-form">
         
-        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-person-circle me-2"></i>Account Details</h5>
+        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-person-circle me-2"></i>{{ t('account_details') }}</h5>
         
         <!-- Name -->
         <div class="mb-3">
@@ -35,23 +35,34 @@
         </div>
 
         <hr class="my-4 border-color-custom">
-        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-gear-fill me-2"></i>Preferences &amp; Customizations</h5>
+        <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-sliders me-2"></i>{{ t('preferences_customizations') }}</h5>
+        <p class="small text-muted-custom mb-3">{{ t('interface_language_desc') }}</p>
 
         <!-- Theme preference -->
         <div class="mb-4">
-          <label class="form-label-custom">Display Theme Mode</label>
-          <div class="d-flex gap-3 mt-1">
-            <div class="form-check bento-cell p-3 m-0 flex-grow-1 border border-color-custom bg-opacity-25" style="box-shadow: none;">
-              <input class="form-check-input ms-0 me-2" type="radio" name="theme" id="theme-light-radio" value="light" {% if user.theme == 'light' %}checked{% endif %}>
-              <label class="form-check-label fw-semibold text-color-custom" for="theme-light-radio">
-                <i class="bi bi-sun-fill me-2 text-warning"></i>Light Mode
+          <label class="form-label-custom">{{ t('display_theme_mode') }}</label>
+          <div class="row g-3 mt-1">
+            <div class="col-sm-6">
+              <label class="theme-option-card w-100 {% if (user.theme or current_theme) == 'light' %}active{% endif %}" for="theme-light-radio">
+                <input class="form-check-input m-0 me-2" type="radio" name="theme" id="theme-light-radio" value="light" {% if (user.theme or current_theme) == 'light' %}checked{% endif %}>
+                <div class="flex-grow-1">
+                  <div class="fw-bold text-color-custom">
+                    <i class="bi bi-sun-fill me-2 text-warning"></i>{{ t('light_mode') }}
+                  </div>
+                  <small class="text-muted-custom" style="font-size: 0.75rem;">{{ t('light_mode_desc') }}</small>
+                </div>
               </label>
             </div>
             
-            <div class="form-check bento-cell p-3 m-0 flex-grow-1 border border-color-custom bg-opacity-25" style="box-shadow: none;">
-              <input class="form-check-input ms-0 me-2" type="radio" name="theme" id="theme-dark-radio" value="dark" {% if user.theme == 'dark' %}checked{% endif %}>
-              <label class="form-check-label fw-semibold text-color-custom" for="theme-dark-radio">
-                <i class="bi bi-moon-fill me-2 text-primary"></i>Dark Mode
+            <div class="col-sm-6">
+              <label class="theme-option-card w-100 {% if (user.theme or current_theme) == 'dark' or not user.theme %}active{% endif %}" for="theme-dark-radio">
+                <input class="form-check-input m-0 me-2" type="radio" name="theme" id="theme-dark-radio" value="dark" {% if (user.theme or current_theme) == 'dark' or not user.theme %}checked{% endif %}>
+                <div class="flex-grow-1">
+                  <div class="fw-bold text-color-custom">
+                    <i class="bi bi-moon-stars-fill me-2 text-primary"></i>{{ t('dark_mode') }}
+                  </div>
+                  <small class="text-muted-custom" style="font-size: 0.75rem;">{{ t('dark_mode_desc') }}</small>
+                </div>
               </label>
             </div>
           </div>
@@ -59,39 +70,70 @@
 
         <!-- Language preference -->
         <div class="mb-4">
-          <label class="form-label-custom">System Interface Language</label>
-          <select name="language" class="form-select form-control-custom">
-            <option value="en" {% if user.language == 'en' %}selected{% endif %}>English (Default)</option>
-            <option value="ta" {% if user.language == 'ta' %}selected{% endif %}>தமிழ் (Tamil)</option>
+          <label class="form-label-custom" for="profile-language-select">{{ t('system_interface_language') }}</label>
+          <select name="language" id="profile-language-select" class="form-select form-control-custom">
+            <option value="en" {% if (user.language or current_lang) == 'en' %}selected{% endif %}>{{ t('english_option') }}</option>
+            <option value="ta" {% if (user.language or current_lang) == 'ta' %}selected{% endif %}>{{ t('tamil_option') }}</option>
           </select>
+          <div class="form-text small text-muted-custom mt-1">
+            <i class="bi bi-info-circle me-1"></i>{{ t('interface_language_desc') }}
+          </div>
         </div>
 
         <hr class="my-4 border-color-custom">
-        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-key-fill me-2"></i>Change Security Password</h5>
+        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-shield-lock-fill me-2"></i>{{ t('change_security_password') }}</h5>
 
         <div class="row g-3">
           <div class="col-sm-6 mb-3">
-            <label class="form-label-custom">New Password</label>
-            <input type="password" id="profile-pwd" name="password" class="form-control form-control-custom" placeholder="Blank to keep current">
+            <label class="form-label-custom">{{ t('new_password') }}</label>
+            <input type="password" id="profile-pwd" name="password" class="form-control form-control-custom" placeholder="{{ t('blank_to_keep_current') }}">
           </div>
 
           <div class="col-sm-6 mb-4">
-            <label class="form-label-custom">Confirm Password</label>
-            <input type="password" id="profile-conf-pwd" name="confirm_password" class="form-control form-control-custom" placeholder="Repeat new password">
-            <div id="profile-pwd-mismatch" class="text-danger small mt-1 d-none font-monospace">Passwords do not match.</div>
+            <label class="form-label-custom">{{ t('confirm_password') }}</label>
+            <input type="password" id="profile-conf-pwd" name="confirm_password" class="form-control form-control-custom" placeholder="{{ t('repeat_new_password') }}">
+            <div id="profile-pwd-mismatch" class="text-danger small mt-1 d-none font-monospace">{{ t('passwords_do_not_match') }}</div>
           </div>
         </div>
 
         <button type="submit" class="btn btn-primary px-5 py-2 fw-semibold rounded-3" id="profile-submit-btn">
-          {{ t('save_changes') }}
+          <i class="bi bi-check2-circle me-2"></i>{{ t('save_changes') }}
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- Right Guidance Card -->
+  <div class="col-lg-4 mt-4 mt-lg-0">
+    <div class="bento-cell h-100 mb-0">
+      <h5 class="fw-bold mb-3 text-primary">
+        <i class="bi bi-palette2 me-2"></i>{{ t('quick_toggle') }}
+      </h5>
+      <p class="small text-muted-custom">
+        {{ t('quick_toggle_desc') }}
+      </p>
+
+      <ul class="list-unstyled small text-muted-custom mt-3">
+        <li class="mb-3 d-flex align-items-start gap-2">
+          <i class="bi bi-sun-fill text-warning fs-5"></i>
+          <div>
+            <b>{{ t('theme_toggle_label') }}</b>: {{ t('theme_toggle_help') }}
+          </div>
+        </li>
+        <li class="mb-3 d-flex align-items-start gap-2">
+          <i class="bi bi-translate text-info fs-5"></i>
+          <div>
+            <b>{{ t('lang_toggle_label') }}</b>: {{ t('lang_toggle_help') }}
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Password validation logic
     const pwdInput = document.getElementById('profile-pwd');
     const confInput = document.getElementById('profile-conf-pwd');
     const mismatchText = document.getElementById('profile-pwd-mismatch');
@@ -110,6 +152,27 @@
       confInput.addEventListener('input', checkPwd);
       pwdInput.addEventListener('input', checkPwd);
     }
+
+    // Interactive Theme Switch cards
+    const themeRadios = document.querySelectorAll('input[name="theme"]');
+    themeRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (window.setAppTheme) {
+          window.setAppTheme(this.value);
+        }
+      });
+    });
+
+    // Interactive Language Dropdown
+    const langSelect = document.getElementById('profile-language-select');
+    if (langSelect) {
+      langSelect.addEventListener('change', function() {
+        if (window.setAppLanguage) {
+          window.setAppLanguage(this.value);
+        }
+      });
+    }
   });
 </script>
 {% endblock %}
+

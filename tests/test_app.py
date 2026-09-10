@@ -144,5 +144,41 @@ class SystemTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('application/pdf', response.headers['Content-Type'])
 
+    def test_user_profile_preferences_update(self):
+        """Verify profile settings update for theme, language, and account details"""
+        self.login_as('user@support.com')
+        response = self.client.get('/user/profile')
+        self.assertEqual(response.status_code, 200)
+
+        # POST update theme to light and language to ta
+        post_response = self.client.post('/user/profile', data={
+            'name': 'Standard User Updated',
+            'mobile': '9876543210',
+            'theme': 'light',
+            'language': 'ta',
+            'password': '',
+            'confirm_password': ''
+        }, follow_redirects=True)
+        self.assertEqual(post_response.status_code, 200)
+
+        with self.client.session_transaction() as sess:
+            self.assertEqual(sess.get('theme'), 'light')
+            self.assertEqual(sess.get('lang'), 'ta')
+            self.assertEqual(sess.get('name'), 'Standard User Updated')
+
+    def test_user_settings_post_update(self):
+        """Verify theme and language settings form POST submission"""
+        self.login_as('user@support.com')
+        post_response = self.client.post('/user/settings', data={
+            'theme': 'dark',
+            'language': 'en'
+        }, follow_redirects=True)
+        self.assertEqual(post_response.status_code, 200)
+
+        with self.client.session_transaction() as sess:
+            self.assertEqual(sess.get('theme'), 'dark')
+            self.assertEqual(sess.get('lang'), 'en')
+
 if __name__ == '__main__':
     unittest.main()
+
