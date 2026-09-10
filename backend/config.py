@@ -29,7 +29,7 @@ class Config:
     SENDER_EMAIL = os.environ.get('SENDER_EMAIL', '')
 
     # Uploads Configurations
-    UPLOAD_FOLDER = os.path.join(base_dir, 'frontend', 'static', 'uploads')
+    UPLOAD_FOLDER = os.path.join(base_dir, 'Frontend' if os.path.exists(os.path.join(base_dir, 'Frontend')) else 'frontend', 'static', 'uploads')
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB upload limit
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}
 

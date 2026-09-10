@@ -4,10 +4,23 @@ from flask import Flask, session, render_template, redirect, url_for
 from backend.config import Config
 from backend.services.translation_service import translate
 
+def resolve_dir(base_path, *subpaths):
+    """Resolve directory path with case-insensitivity support for Linux/Unix and Windows."""
+    p1 = os.path.abspath(os.path.join(base_path, *subpaths))
+    if os.path.exists(p1):
+        return p1
+    p2 = os.path.abspath(os.path.join(base_path, *[s.capitalize() if i == 0 else s for i, s in enumerate(subpaths)]))
+    if os.path.exists(p2):
+        return p2
+    p3 = os.path.abspath(os.path.join(base_path, *[s.lower() if i == 0 else s for i, s in enumerate(subpaths)]))
+    if os.path.exists(p3):
+        return p3
+    return p1
+
 def create_app():
-    # Configure Flask templates and static folders relative to this file
-    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'templates'))
-    static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static'))
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    template_dir = resolve_dir(base_dir, 'Frontend', 'templates')
+    static_dir = resolve_dir(base_dir, 'Frontend', 'static')
 
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
     app.config.from_object(Config)
