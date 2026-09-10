@@ -25,6 +25,10 @@ def create_app():
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
     app.config.from_object(Config)
 
+    # Enable ProxyFix to preserve reverse proxy headers (Render, Heroku, Cloudflare, etc.)
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
     # Ensure uploads and reports folders exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs(os.path.join(os.path.dirname(__file__), '..', 'reports'), exist_ok=True)
