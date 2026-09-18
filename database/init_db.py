@@ -5,11 +5,17 @@ import sqlite3
 def init_db(target_db_path=None):
     if not target_db_path:
         db_dir = os.path.join(os.path.dirname(__file__), 'sqlite')
-        os.makedirs(db_dir, exist_ok=True)
+        try:
+            os.makedirs(db_dir, exist_ok=True)
+        except Exception:
+            pass
         db_path = os.path.join(db_dir, 'database.db')
     else:
         db_path = target_db_path
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        try:
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        except Exception:
+            pass
 
     print(f"Initializing SQLite database at: {db_path}")
 

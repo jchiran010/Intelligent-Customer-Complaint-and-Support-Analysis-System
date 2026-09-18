@@ -1,5 +1,11 @@
 # run.py: Entrypoint runner for the Intelligent Customer Complaint & Support Analysis System
+import sys
 import os
+
+root_dir = os.path.abspath(os.path.dirname(__file__))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
 from backend.app import create_app
 
 app = create_app()
