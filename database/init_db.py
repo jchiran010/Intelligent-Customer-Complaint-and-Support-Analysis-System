@@ -2,17 +2,23 @@
 import os
 import sqlite3
 
-def init_db():
-    db_dir = os.path.join(os.path.dirname(__file__), 'sqlite')
-    if not os.path.exists(db_dir):
-        os.makedirs(db_dir)
+def init_db(target_db_path=None):
+    if not target_db_path:
+        db_dir = os.path.join(os.path.dirname(__file__), 'sqlite')
+        os.makedirs(db_dir, exist_ok=True)
+        db_path = os.path.join(db_dir, 'database.db')
+    else:
+        db_path = target_db_path
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-    db_path = os.path.join(db_dir, 'database.db')
     print(f"Initializing SQLite database at: {db_path}")
 
     # Remove old database if exists
     if os.path.exists(db_path):
-        os.remove(db_path)
+        try:
+            os.remove(db_path)
+        except Exception:
+            pass
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()

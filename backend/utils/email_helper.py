@@ -6,9 +6,15 @@ from email.mime.multipart import MIMEMultipart
 from backend.config import Config
 
 # Ensure instance folder exists for mock logging
-instance_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance')
-if not os.path.exists(instance_dir):
-    os.makedirs(instance_dir)
+try:
+    instance_dir = getattr(Config, 'INSTANCE_FOLDER', os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance'))
+    os.makedirs(instance_dir, exist_ok=True)
+except Exception:
+    instance_dir = '/tmp'
+    try:
+        os.makedirs(instance_dir, exist_ok=True)
+    except Exception:
+        pass
 
 MOCK_EMAIL_LOG = os.path.join(instance_dir, 'mock_emails.log')
 
@@ -36,9 +42,12 @@ HTML Content:
 {body_html}
 ========================================
 \n"""
-        with open(MOCK_EMAIL_LOG, 'a', encoding='utf-8') as f:
-            f.write(log_msg)
-        print(f"[MOCK EMAIL LOGGED] Details saved to backend/instance/mock_emails.log")
+        try:
+            with open(MOCK_EMAIL_LOG, 'a', encoding='utf-8') as f:
+                f.write(log_msg)
+            print(f"[MOCK EMAIL LOGGED] Details saved to {MOCK_EMAIL_LOG}")
+        except Exception as e:
+            print(f"[MOCK EMAIL NOTICE] Could not write to log file: {e}")
         return True
 
     # Send using real SMTP
@@ -65,6 +74,9 @@ HTML Content:
         print(f"Failed to send email via SMTP: {str(e)}")
         # Log to mock log file as a fail-safe
         fail_log = f"[SMTP FAILURE LOG - ERROR: {str(e)}]\nTo: {recipient_email}\nSubject: {subject}\nHTML:\n{body_html}\n\n"
-        with open(MOCK_EMAIL_LOG, 'a', encoding='utf-8') as f:
-            f.write(fail_log)
+        try:
+            with open(MOCK_EMAIL_LOG, 'a', encoding='utf-8') as f:
+                f.write(fail_log)
+        except Exception:
+            pass
         return False

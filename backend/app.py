@@ -29,19 +29,60 @@ def create_app():
     from werkzeug.middleware.proxy_fix import ProxyFix
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
-    # Ensure uploads and reports folders exist
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(os.path.join(os.path.dirname(__file__), '..', 'reports'), exist_ok=True)
+    # Ensure uploads and reports folders exist (with fallback for serverless read-only filesystems)
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    except Exception as e:
+        print(f"Notice: Could not create upload folder ({e}), fallback to /tmp/uploads")
+        app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
+        try:
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        except Exception:
+            pass
+
+    try:
+        os.makedirs(getattr(Config, 'REPORTS_FOLDER', os.path.join(base_dir, 'reports')), exist_ok=True)
+    except Exception:
+        try:
+            os.makedirs('/tmp/reports', exist_ok=True)
+        except Exception:
+            pass
 
     # Auto-initialize SQLite database if not present
     if Config.DB_TYPE == 'sqlite' and not os.path.exists(Config.SQLITE_DB_ABS_PATH):
         try:
-            from database.init_db import init_db
-            init_db()
+            bundled_db = os.path.join(base_dir, 'database', 'sqlite', 'database.db')
+            if os.path.exists(bundled_db) and os.path.abspath(bundled_db) != os.path.abspath(Config.SQLITE_DB_ABS_PATH):
+                import shutil
+                try:
+                    os.makedirs(os.path.dirname(Config.SQLITE_DB_ABS_PATH), exist_ok=True)
+                except Exception:
+                    pass
+                shutil.copy2(bundled_db, Config.SQLITE_DB_ABS_PATH)
+                print(f"Copied bundled SQLite database to: {Config.SQLITE_DB_ABS_PATH}")
+            else:
+                from database.init_db import init_db
+                init_db(Config.SQLITE_DB_ABS_PATH)
         except Exception as e:
             print(f"Warning: Auto-init DB error: {e}")
+            try:
+                from database.init_db import init_db
+                init_db(Config.SQLITE_DB_ABS_PATH)
+            except Exception as e2:
+                print(f"Fatal DB init error: {e2}")
 
-
+    # Route to serve uploads across local and serverless environments
+    from flask import send_from_directory
+    @app.route('/uploads/<path:filename>')
+    @app.route('/static/uploads/<path:filename>')
+    def serve_custom_uploads(filename):
+        upload_dir = app.config.get('UPLOAD_FOLDER', '/tmp/uploads')
+        if os.path.exists(os.path.join(upload_dir, filename)):
+            return send_from_directory(upload_dir, filename)
+        fallback_dir = os.path.join(static_dir, 'uploads')
+        if os.path.exists(os.path.join(fallback_dir, filename)):
+            return send_from_directory(fallback_dir, filename)
+        return render_template('common/error.html', error_code=404), 404
 
     # Inject translations and themes globally to Jinja templates
     @app.context_processor

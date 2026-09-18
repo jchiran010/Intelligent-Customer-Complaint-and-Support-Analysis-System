@@ -26,7 +26,10 @@ def get_db_connection():
     else:
         # SQLite Connection
         import os
-        os.makedirs(os.path.dirname(Config.SQLITE_DB_ABS_PATH), exist_ok=True)
+        try:
+            os.makedirs(os.path.dirname(Config.SQLITE_DB_ABS_PATH), exist_ok=True)
+        except Exception:
+            pass
         conn = sqlite3.connect(Config.SQLITE_DB_ABS_PATH)
         conn.row_factory = dict_factory
         # Enable Foreign Key constraints for SQLite

@@ -10,9 +10,16 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev_secret_key_change_me_in_production')
     DB_TYPE = os.environ.get('DB_TYPE', 'sqlite').lower()
     
+    # Serverless / Vercel detection
+    IS_VERCEL = bool(os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME') or os.environ.get('LAMBDA_TASK_ROOT'))
+
     # SQLite Path
-    SQLITE_DB_PATH = os.environ.get('SQLITE_DB_PATH', 'database/sqlite/database.db')
-    SQLITE_DB_ABS_PATH = os.path.join(base_dir, SQLITE_DB_PATH)
+    if IS_VERCEL:
+        SQLITE_DB_PATH = '/tmp/database.db'
+        SQLITE_DB_ABS_PATH = '/tmp/database.db'
+    else:
+        SQLITE_DB_PATH = os.environ.get('SQLITE_DB_PATH', 'database/sqlite/database.db')
+        SQLITE_DB_ABS_PATH = os.path.join(base_dir, SQLITE_DB_PATH)
 
     # MySQL Configurations
     MYSQL_HOST = os.environ.get('MYSQL_HOST', 'localhost')
@@ -28,8 +35,16 @@ class Config:
     SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
     SENDER_EMAIL = os.environ.get('SENDER_EMAIL', '')
 
-    # Uploads Configurations
-    UPLOAD_FOLDER = os.path.join(base_dir, 'Frontend' if os.path.exists(os.path.join(base_dir, 'Frontend')) else 'frontend', 'static', 'uploads')
+    # Uploads, Reports & Instance Configurations
+    if IS_VERCEL:
+        UPLOAD_FOLDER = '/tmp/uploads'
+        REPORTS_FOLDER = '/tmp/reports'
+        INSTANCE_FOLDER = '/tmp/instance'
+    else:
+        UPLOAD_FOLDER = os.path.join(base_dir, 'frontend' if os.path.exists(os.path.join(base_dir, 'frontend')) else 'Frontend', 'static', 'uploads')
+        REPORTS_FOLDER = os.path.join(base_dir, 'reports')
+        INSTANCE_FOLDER = os.path.join(base_dir, 'instance')
+
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB upload limit
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}
 
