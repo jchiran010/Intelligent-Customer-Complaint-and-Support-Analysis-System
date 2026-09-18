@@ -1,0 +1,19 @@
+[project]
+name = "intelligent-customer-complaint-system"
+version = "1.0.0"
+description = "Intelligent Customer Complaint and Support Analysis System"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Flask>=3.0.0",
+    "pandas>=2.0.0",
+    "numpy>=1.20.0",
+    "reportlab>=4.0.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.30.0",
+    "gunicorn>=21.2.0",
+    "pymysql>=1.1.0"
+]
+
+[tool.vercel]
+entrypoint = "run:app"
