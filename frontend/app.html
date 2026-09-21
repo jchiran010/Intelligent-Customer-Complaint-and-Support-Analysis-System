@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SupportDesk App - Intelligent Customer Complaint System</title>
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Unified Stylesheets -->
+  <link rel="stylesheet" href="/css/unified.css">
+  <link rel="stylesheet" href="/css/unified-responsive.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+
+  <!-- Page Transition Bar & Overlay -->
+  <div class="page-transition-bar" id="pageTransitionBar"></div>
+  <div class="page-transition-overlay" id="pageTransitionOverlay">
+    <div class="page-transition-spinner mb-3"></div>
+    <div class="small fw-bold text-muted animate-pulse-glow">Loading Secure Portal...</div>
+  </div>
+
+  <div class="app-container">
+    <!-- Unified Dynamic Sidebar -->
+    <aside class="unified-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-row">
+          <a href="/app.html" class="text-decoration-none d-flex align-items-center">
+            <i class="bi bi-shield-check text-primary fs-3 me-2"></i>
+            <h5 class="fw-bold mb-0 text-primary">SupportDesk</h5>
+          </a>
+          <button class="btn btn-sm btn-outline-secondary p-1 border-0" id="sidebarCloseBtn" title="Slide Left / Collapse Features">
+            <i class="bi bi-chevron-left fs-5"></i>
+          </button>
+        </div>
+        <div>
+          <span id="portalTitleDisplay" class="badge">PORTAL</span>
+        </div>
+      </div>
+
+      <!-- Dynamically Injected Navigation Items -->
+      <ul class="sidebar-menu" id="unifiedSidebarMenu">
+        <li class="sidebar-heading">Loading...</li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link text-danger btn-unified-logout">
+          <i class="bi bi-box-arrow-right text-danger"></i> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="unified-main">
+      <!-- Top Navbar -->
+      <header class="unified-navbar">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Slide Features Box Button (--- List / Hamburger) -->
+          <button class="btn btn-sm btn-outline-secondary px-2 py-1" id="menuToggleBtn" title="Slide Features Sidebar (---)">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          <div class="d-none d-sm-block ms-1">
+            <h6 class="mb-0 fw-bold">SupportDesk Unified Center</h6>
+            <small class="text-muted">Intelligent Customer Complaint & Support Analysis System</small>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Theme Toggle -->
+          <button class="btn btn-sm btn-outline-secondary border-0" id="themeToggleBtn" title="Toggle Theme">
+            <i class="bi bi-moon-stars theme-toggle-icon fs-5"></i>
+          </button>
+
+          <!-- User Profile Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-sm btn-light border d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;" id="userAvatarLetter">
+                U
+              </div>
+              <div class="text-start d-none d-md-block" style="line-height: 1.2;">
+                <div class="small fw-bold" id="userDisplayName">Loading...</div>
+                <small class="text-muted" style="font-size: 0.72rem;" id="roleBadgeDisplay">USER</small>
+              </div>
+              <i class="bi bi-chevron-down small text-muted ms-1"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li><h6 class="dropdown-header small" id="userDisplayEmail">user@domain.com</h6></li>
+              <li><a class="dropdown-item small" href="#" onclick="showView('user-profile')"><i class="bi bi-person me-2"></i>My Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item small text-danger btn-unified-logout" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- App Views Body Container -->
+      <div class="content-body">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: ADMIN DASHBOARD                    -->
+        <!-- ========================================== -->
+        <div id="view-admin-dashboard" class="app-view-panel d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Administrator Executive Overview</h5>
+            <button class="btn btn-sm btn-primary" onclick="showView('admin-complaints')">View All Complaints &rarr;</button>
+          </div>
+
+          <!-- Bento Grid Stats -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Total</span>
+                <div class="metric-number text-primary" id="admTotalComplaints">0</div>
+                <small class="text-muted">Total filed</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Pending</span>
+                <div class="metric-number text-warning" id="admPendingComplaints">0</div>
+                <small class="text-muted">Awaiting triage</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">In Progress</span>
+                <div class="metric-number text-info" id="admInProgressComplaints">0</div>
+                <small class="text-muted">Under investigation</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Resolved</span>
+                <div class="metric-number text-success" id="admResolvedComplaints">0</div>
+                <small class="text-muted">Successfully closed</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">High Priority</span>
+                <div class="metric-number text-danger" id="admHighPriorityComplaints">0</div>
+                <small class="text-muted">Escalated</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Resolution Rate</span>
+                <div class="metric-number text-primary" id="admResolutionRate">0%</div>
+                <small class="text-muted">Total Users: <strong id="admTotalUsers">0</strong></small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-3 mb-4">
+            <div class="col-lg-5">
+              <div class="bento-card h-100 card-hover-lift">
+                <h6 class="fw-bold mb-3">Complaint Status Breakdown</h6>
+                <div style="height: 240px; position: relative;">
+                  <canvas id="admStatusChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="bento-card h-100 card-hover-lift">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0">Intelligent NLP Sentiment Distribution</h6>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle animate-pulse-glow"><i class="bi bi-cpu-fill me-1"></i> NLP Engine Active</span>
+                </div>
+                <div style="height: 240px; position: relative;">
+                  <canvas id="admSentimentChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Complaints Inflow Table -->
+          <div class="bento-card">
+            <h6 class="fw-bold mb-3">Recent Complaints Inflow</h6>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 16%; min-width: 140px;">Complaint #</th>
+                    <th style="width: 28%; min-width: 200px;">Title & Category</th>
+                    <th style="width: 14%; min-width: 120px;">Customer</th>
+                    <th style="width: 12%; min-width: 110px;">Status</th>
+                    <th style="width: 10%; min-width: 90px;">Priority</th>
+                    <th style="width: 10%; min-width: 100px;">Sentiment</th>
+                    <th style="width: 10%; min-width: 90px;" class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admRecentComplaintsTable">
+                  <tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: ADMIN COMPLAINTS                   -->
+        <!-- ========================================== -->
+        <div id="view-admin-complaints" class="app-view-panel d-none">
+          <div class="bento-card mb-4">
+            <h5 class="fw-bold mb-3">All Customer Complaints</h5>
+            <div class="row g-2 align-items-center">
+              <div class="col-md-6">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-surface-alt"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="admFilterSearch" placeholder="Search by title, number, or description...">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select class="form-select form-select-sm" id="admFilterStatus">
+                  <option value="">All Statuses</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="IN_PROGRESS">IN PROGRESS</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                  <option value="CLOSED">CLOSED</option>
+                </select>
+              </div>
+              <div class="col-md-3 text-md-end">
+                <button class="btn btn-sm btn-primary w-100" onclick="loadAdminComplaints()"><i class="bi bi-funnel"></i> Apply Filter</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bento-card">
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 18%; min-width: 150px;">Complaint & Ticket</th>
+                    <th style="width: 26%; min-width: 200px;">Title & Category</th>
+                    <th style="width: 14%; min-width: 120px;">Customer</th>
+                    <th style="width: 12%; min-width: 110px;">Status</th>
+                    <th style="width: 10%; min-width: 90px;">Priority</th>
+                    <th style="width: 10%; min-width: 100px;">Sentiment</th>
+                    <th style="width: 10%; min-width: 90px;" class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admAllComplaintsTable">
+                  <tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: ADMIN USERS                        -->
+        <!-- ========================================== -->
+        <div id="view-admin-users" class="app-view-panel d-none">
+          <div class="bento-card">
+            <h5 class="fw-bold mb-3">Registered Users & Staff</h5>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Complaints</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admUsersTableBody">
+                  <tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: ADMIN CATEGORIES                   -->
+        <!-- ========================================== -->
+        <div id="view-admin-categories" class="app-view-panel d-none">
+          <div class="bento-card">
+            <h5 class="fw-bold mb-3">Categories & SLA Windows</h5>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>SLA Target</th>
+                    <th>Total Complaints</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admCategoriesTableBody">
+                  <tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: ADMIN ANALYTICS & REPORTS          -->
+        <!-- ========================================== -->
+        <div id="view-admin-analytics" class="app-view-panel d-none">
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div class="bento-card text-center">
+                <span class="text-muted small fw-semibold text-uppercase">SLA Compliance Rate</span>
+                <div class="metric-number text-success my-2" id="admSlaRate">94.8%</div>
+                <small class="text-muted">Target: &ge; 90% compliance</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="bento-card text-center">
+                <span class="text-muted small fw-semibold text-uppercase">Average Resolution Time</span>
+                <div class="metric-number text-primary my-2" id="admAvgHours">18.5h</div>
+                <small class="text-muted">Across all complaint categories</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="bento-card text-center">
+                <span class="text-muted small fw-semibold text-uppercase">Customer Satisfaction (CSAT)</span>
+                <div class="metric-number text-warning my-2" id="admCsatScore">88%</div>
+                <small class="text-muted">Based on customer feedback</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-admin-reports" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="bento-card">
+                <h5 class="fw-bold mb-3"><i class="bi bi-filetype-csv text-primary me-2"></i> Export Complaints Report</h5>
+                <p class="text-muted small mb-4">Download comprehensive complaint records in CSV format with resolution timestamps and sentiment scores.</p>
+                <button class="btn btn-primary px-4 py-2 fw-semibold" onclick="exportCsvReport()">
+                  <i class="bi bi-download me-2"></i> Export CSV Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 6: USER DASHBOARD                     -->
+        <!-- ========================================== -->
+        <div id="view-user-dashboard" class="app-view-panel d-none">
+          <div class="welcome-banner mb-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <span class="badge bg-primary text-white fw-bold mb-2">CUSTOMER PORTAL</span>
+                <h4 class="fw-bold mb-1">Welcome to Customer Support!</h4>
+                <p class="text-muted small mb-0">Submit complaints easily and track support progress in real-time with automated SLA notifications.</p>
+              </div>
+              <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <button class="btn btn-primary px-4 py-2" onclick="showView('user-submit')">
+                  <i class="bi bi-plus-circle me-1"></i> File Complaint
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Bento Stats -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">My Total</span>
+                <div class="metric-number text-primary" id="usrTotalComplaints">0</div>
+                <small class="text-muted">Complaints filed</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Pending</span>
+                <div class="metric-number text-warning" id="usrPendingComplaints">0</div>
+                <small class="text-muted">Awaiting triage</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">In Progress</span>
+                <div class="metric-number text-info" id="usrInProgressComplaints">0</div>
+                <small class="text-muted">Investigating</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Resolved</span>
+                <div class="metric-number text-success" id="usrResolvedComplaints">0</div>
+                <small class="text-muted">Completed</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Recent Complaints -->
+          <div class="bento-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="fw-bold mb-0">My Recent Complaints</h6>
+              <button class="btn btn-sm btn-outline-primary" onclick="showView('user-complaints')">View All &rarr;</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 20%; min-width: 150px;">Complaint #</th>
+                    <th style="width: 42%; min-width: 240px;">Title & Category</th>
+                    <th style="width: 16%; min-width: 130px;">Status</th>
+                    <th style="width: 12%; min-width: 100px;">Priority</th>
+                    <th style="width: 10%; min-width: 90px;" class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="usrRecentComplaintsTable">
+                  <tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 7: USER SUBMIT COMPLAINT              -->
+        <!-- ========================================== -->
+        <div id="view-user-submit" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="bento-card">
+                <h5 class="fw-bold mb-2"><i class="bi bi-pencil-square text-primary me-2"></i> File a New Support Complaint</h5>
+                <p class="text-muted small mb-4">Provide details about the issue. Our intelligent system analyzes sentiment and ensures fast resolution within SLA targets.</p>
+
+                <form id="userComplaintForm">
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Subject / Title *</label>
+                    <input type="text" class="form-control" id="usrSubmitTitle" placeholder="e.g. Double charged on subscription invoice" required>
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Category *</label>
+                      <select class="form-select" id="usrSubmitCategory" required>
+                        <option value="">Loading categories...</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Urgency / Severity</label>
+                      <select class="form-select" id="usrSubmitPriority">
+                        <option value="">Auto-detect via Intelligent NLP</option>
+                        <option value="LOW">Low</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="HIGH">High</option>
+                        <option value="CRITICAL">Critical</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Description *</label>
+                    <textarea class="form-control" id="usrSubmitDesc" rows="5" placeholder="Explain the problem in detail..." required></textarea>
+                    <!-- Live NLP Sentiment Preview Box -->
+                    <div id="usrSentimentPreview" class="d-none mt-2"></div>
+                  </div>
+
+                  <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary" onclick="showView('user-dashboard')">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold">Submit Complaint</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 8: USER ALL COMPLAINTS                -->
+        <!-- ========================================== -->
+        <div id="view-user-complaints" class="app-view-panel d-none">
+          <div class="bento-card">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-2">
+              <div>
+                <h5 class="fw-bold mb-1">My Filed Complaints</h5>
+                <small class="text-muted">Track status, live SLA timelines, and feedback for all your submitted complaints</small>
+              </div>
+              <button class="btn btn-sm btn-primary px-3 py-2 fw-semibold" onclick="showView('user-submit')">
+                <i class="bi bi-plus-lg me-1"></i> New Complaint
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 22%; min-width: 170px;">Complaint & Ticket</th>
+                    <th style="width: 35%; min-width: 240px;">Subject & Category</th>
+                    <th style="width: 15%; min-width: 130px;">Status</th>
+                    <th style="width: 10%; min-width: 100px;">Priority</th>
+                    <th style="width: 10%; min-width: 110px;">Date Filed</th>
+                    <th style="width: 8%; min-width: 80px;" class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="usrAllComplaintsTable">
+                  <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 9: TICKET TRACKER & DETAILS           -->
+        <!-- ========================================== -->
+        <div id="view-ticket-tracker" class="app-view-panel d-none">
+          <div class="row g-4 justify-content-center">
+            <div class="col-lg-8">
+              <div class="bento-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="text-muted small">Complaint Number</span>
+                    <h4 class="fw-bold text-primary mb-0" id="trackComplaintNumber">CMP-XXXX</h4>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <span id="trackStatus" class="badge badge-status">PENDING</span>
+                    <span id="trackPriority" class="badge">MEDIUM</span>
+                  </div>
+                </div>
+
+                <h5 class="fw-bold mb-2" id="trackTitle">...</h5>
+                <div class="text-muted small mb-3">
+                  <i class="bi bi-folder me-1"></i> <span id="trackCategory">General</span>
+                  <span class="mx-2">•</span>
+                  <i class="bi bi-clock me-1"></i> <span id="trackCreatedAt">...</span>
+                </div>
+
+                <div class="p-3 bg-surface-alt rounded border mb-3">
+                  <h6 class="fw-bold small text-uppercase text-muted mb-2">Description</h6>
+                  <p id="trackDesc" class="mb-0" style="white-space: pre-wrap;">...</p>
+                </div>
+
+                <div id="trackResolutionBox" class="p-3 rounded border bg-light d-none mb-3">
+                  <h6 class="fw-bold small text-uppercase text-success mb-1"><i class="bi bi-check-circle-fill me-1"></i> Resolution Notes</h6>
+                  <p id="trackResolutionNotes" class="mb-0 text-dark"></p>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <button class="btn btn-sm btn-outline-secondary" onclick="showView(currentRole === 'ADMIN' ? 'admin-complaints' : 'user-complaints')">
+                    &larr; Back to List
+                  </button>
+                  <button class="btn btn-sm btn-warning d-none" id="btnTrackFeedback" data-bs-toggle="modal" data-bs-target="#userFeedbackModal">
+                    <i class="bi bi-star-fill me-1"></i> Rate Support Experience
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="bento-card">
+                <h6 class="fw-bold mb-3">Ticket Information</h6>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
+                  <span>Ticket Reference:</span>
+                  <strong class="text-dark" id="trackTicketNumber">#TCK-XXXX</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 text-muted small">
+                  <span>Support Status:</span>
+                  <span class="badge bg-primary-subtle text-primary">SLA Monitored</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 10: NOTIFICATIONS & FEEDBACK          -->
+        <!-- ========================================== -->
+        <div id="view-user-notifications" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Notifications</h5>
+              </div>
+              <div id="usrNotificationsList">
+                <div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-user-feedback" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <h5 class="fw-bold mb-3">Customer Feedback & Satisfaction Reviews</h5>
+              <div id="usrFeedbacksList">
+                <div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 11: USER PROFILE                      -->
+        <!-- ========================================== -->
+        <div id="view-user-profile" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="bento-card">
+                <h5 class="fw-bold mb-3">Account Profile</h5>
+                <form id="profileEditForm">
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Full Name</label>
+                    <input type="text" class="form-control" id="profName" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Email (Read-only)</label>
+                    <input type="email" class="form-control bg-light" id="profEmail" disabled>
+                  </div>
+                  <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Phone Number</label>
+                      <input type="tel" class="form-control" id="profPhone">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Department / Company</label>
+                      <input type="text" class="form-control" id="profDept">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary px-4 fw-semibold">Save Profile</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile Floating Action Button (FAB) -->
+  <a href="#" class="fab-submit" onclick="showView('user-submit')" title="File Complaint">
+    <i class="bi bi-plus-lg"></i>
+  </a>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <!-- Populated dynamically via unified-app.js -->
+  </nav>
+
+  <!-- Admin Status Update Modal -->
+  <div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Update Complaint Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">New Status</label>
+            <select class="form-select" id="modalStatusSelect">
+              <option value="PENDING">PENDING</option>
+              <option value="IN_PROGRESS">IN PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="CLOSED">CLOSED</option>
+              <option value="REJECTED">REJECTED</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Resolution / Internal Notes</label>
+            <textarea class="form-control" id="modalResolutionNotes" rows="3" placeholder="Enter resolution notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-sm btn-primary" onclick="saveStatusUpdate()">Save Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Feedback Rating Modal -->
+  <div class="modal fade" id="userFeedbackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Rate Support Experience</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="appFeedbackForm" onsubmit="event.preventDefault(); submitAppFeedback();">
+            <div class="mb-3 text-center">
+              <label class="form-label small fw-semibold d-block">Satisfaction Rating</label>
+              <div class="star-rating justify-content-center">
+                <input type="radio" id="fstar5" name="appRating" value="5" checked /><label for="fstar5"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar4" name="appRating" value="4" /><label for="fstar4"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar3" name="appRating" value="3" /><label for="fstar3"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar2" name="appRating" value="2" /><label for="fstar2"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar1" name="appRating" value="1" /><label for="fstar1"><i class="bi bi-star-fill"></i></label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Review Comments</label>
+              <textarea class="form-control" id="appFeedbackComments" rows="3" placeholder="Share your experience..."></textarea>
+            </div>
+            <div class="modal-footer px-0 pb-0">
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-sm btn-primary">Submit Rating</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/unified-app.js"></script>
+  <script>
+    async function submitAppFeedback() {
+      const btn = document.getElementById('btnTrackFeedback');
+      const complaintId = btn ? btn.getAttribute('data-complaint-id') : null;
+      if (!complaintId) return;
+
+      const rating = document.querySelector('input[name="appRating"]:checked').value;
+      const comments = document.getElementById('appFeedbackComments').value.trim();
+
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ complaintId, rating, comments })
+        });
+        if (res.ok) {
+          showToast('Thank you for rating our support!', 'success');
+          bootstrap.Modal.getInstance(document.getElementById('userFeedbackModal')).hide();
+          btn.classList.add('d-none');
+        } else {
+          showToast('Failed to submit feedback', 'danger');
+        }
+      } catch (e) {
+        showToast('Network error', 'danger');
+      }
+    }
+
+    // Page Transition Interceptor
+    function initPageTransitions() {
+      const bar = document.getElementById('pageTransitionBar');
+      const overlay = document.getElementById('pageTransitionOverlay');
+
+      if (overlay) overlay.classList.remove('active');
+      if (bar) bar.classList.remove('loading');
+
+      document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (
+          href &&
+          !href.startsWith('#') &&
+          !href.startsWith('javascript:') &&
+          !href.startsWith('mailto:') &&
+          !href.startsWith('tel:') &&
+          !link.hasAttribute('target') &&
+          link.getAttribute('target') !== '_blank'
+        ) {
+          link.addEventListener('click', (e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+            e.preventDefault();
+            if (bar) bar.classList.add('loading');
+            if (overlay) overlay.classList.add('active');
+            setTimeout(() => {
+              window.location.href = href;
+            }, 280);
+          });
+        }
+      });
+    }
+
+    window.addEventListener('pageshow', () => {
+      const bar = document.getElementById('pageTransitionBar');
+      const overlay = document.getElementById('pageTransitionOverlay');
+      if (overlay) overlay.classList.remove('active');
+      if (bar) bar.classList.remove('loading');
+    });
+
+    initPageTransitions();
+  </script>
+</body>
+</html>

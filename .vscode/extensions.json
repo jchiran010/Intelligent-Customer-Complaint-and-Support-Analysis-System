@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "vscjava.vscode-java-pack",
+    "vmware.vscode-spring-boot",
+    "vscjava.vscode-spring-boot-dashboard",
+    "vscjava.vscode-maven",
+    "ecmel.vscode-html-css",
+    "formulahendry.auto-rename-tag",
+    "cweijan.vscode-mysql-client2",
+    "mtxr.sqltools",
+    "dbaeumer.vscode-eslint"
+  ]
+}

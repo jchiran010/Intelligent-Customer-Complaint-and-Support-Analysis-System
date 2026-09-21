@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaint Details - Admin Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <link rel="stylesheet" href="/admin/css/admin-dashboard.css">
+  <link rel="stylesheet" href="/admin/css/admin-responsive.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div>
+          <h5 class="fw-bold mb-0 text-primary d-flex align-items-center">
+            <i class="bi bi-shield-check me-2 fs-4"></i> SupportDesk
+          </h5>
+          <span class="brand-badge">ADMIN PORTAL</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Core Management</li>
+        <li class="sidebar-item"><a href="/admin/dashboard.html" class="sidebar-link"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+        <li class="sidebar-item"><a href="/admin/complaints.html" class="sidebar-link active"><i class="bi bi-inbox-fill"></i> Complaints</a></li>
+        <li class="sidebar-item"><a href="/admin/users.html" class="sidebar-link"><i class="bi bi-people"></i> Users</a></li>
+        <li class="sidebar-item"><a href="/admin/categories.html" class="sidebar-link"><i class="bi bi-tags"></i> Categories</a></li>
+        <li class="sidebar-heading mt-3">Intelligence & Reports</li>
+        <li class="sidebar-item"><a href="/admin/analytics.html" class="sidebar-link"><i class="bi bi-graph-up-arrow"></i> Analytics</a></li>
+        <li class="sidebar-item"><a href="/admin/reports.html" class="sidebar-link"><i class="bi bi-file-earmark-bar-graph"></i> Reports</a></li>
+        <li class="sidebar-item"><a href="/admin/notifications.html" class="sidebar-link"><i class="bi bi-bell"></i> Notifications</a></li>
+        <li class="sidebar-item"><a href="/admin/settings.html" class="sidebar-link"><i class="bi bi-gear"></i> Settings</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link text-danger btn-admin-logout"><i class="bi bi-box-arrow-right text-danger"></i> Sign Out</a>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-navbar">
+        <div class="d-flex align-items-center gap-3">
+          <a href="/admin/complaints.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a>
+          <h6 class="mb-0 fw-bold">Complaint & Ticket Inspection</h6>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-sm btn-outline-secondary border-0" id="themeToggleBtn"><i class="bi bi-moon-stars theme-toggle-icon fs-5"></i></button>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <div class="row g-4" id="detailsWrapper">
+          <!-- Left Column: Complaint & NLP Analysis -->
+          <div class="col-lg-8">
+            <div class="bento-card mb-4">
+              <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div>
+                  <span class="text-muted small">Complaint Number</span>
+                  <h4 class="fw-bold mb-0 text-primary" id="adminDetailNumber">CMP-XXXX</h4>
+                </div>
+                <div class="d-flex gap-2">
+                  <span id="adminDetailStatus" class="badge badge-status">PENDING</span>
+                  <span id="adminDetailPriority" class="badge">MEDIUM</span>
+                </div>
+              </div>
+
+              <h5 class="fw-bold mb-2" id="adminDetailTitle">Loading...</h5>
+              <div class="text-muted small mb-3">
+                <i class="bi bi-folder me-1"></i> <span id="adminDetailCategory">General</span>
+                <span class="mx-2">•</span>
+                <i class="bi bi-clock me-1"></i> <span id="adminDetailCreated">...</span>
+              </div>
+
+              <div class="p-3 bg-surface-alt rounded border mb-4">
+                <h6 class="fw-bold small text-uppercase text-muted mb-2">Complaint Description</h6>
+                <p id="adminDetailDesc" class="mb-0" style="white-space: pre-wrap;">Loading...</p>
+              </div>
+
+              <!-- Intelligent Sentiment Analysis Box -->
+              <div class="p-3 rounded border mb-4" style="background: rgba(79, 70, 229, 0.04); border-color: rgba(79, 70, 229, 0.2) !important;">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="fw-bold small text-primary text-uppercase">
+                    <i class="bi bi-cpu-fill me-1"></i> Intelligent NLP Sentiment Analysis
+                  </span>
+                  <span class="badge badge-sentiment" id="adminDetailSentiment">NEUTRAL</span>
+                </div>
+                <div class="row g-2 align-items-center">
+                  <div class="col-sm-8">
+                    <small class="text-muted" id="adminDetailSentimentText">Calculated polarity score reflecting urgency and emotional valence.</small>
+                  </div>
+                  <div class="col-sm-4 text-sm-end">
+                    <span class="small text-muted">Polarity Score: </span>
+                    <strong id="adminDetailScore" class="fs-6">0.0</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Resolution Section -->
+              <div id="adminResolutionCard" class="p-3 rounded border bg-light d-none">
+                <h6 class="fw-bold small text-uppercase text-muted mb-2">Official Resolution Notes</h6>
+                <p id="adminDetailResolution" class="mb-0 text-dark"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Customer info & Actions -->
+          <div class="col-lg-4">
+            <!-- Actions Card -->
+            <div class="bento-card mb-4">
+              <h6 class="fw-bold mb-3">Triage & Management</h6>
+              
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Update Status</label>
+                <select class="form-select form-select-sm" id="actionStatusSelect">
+                  <option value="PENDING">PENDING</option>
+                  <option value="IN_PROGRESS">IN PROGRESS</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                  <option value="CLOSED">CLOSED</option>
+                  <option value="REJECTED">REJECTED</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Resolution / Internal Notes</label>
+                <textarea class="form-control form-control-sm" id="actionResolutionNotes" rows="3" placeholder="Enter resolution details..."></textarea>
+              </div>
+
+              <button class="btn btn-sm btn-primary w-100 mb-3" onclick="handleAdminStatusUpdate()">
+                <i class="bi bi-check-lg me-1"></i> Save Status Update
+              </button>
+
+              <hr>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Change Priority</label>
+                <div class="input-group input-group-sm">
+                  <select class="form-select" id="actionPrioritySelect">
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                    <option value="CRITICAL">CRITICAL</option>
+                  </select>
+                  <button class="btn btn-outline-secondary" onclick="handleAdminPriorityUpdate()">Update</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer Info Card -->
+            <div class="bento-card">
+              <h6 class="fw-bold mb-3">Customer Information</h6>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;" id="adminUserAvatar">
+                  C
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0" id="adminDetailUserName">...</h6>
+                  <small class="text-muted" id="adminDetailUserEmail">...</small>
+                </div>
+              </div>
+              <div class="small border-top pt-2">
+                <div class="d-flex justify-content-between py-1 text-muted">
+                  <span>Linked Ticket:</span>
+                  <strong class="text-dark" id="adminDetailTicket">#TCK-XXXX</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/admin/js/admin-common.js"></script>
+  <script>
+    let currentId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      currentId = params.get('id');
+      if (!currentId) {
+        window.location.href = '/admin/complaints.html';
+        return;
+      }
+      loadDetails();
+    });
+
+    async function loadDetails() {
+      try {
+        const res = await fetch(`/api/admin/complaints/${currentId}`);
+        if (!res.ok) {
+          showToast('Failed to load complaint details.', 'danger');
+          return;
+        }
+        const c = await res.json();
+        populateAdminDetails(c);
+      } catch (e) {
+        showToast('Network error loading details.', 'danger');
+      }
+    }
+
+    function populateAdminDetails(c) {
+      document.getElementById('adminDetailNumber').textContent = c.complaintNumber;
+      document.getElementById('adminDetailTitle').textContent = c.title;
+      document.getElementById('adminDetailCategory').textContent = c.categoryName || 'General';
+      document.getElementById('adminDetailCreated').textContent = new Date(c.createdAt).toLocaleString();
+      document.getElementById('adminDetailDesc').textContent = c.description;
+
+      const statusEl = document.getElementById('adminDetailStatus');
+      statusEl.className = `badge badge-status badge-${c.status.toLowerCase().replace('_', '-')}`;
+      statusEl.textContent = c.status.replace('_', ' ');
+
+      const priorityEl = document.getElementById('adminDetailPriority');
+      const pClass = c.priority.toLowerCase();
+      priorityEl.className = `badge bg-${pClass === 'critical' ? 'danger' : pClass === 'high' ? 'warning text-dark' : 'secondary'}`;
+      priorityEl.textContent = c.priority;
+
+      const sentimentEl = document.getElementById('adminDetailSentiment');
+      sentimentEl.className = `badge badge-sentiment badge-${c.sentiment.toLowerCase().replace('_', '-')}`;
+      sentimentEl.textContent = c.sentiment.replace('_', ' ');
+
+      document.getElementById('adminDetailScore').textContent = (c.sentimentScore || 0).toFixed(2);
+      document.getElementById('adminDetailUserName').textContent = c.userName || 'Customer';
+      document.getElementById('adminDetailUserEmail').textContent = c.userEmail || '';
+      document.getElementById('adminUserAvatar').textContent = (c.userName || 'C').charAt(0).toUpperCase();
+      document.getElementById('adminDetailTicket').textContent = c.ticketNumber ? '#' + c.ticketNumber : 'None';
+
+      document.getElementById('actionStatusSelect').value = c.status;
+      document.getElementById('actionPrioritySelect').value = c.priority;
+
+      if (c.resolutionNotes) {
+        document.getElementById('adminResolutionCard').classList.remove('d-none');
+        document.getElementById('adminDetailResolution').textContent = c.resolutionNotes;
+        document.getElementById('actionResolutionNotes').value = c.resolutionNotes;
+      }
+    }
+
+    async function handleAdminStatusUpdate() {
+      const status = document.getElementById('actionStatusSelect').value;
+      const resolutionNotes = document.getElementById('actionResolutionNotes').value.trim();
+
+      try {
+        const res = await fetch(`/api/admin/complaints/${currentId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, resolutionNotes })
+        });
+        if (res.ok) {
+          showToast('Status updated successfully.', 'success');
+          loadDetails();
+        } else {
+          showToast('Failed to update status.', 'danger');
+        }
+      } catch (e) {
+        showToast('Network error updating status.', 'danger');
+      }
+    }
+
+    async function handleAdminPriorityUpdate() {
+      const priority = document.getElementById('actionPrioritySelect').value;
+      try {
+        const res = await fetch(`/api/admin/complaints/${currentId}/priority`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priority })
+        });
+        if (res.ok) {
+          showToast('Priority updated successfully.', 'success');
+          loadDetails();
+        } else {
+          showToast('Failed to update priority.', 'danger');
+        }
+      } catch (e) {
+        showToast('Network error updating priority.', 'danger');
+      }
+    }
+  </script>
+</body>
+</html>
