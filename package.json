@@ -1,0 +1,10 @@
+{
+  "name": "intelligent-customer-complaint-and-support-analysis-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Intelligent Customer Complaint & Support Analysis System - Enterprise Support Platform",
+  "scripts": {
+    "build": "echo 'Frontend ready for Vercel deployment'",
+    "start": "echo 'Application ready'"
+  }
+}
