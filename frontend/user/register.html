@@ -75,7 +75,7 @@
 
       <div class="mt-4 pt-3 border-top text-center">
         <span class="text-muted small">Already have an account?</span>
-        <a href="/user/login.html" class="small fw-semibold text-decoration-none ms-1">Sign In &rarr;</a>
+        <a href="/login.html" class="small fw-semibold text-decoration-none ms-1">Sign In &rarr;</a>
       </div>
     </div>
   </div>
@@ -103,22 +103,44 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, phone, department, password })
         });
-        const data = await res.json();
         if (res.ok) {
           alertBox.className = 'alert alert-success d-block';
           alertBox.textContent = 'Account created successfully! Redirecting to login...';
-          setTimeout(() => { window.location.href = '/user/login.html'; }, 1200);
-        } else {
+          setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+          return;
+        }
+        if (res.status !== 404 && res.status !== 502) {
+          const data = await res.json().catch(() => ({}));
           submitBtn.disabled = false;
           submitBtn.textContent = 'Create Customer Account';
           alertBox.className = 'alert alert-danger d-block';
           alertBox.textContent = data.message || 'Registration failed.';
+          return;
         }
-      } catch (err) {
+      } catch (netErr) {
+        console.warn('Backend unavailable, saving user to local store:', netErr);
+      }
+
+      // Fallback for Vercel / offline client mode
+      try {
+        const users = JSON.parse(localStorage.getItem('registered_users') || '[]');
+        if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Customer Account';
+          alertBox.className = 'alert alert-danger d-block';
+          alertBox.textContent = 'An account with this email already exists.';
+          return;
+        }
+        users.push({ id: Date.now(), name, email, phone, department, password, role: 'USER' });
+        localStorage.setItem('registered_users', JSON.stringify(users));
+        alertBox.className = 'alert alert-success d-block';
+        alertBox.textContent = 'Account created successfully! Redirecting to login...';
+        setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+      } catch (e) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Create Customer Account';
         alertBox.className = 'alert alert-danger d-block';
-        alertBox.textContent = 'Network error during registration.';
+        alertBox.textContent = 'Registration failed. Please try again.';
       }
     });
   </script>
