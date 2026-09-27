@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Customer Complaint & Support Analysis System</title>
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Chart.js for Homepage Preview -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Unified Stylesheets -->
+  <link rel="stylesheet" href="/css/unified.css">
+  <link rel="stylesheet" href="/css/unified-responsive.css">
+  <link rel="manifest" href="/manifest.json">
+
+  <style>
+    /* Homepage Specific Refinements */
+    .hero-wrapper {
+      position: relative;
+      padding: 6rem 1rem 4rem;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 15%, rgba(99, 102, 241, 0.12) 0%, rgba(6, 182, 212, 0.06) 40%, rgba(15, 23, 42, 0.01) 100%);
+    }
+
+    .hero-glow-blob {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.05) 70%, transparent 100%);
+      filter: blur(60px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-glow-1 { top: -100px; left: 15%; }
+    .hero-glow-2 { top: 100px; right: 10%; }
+
+    .portal-toggle-container {
+      max-width: 480px;
+      margin: 2.25rem auto 1.5rem;
+      background: var(--bg-surface);
+      padding: 6px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      z-index: 2;
+    }
+
+    .portal-toggle-btn {
+      flex: 1;
+      padding: 0.65rem 1.25rem;
+      border-radius: 9999px;
+      border: 0;
+      background: transparent;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .portal-toggle-btn.active {
+      background: var(--primary-color);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    }
+
+    .portal-toggle-btn.active.admin {
+      background: var(--admin-accent);
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.75rem;
+      height: 100%;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary-color);
+    }
+
+    .feature-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .interactive-simulator-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-xl);
+      position: relative;
+    }
+
+    .sample-pill-btn {
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface-alt);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .sample-pill-btn:hover {
+      background: var(--primary-light);
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .step-number-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--primary-gradient);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .stat-box {
+      padding: 1.75rem 1rem;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      transition: var(--transition);
+    }
+
+    .stat-box:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Transition Bar & Overlay -->
+  <div class="page-transition-bar" id="pageTransitionBar"></div>
+  <div class="page-transition-overlay" id="pageTransitionOverlay">
+    <div class="page-transition-spinner mb-3"></div>
+    <div class="small fw-bold text-muted animate-pulse-glow">Loading Secure Portal...</div>
+  </div>
+
+  <!-- Top Global Navigation Bar -->
+  <nav class="navbar navbar-expand-lg border-bottom sticky-top glass-panel" style="backdrop-filter: blur(12px); z-index: 1050;">
+    <div class="container py-1">
+      <a class="navbar-brand fw-extrabold d-flex align-items-center" href="/">
+        <div class="rounded-circle d-flex align-items-center justify-content-center me-2 animate-pulse-glow" style="width: 36px; height: 36px; background: var(--primary-gradient); color: white;">
+          <i class="bi bi-shield-check fs-5"></i>
+        </div>
+        <span class="gradient-text fs-4 fw-bold">SupportDesk</span>
+      </a>
+
+      <!-- Mobile Toggle -->
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <i class="bi bi-list fs-3"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3 fw-semibold small">
+          <li class="nav-item"><a class="nav-link text-muted" href="#showcase">Visual Tour</a></li>
+          <li class="nav-item"><a class="nav-link text-muted" href="#simulator">Live AI Simulator</a></li>
+          <li class="nav-item"><a class="nav-link text-muted" href="#features">Capabilities</a></li>
+          <li class="nav-item"><a class="nav-link text-muted" href="#workflow">Resolution Pipeline</a></li>
+          <li class="nav-item"><a class="nav-link text-muted" href="#portals">Dual Portals</a></li>
+          <li class="nav-item"><a class="nav-link text-muted" href="#stats">System Metrics</a></li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+          <!-- Theme Toggle Button -->
+          <button class="btn btn-sm btn-outline-secondary border-0 px-2 py-1" id="themeToggleBtn" title="Toggle Theme">
+            <i class="bi bi-moon-stars theme-toggle-icon fs-5"></i>
+          </button>
+          
+          <a href="/login.html" class="btn btn-sm btn-outline-primary px-3 py-2 fw-semibold">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+          </a>
+          <a href="/app.html" class="btn btn-sm text-white px-3 py-2 fw-semibold shadow-sm" style="background: var(--primary-gradient);">
+            Open Web App <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-wrapper text-center">
+    <div class="hero-glow-blob hero-glow-1"></div>
+    <div class="hero-glow-blob hero-glow-2"></div>
+
+    <div class="container position-relative" style="z-index: 1;">
+      <!-- Pulsing Announcement Badge -->
+      <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3 border animate-pulse-glow" style="background: var(--primary-light); border-color: var(--primary-color) !important;">
+        <span class="badge rounded-circle p-1" style="background: var(--primary-color);"><i class="bi bi-cpu-fill text-white"></i></span>
+        <span class="small fw-bold" style="color: var(--primary-color);">AI-POWERED SUPPORT & COMPLAINT RESOLUTION SYSTEM</span>
+      </div>
+
+      <h1 class="display-4 fw-bolder mb-3 animate-fade-in-up">
+        Intelligent Customer Complaint <br class="d-none d-md-block">
+        <span class="gradient-text">& Support Analysis System</span>
+      </h1>
+
+      <p class="lead text-muted mx-auto mb-4 animate-fade-in-up" style="max-width: 720px; font-size: 1.15rem; animation-delay: 0.1s;">
+        An enterprise web and mobile platform unifying customer self-service, real-time ticket tracking, automated NLP sentiment triage, and executive support intelligence in one cohesive system.
+      </p>
+
+      <!-- Quick Action Buttons -->
+      <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap mb-4 animate-fade-in-up" style="animation-delay: 0.15s;">
+        <a href="/app.html" class="btn btn-lg text-white px-4 py-3 fw-bold shadow-lg card-hover-lift" style="background: var(--primary-gradient); border-radius: 12px;">
+          <i class="bi bi-rocket-takeoff-fill me-2"></i> Launch Application
+        </a>
+        <a href="#simulator" class="btn btn-lg btn-outline-secondary px-4 py-3 fw-bold card-hover-lift" style="border-radius: 12px;">
+          <i class="bi bi-play-circle me-2"></i> Test AI Simulator
+        </a>
+        <a href="/login.html" class="btn btn-lg btn-outline-primary px-4 py-3 fw-bold card-hover-lift" style="border-radius: 12px;">
+          <i class="bi bi-shield-lock me-2"></i> Portal Logins
+        </a>
+      </div>
+
+      <!-- Interactive Dual Portal Switcher -->
+      <div class="portal-toggle-container animate-fade-in-up" style="animation-delay: 0.2s;">
+        <button class="portal-toggle-btn active" id="btnSelectCustomer" onclick="switchPortalView('customer')">
+          <i class="bi bi-person-fill me-1"></i> Customer Support Portal
+        </button>
+        <button class="portal-toggle-btn" id="btnSelectAdmin" onclick="switchPortalView('admin')">
+          <i class="bi bi-shield-lock-fill me-1"></i> Admin Executive Console
+        </button>
+      </div>
+
+      <!-- Portal Showcase Cards -->
+      <div class="row justify-content-center mt-3 animate-fade-in-up" style="animation-delay: 0.25s;">
+        <div class="col-lg-10 col-xl-9">
+
+          <!-- 1. Customer Showcase -->
+          <div id="customerShowcase" class="bento-card p-4 p-md-5 text-start shadow-xl border">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+              <div>
+                <span class="badge px-2 py-1 mb-2 text-white fw-bold" style="background: var(--primary-color);">CUSTOMER SELF-SERVICE EXPERIENCE</span>
+                <h3 class="fw-bold mb-0">Customer Support Portal</h3>
+              </div>
+              <a href="/login.html" class="btn btn-primary px-4 py-2 fw-semibold card-hover-lift">
+                Customer Sign In &rarr;
+              </a>
+            </div>
+            <p class="text-muted mb-4" style="font-size: 1.05rem;">Empowering customers with instant complaint lodging, real-time AI sentiment analysis, transparent SLA countdowns, and 5-star resolution feedback.</p>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1"><i class="bi bi-magic text-primary me-2"></i>Live Sentiment Preview</h6>
+                  <p class="text-muted small mb-0">Real-time keyword engine analyzes urgency to prioritize high-risk complaints automatically.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1"><i class="bi bi-stopwatch text-primary me-2"></i>Real-time SLA Timeline</h6>
+                  <p class="text-muted small mb-0">Follow ticket status through Pending, In Progress, and Resolved with guaranteed SLA deadlines.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1"><i class="bi bi-bell text-primary me-2"></i>Instant Status Alerts</h6>
+                  <p class="text-muted small mb-0">Automated notifications alert customers the moment support staff updates their ticket.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1"><i class="bi bi-star-fill text-warning me-2"></i>5-Star CSAT Feedback</h6>
+                  <p class="text-muted small mb-0">Rate the resolution quality upon completion to ensure support excellence.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-3 border bg-surface-alt d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div class="small text-muted">
+                <i class="bi bi-key-fill text-primary me-1"></i> Demo Customer Account: <code>john.doe@example.com</code> | <code>User@123</code>
+              </div>
+              <a href="/login.html" class="small fw-bold text-primary text-decoration-none">Sign In Now &rarr;</a>
+            </div>
+          </div>
+
+          <!-- 2. Admin Showcase -->
+          <div id="adminShowcase" class="bento-card p-4 p-md-5 text-start shadow-xl border d-none">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+              <div>
+                <span class="badge px-2 py-1 mb-2 text-white fw-bold" style="background: var(--admin-accent);">EXECUTIVE TRIAGE & CONTROL</span>
+                <h3 class="fw-bold mb-0">Administrator Executive Console</h3>
+              </div>
+              <a href="/login.html" class="btn text-white px-4 py-2 fw-semibold card-hover-lift" style="background: var(--admin-accent);">
+                Admin Sign In &rarr;
+              </a>
+            </div>
+            <p class="text-muted mb-4" style="font-size: 1.05rem;">Comprehensive administrative control suite: real-time Bento analytics, NLP sentiment distribution, ticket assignment, and SLA auditing.</p>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1" style="color: var(--admin-accent);"><i class="bi bi-grid-1x2 me-2"></i>Bento Executive Metrics</h6>
+                  <p class="text-muted small mb-0">Live MySQL stats on complaint inflow volume, active investigation queues, and resolution rate.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1" style="color: var(--admin-accent);"><i class="bi bi-pie-chart me-2"></i>NLP Sentiment Analytics</h6>
+                  <p class="text-muted small mb-0">Automated breakdown of positive, neutral, negative, and critical complaint categories.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1" style="color: var(--admin-accent);"><i class="bi bi-people me-2"></i>User & Staff Directory</h6>
+                  <p class="text-muted small mb-0">Manage customer accounts, assign complaints to support staff, and monitor department performance.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border bg-surface-alt h-100">
+                  <h6 class="fw-bold mb-1" style="color: var(--admin-accent);"><i class="bi bi-filetype-csv me-2"></i>Audit-Ready CSV Reports</h6>
+                  <p class="text-muted small mb-0">Export date-filtered compliance records and customer sentiment trends in 1 click.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-3 border bg-surface-alt d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div class="small text-muted">
+                <i class="bi bi-shield-check text-primary me-1"></i> Demo Administrator: <code>admin@complaintsystem.com</code> | <code>Admin@123</code>
+              </div>
+              <a href="/login.html" class="small fw-bold text-decoration-none" style="color: var(--admin-accent);">Sign In Now &rarr;</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Visual Interface Showcase & Product Tour -->
+  <section class="py-5 border-bottom position-relative" id="showcase">
+    <div class="container py-4">
+      <div class="text-center mb-5 reveal-on-scroll">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-bold text-uppercase mb-2">Interactive Interface Tour</span>
+        <h2 class="fw-extrabold mb-2">Explore the System in Action</h2>
+        <p class="text-muted mx-auto" style="max-width: 650px;">
+          Preview real operational modules engineered with role-based security, automated sentiment pipelines, and real-time SLA tracking.
+        </p>
+      </div>
+
+      <div class="row g-4 align-items-center">
+        <!-- Left: Interactive Tab Controls -->
+        <div class="col-lg-4 reveal-on-scroll">
+          <div class="d-flex flex-column gap-3">
+            <button class="showcase-tab-btn active" id="tabShowcaseBtn0" onclick="switchShowcaseTab(0)">
+              <div class="showcase-tab-icon">
+                <i class="bi bi-speedometer2"></i>
+              </div>
+              <div>
+                <div class="fw-bold">Executive AI Command Center</div>
+                <small class="text-muted">Live triage KPIs & resolution trends</small>
+              </div>
+            </button>
+
+            <button class="showcase-tab-btn" id="tabShowcaseBtn1" onclick="switchShowcaseTab(1)">
+              <div class="showcase-tab-icon">
+                <i class="bi bi-cpu"></i>
+              </div>
+              <div>
+                <div class="fw-bold">NLP Sentiment Radar & Scanner</div>
+                <small class="text-muted">Keyword sentiment & urgency scoring</small>
+              </div>
+            </button>
+
+            <button class="showcase-tab-btn" id="tabShowcaseBtn2" onclick="switchShowcaseTab(2)">
+              <div class="showcase-tab-icon">
+                <i class="bi bi-stopwatch"></i>
+              </div>
+              <div>
+                <div class="fw-bold">Dynamic SLA Breach Predictor</div>
+                <small class="text-muted">Ticking timer & multi-tier escalation</small>
+              </div>
+            </button>
+
+            <button class="showcase-tab-btn" id="tabShowcaseBtn3" onclick="switchShowcaseTab(3)">
+              <div class="showcase-tab-icon">
+                <i class="bi bi-person-workspace"></i>
+              </div>
+              <div>
+                <div class="fw-bold">Customer Ticket Lifecycle</div>
+                <small class="text-muted">5-stage journey & CSAT feedback</small>
+              </div>
+            </button>
+          </div>
+
+          <!-- Floating Badges / Trust Metrics -->
+          <div class="mt-4 p-3 rounded-3 border bg-surface-alt d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-shield-lock-fill text-success fs-4"></i>
+              <div class="small">
+                <div class="fw-bold">Spring Security 6</div>
+                <span class="text-muted">Role-Separated RBAC</span>
+              </div>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Active</span>
+          </div>
+        </div>
+
+        <!-- Right: Animated Browser Mockup Window -->
+        <div class="col-lg-8 reveal-on-scroll reveal-delay-2">
+          <div class="mockup-window">
+            <!-- Browser Chrome Header -->
+            <div class="mockup-header">
+              <div class="mockup-dots">
+                <div class="mockup-dot red"></div>
+                <div class="mockup-dot yellow"></div>
+                <div class="mockup-dot green"></div>
+              </div>
+              <div class="badge bg-surface text-muted px-3 py-1 border small fw-normal font-monospace" id="mockupUrlBar">
+                https://supportdesk.internal/admin/dashboard
+              </div>
+              <div class="small text-muted d-flex align-items-center gap-1">
+                <span class="d-inline-block rounded-circle bg-success" style="width: 8px; height: 8px;"></span>
+                <span class="small fw-bold">ONLINE</span>
+              </div>
+            </div>
+
+            <!-- Mockup Content Panels -->
+            <div class="mockup-body">
+
+              <!-- Panel 0: Executive Command Center -->
+              <div class="showcase-panel animate-fade-in" id="showcasePanel0">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h6 class="fw-bold mb-0">Operational Triage Overview</h6>
+                    <small class="text-muted">Real-time complaint inflow & department distribution</small>
+                  </div>
+                  <span class="badge bg-primary text-white">Live MySQL Sync</span>
+                </div>
+
+                <!-- 4 KPI Stat Cards -->
+                <div class="row g-2 mb-3">
+                  <div class="col-6 col-md-3">
+                    <div class="p-2 rounded-2 border bg-surface text-center">
+                      <small class="text-muted d-block">Total Tickets</small>
+                      <span class="fs-5 fw-extrabold text-primary">1,420</span>
+                      <small class="text-success d-block" style="font-size: 0.72rem;">&uarr; 12% week</small>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="p-2 rounded-2 border bg-surface text-center">
+                      <small class="text-muted d-block">Under Review</small>
+                      <span class="fs-5 fw-extrabold text-warning">45</span>
+                      <small class="text-warning d-block" style="font-size: 0.72rem;">Queue active</small>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="p-2 rounded-2 border bg-surface text-center">
+                      <small class="text-muted d-block">In Progress</small>
+                      <span class="fs-5 fw-extrabold text-info">82</span>
+                      <small class="text-info d-block" style="font-size: 0.72rem;">Assigned</small>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="p-2 rounded-2 border bg-surface text-center">
+                      <small class="text-muted d-block">Resolved</small>
+                      <span class="fs-5 fw-extrabold text-success">1,293</span>
+                      <small class="text-success d-block" style="font-size: 0.72rem;">91.1% rate</small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Visual Trend Line Chart (SVG Graphic) -->
+                <div class="p-3 rounded-2 border bg-surface mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="fw-bold text-muted">WEEKLY RESOLUTION TRAJECTORY</small>
+                    <small class="badge bg-light text-dark border">Mon - Sun</small>
+                  </div>
+                  <svg viewBox="0 0 400 90" class="w-100" style="height: 90px; overflow: visible;">
+                    <defs>
+                      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.0"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,75 Q50,45 100,55 T200,30 T300,40 T400,15 L400,90 L0,90 Z" fill="url(#chartGrad)"/>
+                    <path d="M0,75 Q50,45 100,55 T200,30 T300,40 T400,15" fill="none" stroke="#4f46e5" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="100" cy="55" r="4" fill="#4f46e5"/>
+                    <circle cx="200" cy="30" r="4" fill="#4f46e5"/>
+                    <circle cx="300" cy="40" r="4" fill="#4f46e5"/>
+                    <circle cx="400" cy="15" r="5" fill="#06b6d4" stroke="#fff" stroke-width="2"/>
+                  </svg>
+                </div>
+
+                <!-- Recent Live Cases Mini Table -->
+                <div class="border rounded-2 overflow-hidden bg-surface">
+                  <div class="p-2 border-bottom bg-surface-alt d-flex justify-content-between align-items-center">
+                    <small class="fw-bold">LATEST INCOMING CASES</small>
+                    <small class="text-primary fw-semibold">Auto-Assigned</small>
+                  </div>
+                  <div class="p-2 d-flex justify-content-between align-items-center border-bottom">
+                    <div>
+                      <span class="badge bg-danger me-1">CRITICAL</span>
+                      <small class="fw-bold">#CMP-1048: Duplicate Debit on Monthly Invoice</small>
+                    </div>
+                    <span class="badge bg-light text-dark border">Finance Desk</span>
+                  </div>
+                  <div class="p-2 d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="badge bg-warning text-dark me-1">HIGH</span>
+                      <small class="fw-bold">#CMP-1047: Android App Crash during Payment</small>
+                    </div>
+                    <span class="badge bg-light text-dark border">Engineering</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel 1: NLP Sentiment Radar -->
+              <div class="showcase-panel animate-fade-in d-none position-relative" id="showcasePanel1">
+                <div class="radar-scan-line"></div>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h6 class="fw-bold mb-0">Real-Time NLP Sentiment Analyzer</h6>
+                    <small class="text-muted">Lexical urgency weighting & automated polarity grading</small>
+                  </div>
+                  <span class="badge bg-info text-dark animate-pulse-glow"><i class="bi bi-radar me-1"></i>Scanning Stream</span>
+                </div>
+
+                <!-- Sentiment Spectrum Bar -->
+                <div class="p-3 rounded-2 border bg-surface mb-3">
+                  <small class="fw-bold text-muted d-block mb-2">SYSTEM SENTIMENT SPECTRUM</small>
+                  <div class="progress" style="height: 14px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 35%;" title="Positive">35% Pos</div>
+                    <div class="progress-bar bg-secondary" role="progressbar" style="width: 25%;" title="Neutral">25% Neu</div>
+                    <div class="progress-bar bg-warning text-dark" role="progressbar" style="width: 25%;" title="Negative">25% Neg</div>
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: 15%;" title="Very Negative">15% Crit</div>
+                  </div>
+                </div>
+
+                <!-- Live Tokenizer Scanner Output -->
+                <div class="p-3 rounded-2 border bg-surface mb-3">
+                  <div class="small fw-bold text-muted mb-2"><i class="bi bi-cpu me-1 text-primary"></i>ACTIVE TICKET SCAN:</div>
+                  <div class="p-2 rounded bg-surface-alt font-monospace small mb-2 border">
+                    "I was <mark class="bg-danger-subtle text-danger px-1 rounded fw-bold">charged twice</mark> on invoice #9012. Kindly <mark class="bg-danger-subtle text-danger px-1 rounded fw-bold">refund immediately</mark> as this is an unauthorized debit."
+                  </div>
+                  <div class="row g-2 text-center">
+                    <div class="col-4">
+                      <div class="p-1 rounded border bg-surface">
+                        <small class="text-muted d-block" style="font-size: 0.72rem;">Sentiment</small>
+                        <span class="fw-bold text-danger">VERY NEGATIVE</span>
+                      </div>
+                    </div>
+                    <div class="col-4">
+                      <div class="p-1 rounded border bg-surface">
+                        <small class="text-muted d-block" style="font-size: 0.72rem;">Polarity Score</small>
+                        <span class="fw-bold text-danger">-0.92</span>
+                      </div>
+                    </div>
+                    <div class="col-4">
+                      <div class="p-1 rounded border bg-surface">
+                        <small class="text-muted d-block" style="font-size: 0.72rem;">Auto Triage</small>
+                        <span class="fw-bold text-primary">CRITICAL / 12h SLA</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel 2: Dynamic SLA Breach Predictor -->
+              <div class="showcase-panel animate-fade-in d-none" id="showcasePanel2">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h6 class="fw-bold mb-0">Dynamic SLA Breach Predictor</h6>
+                    <small class="text-muted">Automated deadline tracking & multi-tier escalation hierarchy</small>
+                  </div>
+                  <span class="badge bg-warning text-dark"><i class="bi bi-clock-history me-1"></i>Active SLA Clock</span>
+                </div>
+
+                <!-- Ticking Countdown Display -->
+                <div class="p-3 rounded-2 border bg-surface text-center mb-3">
+                  <small class="text-muted fw-bold d-block text-uppercase">Time Remaining Before Breach (#CMP-1048)</small>
+                  <div class="display-6 fw-extrabold text-primary font-monospace my-1" id="showcaseSlaTimer">
+                    03:41:22
+                  </div>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">Within Guaranteed 12h Window</span>
+                </div>
+
+                <!-- Escalation Sequence Pathway -->
+                <div class="p-3 rounded-2 border bg-surface">
+                  <small class="text-muted fw-bold d-block mb-3">AUTOMATED ESCALATION PIPELINE</small>
+                  <div class="d-flex align-items-center justify-content-between position-relative">
+                    <div class="text-center" style="z-index: 2;">
+                      <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 32px; height: 32px;">
+                        <i class="bi bi-check-lg"></i>
+                      </div>
+                      <small class="fw-bold d-block">Tier 1</small>
+                      <span class="text-muted" style="font-size: 0.7rem;">Specialist Assigned</span>
+                    </div>
+
+                    <div class="text-center" style="z-index: 2;">
+                      <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-1 animate-pulse-glow" style="width: 32px; height: 32px;">
+                        <i class="bi bi-arrow-repeat"></i>
+                      </div>
+                      <small class="fw-bold d-block">Tier 2</small>
+                      <span class="text-muted" style="font-size: 0.7rem;">Team Lead Alert</span>
+                    </div>
+
+                    <div class="text-center" style="z-index: 2;">
+                      <div class="rounded-circle bg-light text-muted border d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 32px; height: 32px;">
+                        <i class="bi bi-shield-exclamation"></i>
+                      </div>
+                      <small class="fw-bold d-block">Tier 3</small>
+                      <span class="text-muted" style="font-size: 0.7rem;">Director Escalation</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel 3: Customer Ticket Lifecycle -->
+              <div class="showcase-panel animate-fade-in d-none" id="showcasePanel3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h6 class="fw-bold mb-0">Customer Ticket Lifecycle & CSAT</h6>
+                    <small class="text-muted">End-to-end transparency with real-time customer timeline</small>
+                  </div>
+                  <span class="badge bg-success text-white"><i class="bi bi-check2-circle me-1"></i>Customer Portal</span>
+                </div>
+
+                <div class="p-3 rounded-2 border bg-surface mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                      <span class="fw-bold text-primary">#CMP-2026-9042</span>
+                      <div class="fw-semibold">Payment Deducted But Order Pending</div>
+                    </div>
+                    <span class="badge bg-success">RESOLVED</span>
+                  </div>
+
+                  <!-- 5-Step Stepper -->
+                  <div class="row text-center g-1 mb-3">
+                    <div class="col">
+                      <div class="p-1 rounded bg-success-subtle text-success small fw-bold">1. Ingestion &check;</div>
+                    </div>
+                    <div class="col">
+                      <div class="p-1 rounded bg-success-subtle text-success small fw-bold">2. AI Scanned &check;</div>
+                    </div>
+                    <div class="col">
+                      <div class="p-1 rounded bg-success-subtle text-success small fw-bold">3. In Progress &check;</div>
+                    </div>
+                    <div class="col">
+                      <div class="p-1 rounded bg-success-subtle text-success small fw-bold">4. Resolved &check;</div>
+                    </div>
+                    <div class="col">
+                      <div class="p-1 rounded bg-warning-subtle text-warning small fw-bold">5. CSAT &starf;&starf;&starf;&starf;&starf;</div>
+                    </div>
+                  </div>
+
+                  <!-- Support Agent Message Bubble -->
+                  <div class="p-2 rounded bg-surface-alt border small">
+                    <div class="d-flex justify-content-between mb-1">
+                      <span class="fw-bold text-primary"><i class="bi bi-headset me-1"></i>Support Agent (Sarah Jenkins)</span>
+                      <span class="text-muted" style="font-size: 0.72rem;">10 mins ago</span>
+                    </div>
+                    "We have verified the duplicate charge and processed an immediate refund to your original card ending in 4912. Reference ID: #REF-9921."
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Interactive AI Sentiment Simulator Section -->
+  <section class="py-5 bg-surface-alt border-top border-bottom" id="simulator">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-bold text-uppercase mb-2">Live AI Interactive Engine</span>
+        <h2 class="fw-extrabold mb-2">Experience the Real-Time NLP Sentiment Analyzer</h2>
+        <p class="text-muted mx-auto" style="max-width: 620px;">
+          Type any complaint or click one of the pre-loaded scenarios below to see our intelligent engine auto-detect urgency, sentiment polarity, and recommended SLA routing.
+        </p>
+      </div>
+
+      <div class="interactive-simulator-card mx-auto" style="max-width: 960px;">
+        <!-- Clickable Pre-loaded Scenarios -->
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-muted text-uppercase mb-2">Try Pre-Loaded Test Scenarios:</label>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="sample-pill-btn" onclick="simulateComplaint('billing')">
+              <i class="bi bi-credit-card me-1"></i> Double Debit / Billing Overcharge
+            </button>
+            <button class="sample-pill-btn" onclick="simulateComplaint('crash')">
+              <i class="bi bi-bug me-1"></i> Mobile App Crash on Checkout
+            </button>
+            <button class="sample-pill-btn" onclick="simulateComplaint('damaged')">
+              <i class="bi bi-box-seam me-1"></i> Torn Package & Missing Adapter
+            </button>
+            <button class="sample-pill-btn" onclick="simulateComplaint('inquiry')">
+              <i class="bi bi-question-circle me-1"></i> Corporate Contract Tier Renewal
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Input Box -->
+        <div class="mb-4">
+          <label class="form-label small fw-semibold">Complaint Description Input:</label>
+          <textarea class="form-control p-3 fs-6" id="simInput" rows="4" placeholder="Type a complaint here to see real-time AI sentiment analysis in action..."></textarea>
+        </div>
+
+        <!-- Dynamic AI Analysis Output Grid -->
+        <div class="row g-3 p-3 rounded-3 border bg-surface-alt align-items-center">
+          <div class="col-md-3 text-center border-end">
+            <div class="small fw-bold text-muted text-uppercase mb-1">Detected Sentiment</div>
+            <div class="fs-5 fw-extrabold" id="simSentiment">-</div>
+            <small class="text-muted" id="simScore">Score: 0.00</small>
+          </div>
+          <div class="col-md-3 text-center border-end">
+            <div class="small fw-bold text-muted text-uppercase mb-1">Priority / Urgency</div>
+            <div class="fs-5 fw-extrabold" id="simPriority">-</div>
+            <small class="text-muted" id="simUrgentText">Auto Triage</small>
+          </div>
+          <div class="col-md-3 text-center border-end">
+            <div class="small fw-bold text-muted text-uppercase mb-1">Guaranteed SLA</div>
+            <div class="fs-5 fw-extrabold text-primary" id="simSla">-</div>
+            <small class="text-muted">Target Window</small>
+          </div>
+          <div class="col-md-3 text-center">
+            <div class="small fw-bold text-muted text-uppercase mb-1">Smart Routing</div>
+            <div class="fs-6 fw-bold text-truncate" id="simDept">-</div>
+            <small class="text-muted">Specialized Desk</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Capabilities Bento Grid Section -->
+  <section class="py-5" id="features">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-bold text-uppercase mb-2">Core System Features</span>
+        <h2 class="fw-extrabold mb-2">Engineered for Rapid Support & Deep Analytics</h2>
+        <p class="text-muted mx-auto" style="max-width: 650px;">
+          Built with Spring Boot 3, Spring Security 6, MySQL 8, and Chart.js to ensure high performance, security, and actionable business intelligence.
+        </p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Card 1 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper bg-primary-subtle text-primary">
+              <i class="bi bi-cpu"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Automated NLP Sentiment AI</h5>
+            <p class="text-muted small mb-0">
+              Analyzes incoming complaint text polarity and urgency in real time, automatically escalating critical tickets for rapid triage.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">
+              <i class="bi bi-stopwatch"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Guaranteed SLA Timelines</h5>
+            <p class="text-muted small mb-0">
+              Each category features a dynamic Service Level Agreement (SLA) countdown with automatic overdue notifications and escalation flags.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper" style="background: rgba(124, 58, 237, 0.15); color: var(--admin-accent);">
+              <i class="bi bi-shield-lock"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Dual-Role Isolation & Security</h5>
+            <p class="text-muted small mb-0">
+              Spring Security 6 enforces strict role boundaries between customers and administrators with BCrypt encryption and CSRF defense.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper bg-success-subtle text-success">
+              <i class="bi bi-pie-chart"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Executive Chart.js Analytics</h5>
+            <p class="text-muted small mb-0">
+              Interactive doughnut and bar charts illustrate complaint distributions, resolution speed, and department throughput in real time.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper bg-warning-subtle text-warning">
+              <i class="bi bi-star-half"></i>
+            </div>
+            <h5 class="fw-bold mb-2">5-Star Customer Feedback Loop</h5>
+            <p class="text-muted small mb-0">
+              Empower customers to submit ratings and reviews upon ticket resolution, feeding CSAT scores back into quality assurance audits.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper bg-danger-subtle text-danger">
+              <i class="bi bi-file-earmark-arrow-down"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Audit-Ready Export Reports</h5>
+            <p class="text-muted small mb-0">
+              Generate full CSV export summaries filtered by status, category, date, and sentiment for executive reporting and compliance.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4-Step Resolution Pipeline Workflow Section -->
+  <section class="py-5 bg-surface-alt border-top border-bottom" id="workflow">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-bold text-uppercase mb-2">Operational Workflow</span>
+        <h2 class="fw-extrabold mb-2">How a Complaint Moves from Submission to Resolution</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+          A transparent, four-phase automated support journey keeping both customer and support staff aligned.
+        </p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="bento-card h-100 p-4 text-center card-hover-lift">
+            <div class="step-number-badge mx-auto">1</div>
+            <h6 class="fw-bold mb-2">Submit & NLP Triage</h6>
+            <p class="text-muted small mb-0">Customer submits complaint. System generates unique CMP & TCK numbers while AI analyzes sentiment.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+          <div class="bento-card h-100 p-4 text-center card-hover-lift">
+            <div class="step-number-badge mx-auto">2</div>
+            <h6 class="fw-bold mb-2">Smart Assignment</h6>
+            <p class="text-muted small mb-0">Complaint is routed to specialized team (Billing, Tech, Logistics) with SLA target clock running.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+          <div class="bento-card h-100 p-4 text-center card-hover-lift">
+            <div class="step-number-badge mx-auto">3</div>
+            <h6 class="fw-bold mb-2">Investigation & Updates</h6>
+            <p class="text-muted small mb-0">Support staff investigates, updates status to IN_PROGRESS, and notes resolution findings.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+          <div class="bento-card h-100 p-4 text-center card-hover-lift">
+            <div class="step-number-badge mx-auto">4</div>
+            <h6 class="fw-bold mb-2">Resolution & Rating</h6>
+            <p class="text-muted small mb-0">Ticket is marked RESOLVED. Customer receives notification and rates service via 5-star review.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System Metrics & Trust Bar -->
+  <section class="py-5" id="stats">
+    <div class="container py-2">
+      <div class="row g-4 text-center">
+        <div class="col-6 col-md-3">
+          <div class="stat-box">
+            <div class="metric-number text-primary mb-1">99.4%</div>
+            <div class="small fw-bold text-muted text-uppercase">SLA Compliance</div>
+            <small class="text-light">Within resolution window</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-box">
+            <div class="metric-number text-success mb-1">&lt; 18h</div>
+            <div class="small fw-bold text-muted text-uppercase">Average Turnaround</div>
+            <small class="text-light">From filing to closure</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-box">
+            <div class="metric-number text-warning mb-1">4.9 / 5</div>
+            <div class="small fw-bold text-muted text-uppercase">Customer CSAT</div>
+            <small class="text-light">From verified reviews</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-box">
+            <div class="metric-number text-info mb-1">10,000+</div>
+            <div class="small fw-bold text-muted text-uppercase">Tickets Handled</div>
+            <small class="text-light">Enterprise scale</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dual Portal Gateway Section -->
+  <section class="py-5 bg-surface-alt border-top border-bottom" id="portals">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-bold text-uppercase mb-2">Direct Access</span>
+        <h2 class="fw-extrabold mb-2">Choose Your Entry Portal</h2>
+        <p class="text-muted mx-auto" style="max-width: 580px;">
+          Seamlessly access the customer support self-service desk or administrative command console.
+        </p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <!-- Customer Portal Card -->
+        <div class="col-md-6 col-lg-5">
+          <div class="bento-card p-4 p-md-5 h-100 card-hover-lift d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="badge bg-primary text-white px-3 py-2 fw-bold">CUSTOMER</span>
+                <i class="bi bi-person-badge fs-2 text-primary"></i>
+              </div>
+              <h4 class="fw-bold mb-2">Customer Support Portal</h4>
+              <p class="text-muted mb-4">Lodge new complaints, monitor live status, communicate with support staff, and submit resolution reviews.</p>
+              <ul class="list-unstyled text-muted small mb-4">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Real-time SLA ticket tracker</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Automated status notifications</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 5-Star satisfaction feedback</li>
+              </ul>
+            </div>
+            <div>
+              <div class="p-2 rounded bg-surface-alt border text-muted small mb-3">
+                Demo: <code>john.doe@example.com</code> | <code>User@123</code>
+              </div>
+              <a href="/login.html" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                Enter Customer Portal &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Portal Card -->
+        <div class="col-md-6 col-lg-5">
+          <div class="bento-card p-4 p-md-5 h-100 card-hover-lift d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="badge text-white px-3 py-2 fw-bold" style="background: var(--admin-accent);">ADMINISTRATOR</span>
+                <i class="bi bi-shield-shaded fs-2" style="color: var(--admin-accent);"></i>
+              </div>
+              <h4 class="fw-bold mb-2">Admin Executive Console</h4>
+              <p class="text-muted mb-4">Triage complaint queue, assign tickets, manage SLA targets, analyze sentiment trends, and export compliance reports.</p>
+              <ul class="list-unstyled text-muted small mb-4">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Executive Bento dashboard & analytics</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> User & staff directory management</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Exportable audit-ready CSV reports</li>
+              </ul>
+            </div>
+            <div>
+              <div class="p-2 rounded bg-surface-alt border text-muted small mb-3">
+                Demo: <code>admin@complaintsystem.com</code> | <code>Admin@123</code>
+              </div>
+              <a href="/login.html" class="btn text-white w-100 py-2 fw-bold shadow-sm" style="background: var(--admin-accent);">
+                Enter Admin Console &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-5 bg-surface border-top">
+    <div class="container">
+      <div class="row g-4 align-items-center justify-content-between mb-4">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center mb-2">
+            <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: var(--primary-gradient); color: white;">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <span class="gradient-text fs-5 fw-bold">SupportDesk Enterprise</span>
+          </div>
+          <p class="text-muted small mb-0" style="max-width: 480px;">
+            Intelligent Customer Complaint & Support Analysis System built with Java 21, Spring Boot 3.2.5, Spring Security 6, MySQL 8, and modern responsive PWA architecture.
+          </p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <div class="d-flex gap-2 justify-content-md-end flex-wrap">
+            <span class="badge bg-surface-alt border text-muted">Java 21 LTS</span>
+            <span class="badge bg-surface-alt border text-muted">Spring Boot 3</span>
+            <span class="badge bg-surface-alt border text-muted">MySQL 8</span>
+            <span class="badge bg-surface-alt border text-muted">Spring Security 6</span>
+            <span class="badge bg-surface-alt border text-muted">Chart.js</span>
+          </div>
+        </div>
+      </div>
+      <div class="border-top pt-3 text-center text-muted small">
+        &copy; 2026 SupportDesk Enterprise. All rights reserved. Designed for Production Support Operations.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Homepage Interactive Logic -->
+  <script>
+    // 1. Portal Switcher
+    function switchPortalView(portal) {
+      const btnCust = document.getElementById('btnSelectCustomer');
+      const btnAdm = document.getElementById('btnSelectAdmin');
+      const cardCust = document.getElementById('customerShowcase');
+      const cardAdm = document.getElementById('adminShowcase');
+
+      if (portal === 'customer') {
+        btnCust.className = 'portal-toggle-btn active';
+        btnAdm.className = 'portal-toggle-btn';
+        cardCust.classList.remove('d-none');
+        cardAdm.classList.add('d-none');
+      } else {
+        btnCust.className = 'portal-toggle-btn';
+        btnAdm.className = 'portal-toggle-btn active admin';
+        cardCust.classList.add('d-none');
+        cardAdm.classList.remove('d-none');
+      }
+    }
+
+    // 2. Theme Management
+    function applyIndexTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.setAttribute('data-bs-theme', theme);
+      const icon = document.querySelector('.theme-toggle-icon');
+      if (icon) {
+        if (theme === 'dark') {
+          icon.classList.remove('bi-moon-stars');
+          icon.classList.add('bi-sun');
+        } else {
+          icon.classList.remove('bi-sun');
+          icon.classList.add('bi-moon-stars');
+        }
+      }
+    }
+
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyIndexTheme(next);
+        localStorage.setItem('app_theme', next);
+      });
+      const saved = localStorage.getItem('app_theme') || 'light';
+      applyIndexTheme(saved);
+    }
+
+    // 3. Live AI Sentiment Simulator
+    const sampleComplaints = {
+      billing: "I was charged twice on September 15 for my monthly subscription invoice #9821. Kindly refund the duplicate $199 deduction immediately as this has affected our company petty cash.",
+      crash: "Whenever I click Proceed to Payment on the Android app (version 4.2), the application crashes to the home screen without any error code. I have tried clearing cache.",
+      damaged: "Order #ORD-7741 was delivered today. The outer packaging was completely ripped open and the power adapter was missing from the box.",
+      inquiry: "Our contract renewal is coming up next month and we wanted to confirm if the 20% team tier discount is still active on our profile."
+    };
+
+    function simulateComplaint(type) {
+      const text = sampleComplaints[type] || '';
+      document.getElementById('simInput').value = text;
+      runLiveAnalysis(text);
+    }
+
+    const simInput = document.getElementById('simInput');
+    if (simInput) {
+      simInput.addEventListener('input', (e) => {
+        runLiveAnalysis(e.target.value);
+      });
+    }
+
+    function runLiveAnalysis(text) {
+      const lower = text.toLowerCase().trim();
+      const sentimentEl = document.getElementById('simSentiment');
+      const scoreEl = document.getElementById('simScore');
+      const prioEl = document.getElementById('simPriority');
+      const urgentEl = document.getElementById('simUrgentText');
+      const slaEl = document.getElementById('simSla');
+      const deptEl = document.getElementById('simDept');
+
+      if (!lower) {
+        sentimentEl.textContent = '-';
+        sentimentEl.className = 'fs-5 fw-extrabold';
+        scoreEl.textContent = 'Score: 0.00';
+        prioEl.textContent = '-';
+        prioEl.className = 'fs-5 fw-extrabold';
+        urgentEl.textContent = 'Auto Triage';
+        slaEl.textContent = '-';
+        deptEl.textContent = '-';
+        return;
+      }
+
+      // NLP Keyword Rules
+      const veryNegativeWords = ['double debit', 'twice', 'refund immediately', 'charged twice', 'stolen', 'fraud', 'unauthorized', 'urgent'];
+      const negativeWords = ['crash', 'broken', 'damaged', 'ripped', 'missing', 'failed', 'error', 'terrible', 'glitch'];
+      const positiveWords = ['thank', 'great', 'discount', 'renew', 'inquiry', 'confirm', 'appreciate', 'happy'];
+
+      let isVeryNeg = veryNegativeWords.some(w => lower.includes(w));
+      let isNeg = negativeWords.some(w => lower.includes(w));
+      let isPos = positiveWords.some(w => lower.includes(w));
+
+      if (isVeryNeg) {
+        sentimentEl.textContent = 'VERY NEGATIVE';
+        sentimentEl.className = 'fs-5 fw-extrabold text-danger';
+        scoreEl.textContent = 'Score: -0.85';
+        prioEl.textContent = 'CRITICAL';
+        prioEl.className = 'fs-5 fw-extrabold text-danger';
+        urgentEl.textContent = 'High Urgency Escalated';
+        slaEl.textContent = '12 Hours';
+        deptEl.textContent = 'Finance & Billing Desk';
+      } else if (isNeg) {
+        sentimentEl.textContent = 'NEGATIVE';
+        sentimentEl.className = 'fs-5 fw-extrabold text-warning';
+        scoreEl.textContent = 'Score: -0.65';
+        prioEl.textContent = 'HIGH';
+        prioEl.className = 'fs-5 fw-extrabold text-warning';
+        urgentEl.textContent = 'Investigation Priority';
+        slaEl.textContent = '24 Hours';
+        deptEl.textContent = lower.includes('crash') ? 'Engineering Support' : 'Logistics Desk';
+      } else if (isPos) {
+        sentimentEl.textContent = 'POSITIVE';
+        sentimentEl.className = 'fs-5 fw-extrabold text-success';
+        scoreEl.textContent = 'Score: +0.65';
+        prioEl.textContent = 'LOW';
+        prioEl.className = 'fs-5 fw-extrabold text-success';
+        urgentEl.textContent = 'Standard Queue';
+        slaEl.textContent = '48 Hours';
+        deptEl.textContent = 'Accounts & Customer Success';
+      } else {
+        sentimentEl.textContent = 'NEUTRAL';
+        sentimentEl.className = 'fs-5 fw-extrabold text-info';
+        scoreEl.textContent = 'Score: 0.00';
+        prioEl.textContent = 'MEDIUM';
+        prioEl.className = 'fs-5 fw-extrabold text-info';
+        urgentEl.textContent = 'Standard Triage';
+        slaEl.textContent = '36 Hours';
+        deptEl.textContent = 'General Support Desk';
+      }
+    }
+
+    // Run initial simulation on load
+    simulateComplaint('billing');
+
+    // 4. Interactive Showcase Tab Switcher
+    const showcaseUrls = [
+      'https://supportdesk.internal/admin/dashboard',
+      'ai://engine.sentiment.analysis/live-stream',
+      'monitor://sla.compliance.engine/escalations',
+      'https://supportdesk.internal/user/complaints/CMP-2026-9042'
+    ];
+
+    let showcaseAutoTimer = null;
+    let currentShowcaseIdx = 0;
+
+    function switchShowcaseTab(idx, isManual = true) {
+      if (isManual && showcaseAutoTimer) {
+        clearInterval(showcaseAutoTimer);
+        showcaseAutoTimer = null;
+      }
+      currentShowcaseIdx = idx;
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById('tabShowcaseBtn' + i);
+        const panel = document.getElementById('showcasePanel' + i);
+        if (btn) btn.className = i === idx ? 'showcase-tab-btn active' : 'showcase-tab-btn';
+        if (panel) {
+          if (i === idx) {
+            panel.classList.remove('d-none');
+            panel.classList.remove('animate-fade-in');
+            void panel.offsetWidth;
+            panel.classList.add('animate-fade-in');
+          } else {
+            panel.classList.add('d-none');
+          }
+        }
+      }
+
+      const urlBar = document.getElementById('mockupUrlBar');
+      if (urlBar) urlBar.textContent = showcaseUrls[idx] || '';
+    }
+
+    // Auto-cycle showcase tabs every 6.5 seconds
+    showcaseAutoTimer = setInterval(() => {
+      currentShowcaseIdx = (currentShowcaseIdx + 1) % 4;
+      switchShowcaseTab(currentShowcaseIdx, false);
+    }, 6500);
+
+    // 5. Ticking SLA Countdown Timer Mockup
+    let slaRemainingSeconds = 3 * 3600 + 41 * 60 + 22;
+    setInterval(() => {
+      if (slaRemainingSeconds > 0) slaRemainingSeconds--;
+      const hrs = String(Math.floor(slaRemainingSeconds / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((slaRemainingSeconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(slaRemainingSeconds % 60).padStart(2, '0');
+      const timerEl = document.getElementById('showcaseSlaTimer');
+      if (timerEl) timerEl.textContent = `${hrs}:${mins}:${secs}`;
+    }, 1000);
+
+    // 6. Scroll-Triggered Reveal Animations
+    document.addEventListener('DOMContentLoaded', () => {
+      const reveals = document.querySelectorAll('.reveal-on-scroll');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        reveals.forEach(r => observer.observe(r));
+      } else {
+        reveals.forEach(r => r.classList.add('is-revealed'));
+      }
+    });
+
+    // 7. Smooth Page Transition on Navigation
+    function initPageTransitions() {
+      const bar = document.getElementById('pageTransitionBar');
+      const overlay = document.getElementById('pageTransitionOverlay');
+
+      // Dismiss overlay on arrival
+      if (overlay) overlay.classList.remove('active');
+      if (bar) bar.classList.remove('loading');
+
+      document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (
+          href &&
+          !href.startsWith('#') &&
+          !href.startsWith('javascript:') &&
+          !href.startsWith('mailto:') &&
+          !href.startsWith('tel:') &&
+          !link.hasAttribute('target') &&
+          link.getAttribute('target') !== '_blank'
+        ) {
+          link.addEventListener('click', (e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+            e.preventDefault();
+            if (bar) bar.classList.add('loading');
+            if (overlay) overlay.classList.add('active');
+            setTimeout(() => {
+              window.location.href = href;
+            }, 280);
+          });
+        }
+      });
+    }
+
+    window.addEventListener('pageshow', () => {
+      const bar = document.getElementById('pageTransitionBar');
+      const overlay = document.getElementById('pageTransitionOverlay');
+      if (overlay) overlay.classList.remove('active');
+      if (bar) bar.classList.remove('loading');
+    });
+
+    initPageTransitions();
+  </script>
+</body>
+</html>

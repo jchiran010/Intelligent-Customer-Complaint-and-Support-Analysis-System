@@ -1,0 +1,131 @@
+/* ==========================================================================
+   UNIFIED APP - RESPONSIVE & MOBILE APP STYLES (unified-responsive.css)
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .unified-sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .unified-sidebar.show {
+    transform: translateX(0);
+  }
+
+  .unified-main {
+    margin-left: 0;
+    padding-bottom: calc(var(--bottom-nav-height) + 1.25rem);
+  }
+
+  .unified-navbar {
+    padding: 0 1rem;
+  }
+
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+
+  .content-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .metric-number {
+    font-size: 1.7rem;
+  }
+
+  .bento-card {
+    padding: 1.15rem;
+  }
+}
+
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height);
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  z-index: 1045;
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.bottom-nav-item i {
+  font-size: 1.3rem;
+  margin-bottom: 2px;
+}
+
+.bottom-nav-item.active {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+body[data-active-role="ADMIN"] .bottom-nav-item.active {
+  color: var(--admin-accent);
+}
+
+/* Floating Action Button (FAB) */
+.fab-submit {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + 1rem);
+  right: 1.25rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: #ffffff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 15px rgba(13, 148, 136, 0.4);
+  text-decoration: none;
+  z-index: 1035;
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 991.98px) {
+  body[data-active-role="USER"] .fab-submit {
+    display: flex;
+  }
+}
+
+.fab-submit:hover {
+  transform: scale(1.08);
+  color: #ffffff;
+}
+
+/* Sidebar Backdrop */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1039;
+  display: none;
+}
+
+.sidebar-backdrop.show {
+  display: block;
+}

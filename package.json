@@ -4,7 +4,7 @@
   "private": true,
   "description": "Intelligent Customer Complaint & Support Analysis System - Enterprise Support Platform",
   "scripts": {
-    "build": "echo 'Frontend ready for Vercel deployment'",
+    "build": "node build.js",
     "start": "echo 'Application ready'"
   }
 }
