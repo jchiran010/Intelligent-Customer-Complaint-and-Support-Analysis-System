@@ -83,12 +83,23 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleClientFallbackAuth(email, password, roleHint, btn) {
     const cleanEmail = email.toLowerCase().trim();
 
-    // 1. Check Demo Admin Account
+    // 1. Check Demo Admin Accounts
     if (cleanEmail === 'admin@complaintsystem.com' && password === 'Admin@123') {
       sessionStorage.setItem('active_role', 'ADMIN');
       sessionStorage.setItem('user_name', 'System Administrator');
       sessionStorage.setItem('user_email', 'admin@complaintsystem.com');
       showAlert('Authenticated successfully as ADMIN. Launching app...', 'success');
+      setTimeout(() => {
+        window.location.href = '/app.html';
+      }, 600);
+      return;
+    }
+
+    if (cleanEmail === 'sarah.support@complaintsystem.com' && password === 'Admin@123') {
+      sessionStorage.setItem('active_role', 'ADMIN');
+      sessionStorage.setItem('user_name', 'Sarah Jenkins (Support Lead)');
+      sessionStorage.setItem('user_email', 'sarah.support@complaintsystem.com');
+      showAlert('Authenticated successfully as ADMIN (Support Lead). Launching app...', 'success');
       setTimeout(() => {
         window.location.href = '/app.html';
       }, 600);
