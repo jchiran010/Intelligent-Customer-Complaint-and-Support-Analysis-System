@@ -1,0 +1,6 @@
+.git
+.vscode
+backend/target
+**/target
+*.log
+node_modules

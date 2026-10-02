@@ -11,6 +11,8 @@ const itemsToCopy = [
   'index.html',
   'login.html',
   'app.html',
+  'documentation.html',
+  'Intelligent_Customer_Complaint_System_Comprehensive_Documentation.pdf',
   'manifest.json',
   'css',
   'js',

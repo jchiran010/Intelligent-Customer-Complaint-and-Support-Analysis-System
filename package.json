@@ -5,6 +5,6 @@
   "description": "Intelligent Customer Complaint & Support Analysis System - Enterprise Support Platform",
   "scripts": {
     "build": "node build.js",
-    "start": "echo 'Application ready'"
+    "start": "node server.js"
   }
 }
