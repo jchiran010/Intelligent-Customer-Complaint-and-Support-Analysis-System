@@ -75,6 +75,34 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Reverse proxy /api requests to Spring Boot backend
+  if (pathname.startsWith('/api/')) {
+    const backendReq = http.request({
+      hostname: '127.0.0.1',
+      port: 8080,
+      path: req.url,
+      method: req.method,
+      headers: {
+        ...req.headers,
+        host: '127.0.0.1:8080'
+      }
+    }, (backendRes) => {
+      res.writeHead(backendRes.statusCode, backendRes.headers);
+      backendRes.pipe(res);
+    });
+
+    backendReq.on('error', (err) => {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        error: 'Backend Unavailable',
+        message: 'Spring Boot backend is offline or starting up on port 8080'
+      }));
+    });
+
+    req.pipe(backendReq);
+    return;
+  }
+
   // Exact rewrite matching
   if (ROUTE_REWRITES[pathname]) {
     pathname = ROUTE_REWRITES[pathname];
