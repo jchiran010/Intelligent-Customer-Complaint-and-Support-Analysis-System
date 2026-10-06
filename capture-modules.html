@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440, initial-scale=1.0">
+  <title>System Development Module Viewer</title>
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --secondary: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --light-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #0f172a;
+      color: var(--text);
+      padding: 24px;
+      width: 1440px;
+      min-height: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Overall Container */
+    .module-capture-card {
+      width: 100%;
+      max-width: 1392px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Academic Header Banner */
+    .academic-banner {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      color: #ffffff;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #4338ca;
+    }
+
+    .academic-badge {
+      background: rgba(99, 102, 241, 0.35);
+      border: 1px solid #818cf8;
+      color: #e0e7ff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .academic-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .project-name {
+      font-size: 0.82rem;
+      color: #c7d2fe;
+      font-weight: 500;
+    }
+
+    /* Realistic Browser Chrome Window */
+    .browser-chrome {
+      background: #f1f5f9;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .address-bar {
+      flex: 1;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #334155;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .address-bar i.lock-icon {
+      color: #10b981;
+      font-size: 0.85rem;
+    }
+
+    .address-bar .domain {
+      color: #0f172a;
+    }
+
+    .address-bar .path {
+      color: #4f46e5;
+    }
+
+    .browser-actions {
+      display: flex;
+      gap: 12px;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    /* Module Viewport Content */
+    .module-viewport {
+      background: #f8fafc;
+      min-height: 680px;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    /* Card styling */
+    .glass-card {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      border-radius: 12px;
+      padding: 18px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .stat-purple { background: linear-gradient(135deg, #6366f1, #4338ca); }
+    .stat-blue { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+    .stat-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .stat-green { background: linear-gradient(135deg, #10b981, #059669); }
+
+    .badge-critical { background: #fee2e2; color: #dc2626; border: 1px solid #f87171; font-weight: 700; }
+    .badge-high { background: #ffedd5; color: #ea580c; border: 1px solid #fb923c; font-weight: 700; }
+    .badge-medium { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; font-weight: 700; }
+    .badge-low { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; font-weight: 700; }
+
+    .badge-resolved { background: #d1fae5; color: #065f46; font-weight: 700; }
+    .badge-investigating { background: #e0f2fe; color: #0369a1; font-weight: 700; }
+    .badge-pending { background: #fef3c7; color: #92400e; font-weight: 700; }
+
+    /* Timeline Stepper */
+    .timeline-step {
+      display: flex;
+      align-items: flex-start;
+      position: relative;
+      padding-bottom: 24px;
+    }
+    .timeline-step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 36px;
+      bottom: 0;
+      width: 2px;
+      background: #cbd5e1;
+    }
+    .timeline-step.completed:not(:last-child)::before {
+      background: #10b981;
+    }
+    .step-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-right: 16px;
+      z-index: 1;
+    }
+    .step-icon.done { background: #10b981; color: white; }
+    .step-icon.active { background: #4f46e5; color: white; box-shadow: 0 0 0 4px #e0e7ff; }
+    .step-icon.pending { background: #e2e8f0; color: #64748b; }
+
+    /* Ticket Card */
+    .ticket-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 2px dashed #6366f1;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.1);
+      position: relative;
+    }
+
+    /* Rating Stars */
+    .star-rating i {
+      font-size: 2rem;
+      color: #fbbf24;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="module-capture-card">
+    <!-- Academic Section Banner -->
+    <div class="academic-banner">
+      <div class="d-flex align-items-center gap-3">
+        <span class="academic-badge" id="moduleBadge">SECTION 3.5</span>
+        <h4 class="academic-title" id="moduleTitle">3.5.1 Dashboard Module</h4>
+      </div>
+      <div class="project-name">
+        <i class="bi bi-cpu-fill text-warning me-1"></i>
+        Intelligent Customer Complaint & Support Analysis System
+      </div>
+    </div>
+
+    <!-- Realistic Browser Chrome Window -->
+    <div class="browser-chrome">
+      <div class="window-dots">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <div class="nav-buttons">
+        <i class="bi bi-arrow-left"></i>
+        <i class="bi bi-arrow-right"></i>
+        <i class="bi bi-arrow-clockwise"></i>
+      </div>
+      <div class="address-bar">
+        <i class="bi bi-shield-lock-fill lock-icon"></i>
+        <span class="domain">http://localhost:3000</span><span class="path" id="urlPath">/admin/dashboard</span>
+      </div>
+      <div class="browser-actions">
+        <i class="bi bi-star"></i>
+        <i class="bi bi-share"></i>
+        <i class="bi bi-three-dots-vertical"></i>
+      </div>
+    </div>
+
+    <!-- Active Module Viewport -->
+    <div class="module-viewport" id="viewportContent">
+      <!-- Content injected by JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const mod = parseInt(urlParams.get('module') || '1', 10);
+
+    const modules = {
+      1: {
+        badge: "SECTION 3.5.1",
+        title: "3.5.1 Dashboard Module",
+        path: "/admin/dashboard",
+        render: () => `
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h4 class="fw-bold text-dark mb-1"><i class="bi bi-speedometer2 text-primary me-2"></i>Executive Support Operations Dashboard</h4>
+              <p class="text-muted small mb-0">Real-time performance metrics, SLA compliance rate, and multi-department analytics</p>
+            </div>
+            <div class="d-flex gap-2">
+              <span class="badge bg-success-subtle text-success border border-success px-3 py-2"><i class="bi bi-broadcast me-1"></i>Live Sync: 0.0.0.0:3000</span>
+              <button class="btn btn-primary btn-sm"><i class="bi bi-download me-1"></i>Export Analytics</button>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-3">
+              <div class="stat-card stat-purple">
+                <div>
+                  <div class="small text-white-50">TOTAL COMPLAINTS</div>
+                  <h2 class="fw-bold mb-0">1,482</h2>
+                  <small class="text-white-50">↑ 12% vs last month</small>
+                </div>
+                <i class="bi bi-ticket-detailed fs-1 text-white-50"></i>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card stat-amber">
+                <div>
+                  <div class="small text-white-50">PENDING TRIAGE</div>
+                  <h2 class="fw-bold mb-0">47</h2>
+                  <small class="text-white-50">Requires urgent assignment</small>
+                </div>
+                <i class="bi bi-hourglass-split fs-1 text-white-50"></i>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card stat-blue">
+                <div>
+                  <div class="small text-white-50">IN PROGRESS</div>
+                  <h2 class="fw-bold mb-0">118</h2>
+                  <small class="text-white-50">Under active investigation</small>
+                </div>
+                <i class="bi bi-gear-wide-connected fs-1 text-white-50"></i>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card stat-green">
+                <div>
+                  <div class="small text-white-50">RESOLVED TICKETS</div>
+                  <h2 class="fw-bold mb-0">1,317</h2>
+                  <small class="text-white-50">SLA Success: 98.4%</small>
+                </div>
+                <i class="bi bi-check-circle-fill fs-1 text-white-50"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-8">
+              <div class="glass-card mb-0">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="bi bi-table me-2 text-primary"></i>Recent High-Priority Complaints</h6>
+                  <span class="badge bg-light text-dark border">Showing latest 5 entries</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr class="small text-muted">
+                        <th>TICKET ID</th>
+                        <th>CUSTOMER</th>
+                        <th>CATEGORY</th>
+                        <th>PRIORITY</th>
+                        <th>STATUS</th>
+                        <th>SLA REMAINING</th>
+                      </tr>
+                    </thead>
+                    <tbody class="small">
+                      <tr>
+                        <td class="fw-bold text-primary">TKT-2026-0894</td>
+                        <td>John Doe</td>
+                        <td>Billing & Invoicing</td>
+                        <td><span class="badge badge-critical px-2 py-1">CRITICAL</span></td>
+                        <td><span class="badge badge-investigating px-2 py-1">INVESTIGATING</span></td>
+                        <td class="text-danger fw-bold"><i class="bi bi-clock me-1"></i>1h 14m</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-bold text-primary">TKT-2026-0891</td>
+                        <td>Emily Watson</td>
+                        <td>Technical Support</td>
+                        <td><span class="badge badge-high px-2 py-1">HIGH</span></td>
+                        <td><span class="badge badge-pending px-2 py-1">PENDING</span></td>
+                        <td class="text-warning fw-bold"><i class="bi bi-clock me-1"></i>3h 40m</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-bold text-primary">TKT-2026-0887</td>
+                        <td>Robert Smith</td>
+                        <td>Hardware Fault</td>
+                        <td><span class="badge badge-medium px-2 py-1">MEDIUM</span></td>
+                        <td><span class="badge badge-investigating px-2 py-1">INVESTIGATING</span></td>
+                        <td class="text-muted"><i class="bi bi-clock me-1"></i>18h 22m</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-bold text-primary">TKT-2026-0880</td>
+                        <td>Sarah Connor</td>
+                        <td>Logistics & Delivery</td>
+                        <td><span class="badge badge-resolved px-2 py-1">RESOLVED</span></td>
+                        <td><span class="badge badge-resolved px-2 py-1">CLOSED</span></td>
+                        <td class="text-success fw-bold"><i class="bi bi-check-all me-1"></i>Met SLA (2h 10m)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="glass-card mb-0">
+                <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Complaint Category Distribution</h6>
+                <div style="height: 220px; position: relative;">
+                  <canvas id="categoryChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        init: () => {
+          const ctx = document.getElementById('categoryChart');
+          if (ctx) {
+            new Chart(ctx, {
+              type: 'doughnut',
+              data: {
+                labels: ['Billing', 'Technical', 'Logistics', 'Product Quality', 'Others'],
+                datasets: [{
+                  data: [35, 28, 18, 12, 7],
+                  backgroundColor: ['#6366f1', '#0ea5e9', '#f59e0b', '#10b981', '#94a3b8']
+                }]
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+            });
+          }
+        }
+      },
+
+      2: {
+        badge: "SECTION 3.5.2",
+        title: "3.5.2 User Registration & Login Module",
+        path: "/login",
+        render: () => `
+          <div class="row g-0 justify-content-center align-items-center" style="min-height: 580px;">
+            <div class="col-md-10 glass-card p-0 overflow-hidden shadow-lg border-0">
+              <div class="row g-0">
+                <div class="col-md-5 p-5 text-white d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #1e1b4b, #4338ca);">
+                  <div>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                      <i class="bi bi-shield-lock-fill fs-2 text-warning"></i>
+                      <h4 class="fw-bold mb-0">SupportDesk</h4>
+                    </div>
+                    <p class="small text-white-50">Intelligent Customer Complaint & Support Analysis System</p>
+                    <div class="mt-4">
+                      <div class="d-flex align-items-center gap-2 mb-2 small"><i class="bi bi-check-circle-fill text-success"></i> Role-Based Access Control (RBAC)</div>
+                      <div class="d-flex align-items-center gap-2 mb-2 small"><i class="bi bi-check-circle-fill text-success"></i> Spring Security Session Invalidation</div>
+                      <div class="d-flex align-items-center gap-2 mb-2 small"><i class="bi bi-check-circle-fill text-success"></i> BCrypt 12-Round Password Encryption</div>
+                      <div class="d-flex align-items-center gap-2 small"><i class="bi bi-check-circle-fill text-success"></i> Resilient Failover & Client Offline Storage</div>
+                    </div>
+                  </div>
+                  <div class="border-top border-white-50 pt-3">
+                    <small class="text-white-50">Localhost Authentication Gateway: Port 3000 / 8080</small>
+                  </div>
+                </div>
+
+                <div class="col-md-7 p-5 bg-white">
+                  <div class="mb-4">
+                    <h4 class="fw-bold text-dark mb-1">Sign In to Your Account</h4>
+                    <p class="text-muted small">Select your designated role to enter the secure portal</p>
+                  </div>
+
+                  <!-- Role Selector Pills -->
+                  <div class="btn-group w-100 mb-4" role="group">
+                    <input type="radio" class="btn-check" name="roleRadio" id="roleCustomer" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary btn-sm fw-bold py-2" for="roleCustomer"><i class="bi bi-person me-1"></i>Customer</label>
+
+                    <input type="radio" class="btn-check" name="roleRadio" id="roleStaff" autocomplete="off">
+                    <label class="btn btn-outline-primary btn-sm fw-bold py-2" for="roleStaff"><i class="bi bi-headset me-1"></i>Support Lead</label>
+
+                    <input type="radio" class="btn-check" name="roleRadio" id="roleAdmin" autocomplete="off">
+                    <label class="btn btn-outline-primary btn-sm fw-bold py-2" for="roleAdmin"><i class="bi bi-shield-check me-1"></i>Administrator</label>
+                  </div>
+
+                  <form>
+                    <div class="mb-3">
+                      <label class="form-label small fw-bold">Email Address</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope text-muted"></i></span>
+                        <input type="email" class="form-control" value="admin@complaintsystem.com" placeholder="name@domain.com">
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <label class="form-label small fw-bold mb-0">Password</label>
+                        <a href="#" class="small text-primary text-decoration-none">Forgot Password?</a>
+                      </div>
+                      <div class="input-group mt-1">
+                        <span class="input-group-text bg-light"><i class="bi bi-key text-muted"></i></span>
+                        <input type="password" class="form-control" value="••••••••••••" placeholder="Enter password">
+                        <span class="input-group-text bg-light"><i class="bi bi-eye text-muted"></i></span>
+                      </div>
+                    </div>
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="checkbox" id="rememberMe" checked>
+                      <label class="form-check-label small text-muted" for="rememberMe">Remember credentials for 30 days</label>
+                    </div>
+                    <button type="button" class="btn btn-primary w-100 py-2 fw-bold shadow-sm mb-3">
+                      <i class="bi bi-box-arrow-in-right me-2"></i>Authenticate & Enter Portal
+                    </button>
+                    <div class="text-center small text-muted">
+                      Don't have an account? <a href="#" class="text-primary fw-bold text-decoration-none">Register as New Customer</a>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      3: {
+        badge: "SECTION 3.5.3",
+        title: "3.5.3 Complaint Submission Module",
+        path: "/user/submit",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-pencil-square text-primary me-2"></i>Submit Customer Complaint & Support Ticket</h4>
+                <p class="text-muted small mb-0">AI-assisted ticket filing with automated sentiment scoring and category validation</p>
+              </div>
+              <span class="badge bg-primary-subtle text-primary border border-primary px-3 py-2"><i class="bi bi-magic me-1"></i>Auto-NLP Classifier Active</span>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-md-8">
+                <form>
+                  <div class="mb-3">
+                    <label class="form-label small fw-bold">Complaint Title / Subject <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" value="Unauthorized duplicate debit charge on monthly billing cycle" placeholder="Brief summary of your complaint">
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Service Category <span class="text-danger">*</span></label>
+                      <select class="form-select">
+                        <option selected>Billing & Invoicing Issues</option>
+                        <option>Technical Software Faults</option>
+                        <option>Hardware & Device Damage</option>
+                        <option>Order Delivery & Logistics</option>
+                        <option>Customer Support Interaction</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Target Department</label>
+                      <input type="text" class="form-control bg-light" value="Finance & Accounts Department" readonly>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label small fw-bold">Detailed Incident Description <span class="text-danger">*</span></label>
+                    <textarea class="form-control" rows="5">I noticed two consecutive charges of $89.00 on my bank statement on October 1st. My account ID is #ACC-4491. Please investigate this immediately and initiate a refund for the duplicate transaction as this has caused an overdraft fee.</textarea>
+                    <div class="d-flex justify-content-between mt-1 text-muted small">
+                      <span>Minimum 20 characters required</span>
+                      <span>284 / 2000 characters</span>
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="form-label small fw-bold">Supporting Evidence / Attachment (Optional)</label>
+                    <div class="border border-2 border-dashed rounded p-3 text-center bg-light">
+                      <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
+                      <div class="small fw-bold mt-1">bank_statement_october.pdf (245 KB) uploaded</div>
+                      <small class="text-muted">Supports PNG, JPG, PDF up to 10 MB</small>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-3">
+                    <button type="button" class="btn btn-primary px-4 py-2 fw-bold"><i class="bi bi-send-fill me-2"></i>Submit Complaint Ticket</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 py-2">Save as Draft</button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="col-md-4">
+                <div class="glass-card bg-light border">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-cpu text-primary me-2"></i>AI Real-Time Analysis Preview</h6>
+                  <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Detected Sentiment</small>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1">VERY NEGATIVE (-0.82)</span>
+                      <small class="text-muted">High Frustration</small>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Recommended Priority</small>
+                    <span class="badge badge-critical px-3 py-1">CRITICAL (Escalated)</span>
+                  </div>
+                  <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Target SLA Turnaround</small>
+                    <span class="fw-bold text-dark"><i class="bi bi-stopwatch text-danger me-1"></i>Within 4 Hours</span>
+                  </div>
+                  <div class="p-2 rounded bg-white border small text-muted">
+                    <i class="bi bi-info-circle text-primary me-1"></i> Because financial terms ("duplicate debit", "overdraft") were identified, this complaint will be routed directly to Tier-2 Finance support.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      4: {
+        badge: "SECTION 3.5.4",
+        title: "3.5.4 Complaint Management Module",
+        path: "/admin/complaints",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-kanban-fill text-primary me-2"></i>Complaint Triage & Master Management</h4>
+                <p class="text-muted small mb-0">Central administrative queue for filtering, sorting, and resolving incoming enterprise tickets</p>
+              </div>
+              <div class="d-flex gap-2">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" placeholder="Search ticket, user, text...">
+                </div>
+                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-funnel me-1"></i>Filter</button>
+              </div>
+            </div>
+
+            <!-- Filter Status Badges -->
+            <div class="d-flex gap-2 mb-3">
+              <button class="btn btn-primary btn-sm px-3">All Complaints (1,482)</button>
+              <button class="btn btn-outline-secondary btn-sm px-3">Pending Triage (47)</button>
+              <button class="btn btn-outline-secondary btn-sm px-3">In Progress (118)</button>
+              <button class="btn btn-outline-secondary btn-sm px-3">Resolved (1,317)</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle border">
+                <thead class="table-light">
+                  <tr class="small text-muted">
+                    <th>TICKET #</th>
+                    <th>COMPLAINT SUMMARY</th>
+                    <th>CUSTOMER</th>
+                    <th>CATEGORY</th>
+                    <th>PRIORITY</th>
+                    <th>ASSIGNED TO</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody class="small">
+                  <tr>
+                    <td class="fw-bold text-primary">TKT-2026-0894</td>
+                    <td class="fw-semibold">Unauthorized duplicate debit charge on monthly billing cycle</td>
+                    <td>John Doe</td>
+                    <td>Billing & Accounts</td>
+                    <td><span class="badge badge-critical px-2 py-1">CRITICAL</span></td>
+                    <td><i class="bi bi-person-circle text-primary me-1"></i>Sarah Jenkins</td>
+                    <td><span class="badge badge-investigating px-2 py-1">INVESTIGATING</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary py-0 px-2">Update</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold text-primary">TKT-2026-0893</td>
+                    <td class="fw-semibold">API rate limit threshold triggering false 429 throttling</td>
+                    <td>DevCorp LLC</td>
+                    <td>Technical Support</td>
+                    <td><span class="badge badge-high px-2 py-1">HIGH</span></td>
+                    <td><i class="bi bi-person-circle text-primary me-1"></i>Alex Kumar</td>
+                    <td><span class="badge badge-investigating px-2 py-1">INVESTIGATING</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary py-0 px-2">Update</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold text-primary">TKT-2026-0892</td>
+                    <td class="fw-semibold">Delayed courier dispatch for hardware replacement unit</td>
+                    <td>Robert Vance</td>
+                    <td>Logistics</td>
+                    <td><span class="badge badge-medium px-2 py-1">MEDIUM</span></td>
+                    <td><span class="text-muted">Unassigned</span></td>
+                    <td><span class="badge badge-pending px-2 py-1">PENDING</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary py-0 px-2">Assign</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold text-primary">TKT-2026-0889</td>
+                    <td class="fw-semibold">Feature request: Custom webhook event for ticket closure</td>
+                    <td>Alice Morgan</td>
+                    <td>Product Feedback</td>
+                    <td><span class="badge badge-low px-2 py-1">LOW</span></td>
+                    <td><i class="bi bi-person-circle text-primary me-1"></i>Michael Scott</td>
+                    <td><span class="badge badge-resolved px-2 py-1">RESOLVED</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-secondary py-0 px-2">View</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `
+      },
+
+      5: {
+        badge: "SECTION 3.5.5",
+        title: "3.5.5 Complaint Categorization Module",
+        path: "/admin/categories",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-tags-fill text-primary me-2"></i>Automated Complaint Categorization Engine</h4>
+                <p class="text-muted small mb-0">Natural Language Processing (NLP) tokenization and semantic taxonomy routing</p>
+              </div>
+              <span class="badge bg-success-subtle text-success border border-success px-3 py-2"><i class="bi bi-check2-circle me-1"></i>Accuracy: 97.2%</span>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="p-3 border rounded bg-light mb-3">
+                  <h6 class="fw-bold mb-2">Simulated Text Classification Test</h6>
+                  <p class="small text-muted mb-2">Input complaint string to test classifier token matching:</p>
+                  <textarea class="form-control mb-2" rows="3">The server response latency exceeded 8000ms and returned an internal 500 error code on checkout.</textarea>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">Detected Keywords: <strong class="text-primary">latency, 500 error, server</strong></span>
+                    <button class="btn btn-primary btn-sm fw-bold">Run Classifier</button>
+                  </div>
+                </div>
+
+                <div class="glass-card border p-3">
+                  <h6 class="fw-bold mb-3">Predicted Category Probabilities</h6>
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                      <span>Technical Support & Infrastructure</span>
+                      <span class="text-primary">94.8% Match</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                      <div class="progress-bar bg-primary" style="width: 94.8%;"></div>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                      <span>Product Performance</span>
+                      <span class="text-secondary">3.4% Match</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                      <div class="progress-bar bg-secondary" style="width: 3.4%;"></div>
+                    </div>
+                  </div>
+                  <div class="mb-0">
+                    <div class="d-flex justify-content-between small fw-bold mb-1">
+                      <span>Billing / Others</span>
+                      <span class="text-muted">1.8% Match</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                      <div class="progress-bar bg-secondary" style="width: 1.8%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <h6 class="fw-bold mb-3">Configured Taxonomy Rules</h6>
+                <div class="table-responsive">
+                  <table class="table table-bordered table-sm align-middle small">
+                    <thead class="table-light">
+                      <tr>
+                        <th>CATEGORY</th>
+                        <th>DEPARTMENT</th>
+                        <th>AUTO-ROUTING</th>
+                        <th>ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="fw-bold">Billing & Invoicing</td>
+                        <td>Finance Team</td>
+                        <td><span class="badge bg-success">ACTIVE</span></td>
+                        <td><button class="btn btn-sm btn-link p-0">Edit</button></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-bold">Technical Support</td>
+                        <td>IT Engineering</td>
+                        <td><span class="badge bg-success">ACTIVE</span></td>
+                        <td><button class="btn btn-sm btn-link p-0">Edit</button></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-bold">Hardware Fault</td>
+                        <td>R&D Device Lab</td>
+                        <td><span class="badge bg-success">ACTIVE</span></td>
+                        <td><button class="btn btn-sm btn-link p-0">Edit</button></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-bold">Logistics & Delivery</td>
+                        <td>Supply Chain</td>
+                        <td><span class="badge bg-success">ACTIVE</span></td>
+                        <td><button class="btn btn-sm btn-link p-0">Edit</button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      6: {
+        badge: "SECTION 3.5.6",
+        title: "3.5.6 Priority Assignment Module",
+        path: "/admin/complaints?action=priority",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Intelligent Priority Assignment & SLA Engine</h4>
+                <p class="text-muted small mb-0">Algorithmic severity grading combining sentiment polarity, customer tier, and business impact</p>
+              </div>
+              <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-2"><i class="bi bi-clock-history me-1"></i>SLA Enforcer Active</span>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-3">
+                <div class="p-3 rounded border border-danger bg-danger-subtle text-center">
+                  <span class="badge badge-critical px-3 py-1 fs-6 mb-2">CRITICAL</span>
+                  <div class="fw-bold text-danger fs-4">2 - 4 Hours</div>
+                  <small class="text-muted d-block">Sentiment Score &lt; -0.70 or Financial Loss</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 rounded border border-warning bg-warning-subtle text-center">
+                  <span class="badge badge-high px-3 py-1 fs-6 mb-2">HIGH</span>
+                  <div class="fw-bold text-dark fs-4">8 Hours</div>
+                  <small class="text-muted d-block">System Down, Service Interruption</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 rounded border border-primary bg-primary-subtle text-center">
+                  <span class="badge badge-medium px-3 py-1 fs-6 mb-2">MEDIUM</span>
+                  <div class="fw-bold text-primary fs-4">24 Hours</div>
+                  <small class="text-muted d-block">General Account Queries, Feature Flaws</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 rounded border border-success bg-success-subtle text-center">
+                  <span class="badge badge-low px-3 py-1 fs-6 mb-2">LOW</span>
+                  <div class="fw-bold text-success fs-4">48 Hours</div>
+                  <small class="text-muted d-block">Suggestions, UI Enhancements, Info</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 border rounded bg-white">
+              <h6 class="fw-bold mb-3"><i class="bi bi-sliders me-2 text-primary"></i>Live Priority Calculation Workflow</h6>
+              <div class="row align-items-center">
+                <div class="col-md-4 text-center border-end">
+                  <small class="text-muted d-block">VADER / NLP Sentiment Score</small>
+                  <h3 class="fw-bold text-danger my-1">-0.82</h3>
+                  <span class="badge bg-danger">Severe Negative Polarity</span>
+                </div>
+                <div class="col-md-4 text-center border-end">
+                  <small class="text-muted d-block">Calculated Urgency Weight</small>
+                  <h3 class="fw-bold text-primary my-1">92 / 100</h3>
+                  <span class="badge bg-primary">Escalation Triggered</span>
+                </div>
+                <div class="col-md-4 text-center">
+                  <small class="text-muted d-block">Resulting System Priority</small>
+                  <h3 class="fw-bold text-danger my-1">CRITICAL</h3>
+                  <span class="badge bg-danger">SLA Deadline: 2 Hours</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      7: {
+        badge: "SECTION 3.5.7",
+        title: "3.5.7 Ticket Generation Module",
+        path: "/tickets/TKT-2026-0894",
+        render: () => `
+          <div class="ticket-container">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-qr-code-scan fs-1 text-primary"></i>
+                <div>
+                  <h4 class="fw-bold text-primary mb-0">TICKET #TKT-2026-0894</h4>
+                  <small class="text-muted">Generated Automatically by Complaint Pipeline</small>
+                </div>
+              </div>
+              <div class="text-end">
+                <span class="badge badge-critical px-3 py-2 fs-6">CRITICAL PRIORITY</span>
+                <div class="small text-muted mt-1">Generated: Oct 02, 2026 10:15:22 AM</div>
+              </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                  <small class="text-muted d-block">CUSTOMER NAME</small>
+                  <div class="fw-bold fs-6">John Doe (Acct: #ACC-4491)</div>
+                  <small class="text-muted">john.doe@example.com</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                  <small class="text-muted d-block">ASSIGNED SERVICE UNIT</small>
+                  <div class="fw-bold fs-6">Finance & Billing Operations</div>
+                  <small class="text-muted">Lead Agent: Sarah Jenkins</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-light rounded mb-4">
+              <small class="text-muted d-block mb-1">INCIDENT SUMMARY</small>
+              <div class="fw-bold text-dark">Unauthorized duplicate debit charge on monthly billing cycle ($89.00)</div>
+              <p class="small text-muted mb-0 mt-1">Status: Initial triage completed. Target SLA Resolution within 4 hours.</p>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm fw-bold"><i class="bi bi-printer-fill me-1"></i>Print Ticket</button>
+                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF Receipt</button>
+              </div>
+              <div class="font-monospace small text-muted">
+                HASH: 7f8a9b2c3d4e5f6a1b2c
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      8: {
+        badge: "SECTION 3.5.8",
+        title: "3.5.8 Complaint Assignment Module",
+        path: "/admin/complaints?action=assign",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-person-lines-fill text-primary me-2"></i>Support Agent Dispatch & Ticket Assignment</h4>
+                <p class="text-muted small mb-0">Dynamic staff load-balancing, department skill routing, and workload distribution</p>
+              </div>
+              <button class="btn btn-primary btn-sm fw-bold"><i class="bi bi-robot me-1"></i>Auto-Assign Optimal Agent</button>
+            </div>
+
+            <div class="p-3 bg-light rounded mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="badge badge-critical px-2 py-1 me-2">CRITICAL</span>
+                  <strong class="text-dark">Ticket TKT-2026-0894:</strong> Unauthorized duplicate debit charge on monthly billing cycle
+                </div>
+                <span class="text-muted small">Customer: John Doe</span>
+              </div>
+            </div>
+
+            <h6 class="fw-bold mb-3">Available Support Agents (Finance & Accounts Team)</h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="p-3 border rounded bg-white shadow-sm border-primary">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="rounded-circle bg-primary text-white p-2"><i class="bi bi-person-fill fs-5"></i></div>
+                    <div>
+                      <h6 class="fw-bold mb-0">Sarah Jenkins</h6>
+                      <small class="text-muted">Support Lead (Tier 2)</small>
+                    </div>
+                  </div>
+                  <div class="small mb-2">
+                    <span class="text-muted">Current Load:</span> <strong>2 / 5 Active Tickets</strong>
+                  </div>
+                  <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-success" style="width: 40%;"></div>
+                  </div>
+                  <button class="btn btn-primary btn-sm w-100 fw-bold"><i class="bi bi-check2 me-1"></i>Assign to Sarah (Best Match)</button>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="p-3 border rounded bg-white shadow-sm">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="rounded-circle bg-secondary text-white p-2"><i class="bi bi-person-fill fs-5"></i></div>
+                    <div>
+                      <h6 class="fw-bold mb-0">Alex Kumar</h6>
+                      <small class="text-muted">Billing Specialist</small>
+                    </div>
+                  </div>
+                  <div class="small mb-2">
+                    <span class="text-muted">Current Load:</span> <strong>4 / 5 Active Tickets</strong>
+                  </div>
+                  <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-warning" style="width: 80%;"></div>
+                  </div>
+                  <button class="btn btn-outline-secondary btn-sm w-100">Assign to Alex</button>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="p-3 border rounded bg-white shadow-sm">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="rounded-circle bg-secondary text-white p-2"><i class="bi bi-person-fill fs-5"></i></div>
+                    <div>
+                      <h6 class="fw-bold mb-0">Michael Scott</h6>
+                      <small class="text-muted">Senior Support Officer</small>
+                    </div>
+                  </div>
+                  <div class="small mb-2">
+                    <span class="text-muted">Current Load:</span> <strong>5 / 5 (Max Capacity)</strong>
+                  </div>
+                  <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-danger" style="width: 100%;"></div>
+                  </div>
+                  <button class="btn btn-outline-secondary btn-sm w-100" disabled>Agent Busy</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      9: {
+        badge: "SECTION 3.5.9",
+        title: "3.5.9 Complaint Status Tracking Module",
+        path: "/user/track",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-activity text-primary me-2"></i>Live Complaint Status & Resolution Tracker</h4>
+                <p class="text-muted small mb-0">Real-time multi-stage pipeline showing investigation progress and milestone updates</p>
+              </div>
+              <span class="badge bg-primary-subtle text-primary border border-primary px-3 py-2">Ticket #TKT-2026-0894</span>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-md-7">
+                <h6 class="fw-bold mb-4 text-primary"><i class="bi bi-diagram-3 me-2"></i>Lifecycle Milestone Progress</h6>
+
+                <div class="timeline-step completed">
+                  <div class="step-icon done"><i class="bi bi-check-lg"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Step 1: Complaint Lodged & Submitted</h6>
+                    <small class="text-muted d-block">Oct 02, 2026 - 10:15 AM</small>
+                    <p class="small text-secondary mb-0">Received by system gateway and encrypted in MySQL/H2 database.</p>
+                  </div>
+                </div>
+
+                <div class="timeline-step completed">
+                  <div class="step-icon done"><i class="bi bi-check-lg"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Step 2: AI Classification & Agent Assignment</h6>
+                    <small class="text-muted d-block">Oct 02, 2026 - 10:18 AM</small>
+                    <p class="small text-secondary mb-0">Categorized as "Billing & Invoicing" and assigned to Sarah Jenkins.</p>
+                  </div>
+                </div>
+
+                <div class="timeline-step">
+                  <div class="step-icon active"><i class="bi bi-gear-fill"></i></div>
+                  <div>
+                    <h6 class="fw-bold text-primary mb-1">Step 3: Under Investigation (Current Phase)</h6>
+                    <small class="text-primary d-block fw-semibold">Active now</small>
+                    <p class="small text-secondary mb-0">Agent is cross-verifying payment gateway ledger records with transaction ID #TX-9901.</p>
+                  </div>
+                </div>
+
+                <div class="timeline-step">
+                  <div class="step-icon pending"><i class="bi bi-flag"></i></div>
+                  <div>
+                    <h6 class="fw-bold text-muted mb-1">Step 4: Final Resolution & Refund Issuance</h6>
+                    <small class="text-muted d-block">Estimated: Today by 02:00 PM</small>
+                    <p class="small text-muted mb-0">Refund approval and ticket resolution notification dispatch.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-5">
+                <div class="glass-card bg-light border p-4">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-chat-left-dots text-primary me-2"></i>Support Lead Remarks</h6>
+                  <div class="p-3 bg-white rounded border mb-3 small">
+                    <strong class="text-primary d-block mb-1">Sarah Jenkins (10:30 AM):</strong>
+                    "Hello John, I have verified the duplicate transaction on the billing gateway. The refund request of $89.00 has been initiated to your original payment method. Thank you for your patience."
+                  </div>
+                  <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary btn-sm"><i class="bi bi-reply me-1"></i>Add Note / Response</button>
+                    <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-bell me-1"></i>Subscribe to SMS Alerts</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      10: {
+        badge: "SECTION 3.5.10",
+        title: "3.5.10 Notification Management Module",
+        path: "/user/notifications",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-bell-fill text-primary me-2"></i>Real-Time Notification Management Center</h4>
+                <p class="text-muted small mb-0">Automated multi-channel event dispatch for ticket updates, SLA alerts, and assignments</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm"><i class="bi bi-check2-all me-1"></i>Mark All as Read</button>
+            </div>
+
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-action p-3 border-start border-4 border-primary">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                  <h6 class="mb-0 fw-bold text-primary"><i class="bi bi-ticket-detailed me-2"></i>Status Update: Ticket #TKT-2026-0894</h6>
+                  <small class="text-muted">5 mins ago</small>
+                </div>
+                <p class="mb-1 small text-dark">Your complaint regarding "Unauthorized duplicate debit charge" has been moved to <strong>UNDER INVESTIGATION</strong> by Sarah Jenkins.</p>
+                <small class="text-muted"><i class="bi bi-person me-1"></i>From: Support Operations</small>
+              </a>
+
+              <a href="#" class="list-group-item list-group-item-action p-3 border-start border-4 border-danger">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                  <h6 class="mb-0 fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Urgent SLA Escalation Alert</h6>
+                  <small class="text-muted">22 mins ago</small>
+                </div>
+                <p class="mb-1 small text-dark">Critical Priority ticket #TKT-2026-0891 has 1 hour remaining before SLA threshold breach. Escalated to Department Supervisor.</p>
+                <small class="text-muted"><i class="bi bi-shield me-1"></i>From: System SLA Enforcer</small>
+              </a>
+
+              <a href="#" class="list-group-item list-group-item-action p-3 border-start border-4 border-success">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                  <h6 class="mb-0 fw-bold text-success"><i class="bi bi-check-circle-fill me-2"></i>Complaint Successfully Resolved</h6>
+                  <small class="text-muted">1 hour ago</small>
+                </div>
+                <p class="mb-1 small text-dark">Ticket #TKT-2026-0880 has been marked as <strong>RESOLVED</strong>. Please rate your support experience.</p>
+                <small class="text-muted"><i class="bi bi-star me-1"></i>Feedback request sent to customer</small>
+              </a>
+            </div>
+          </div>
+        `
+      },
+
+      11: {
+        badge: "SECTION 3.5.11",
+        title: "3.5.11 Feedback & Rating Module",
+        path: "/user/feedback",
+        render: () => `
+          <div class="glass-card mb-0" style="max-width: 900px; margin: 0 auto;">
+            <div class="text-center mb-4 border-bottom pb-3">
+              <h4 class="fw-bold mb-1"><i class="bi bi-star-fill text-warning me-2"></i>Customer Satisfaction & Feedback Survey</h4>
+              <p class="text-muted small mb-0">Post-resolution evaluation for closed Ticket #TKT-2026-0880 (Delivery Issue)</p>
+            </div>
+
+            <div class="text-center my-4">
+              <div class="small fw-bold text-muted mb-2">HOW WOULD YOU RATE OUR SERVICE QUALITY?</div>
+              <div class="star-rating mb-2">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+              </div>
+              <div class="fw-bold text-success fs-5">5.0 / 5.0 - Excellent Resolution Experience</div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Resolution Speed</label>
+                <select class="form-select form-select-sm">
+                  <option selected>Resolved faster than expected</option>
+                  <option>Resolved within acceptable timeframe</option>
+                  <option>Resolution was delayed</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Agent Professionalism</label>
+                <select class="form-select form-select-sm">
+                  <option selected>Extremely courteous & helpful</option>
+                  <option>Satisfactory assistance</option>
+                  <option>Needs improvement</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-bold">Detailed Customer Comments & Review</label>
+              <textarea class="form-control" rows="3">The support agent resolved my duplicate billing inquiry within 2 hours and promptly reversed the transaction. Outstanding speed and communication!</textarea>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3">
+              <button class="btn btn-primary px-4 py-2 fw-bold"><i class="bi bi-send-check me-2"></i>Submit Feedback Rating</button>
+              <button class="btn btn-outline-secondary px-4 py-2">Skip</button>
+            </div>
+          </div>
+        `
+      },
+
+      12: {
+        badge: "SECTION 3.5.12",
+        title: "3.5.12 Complaint Analytics & Reporting Module",
+        path: "/admin/analytics",
+        render: () => `
+          <div class="glass-card mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Enterprise Complaint Analytics & Business Intelligence</h4>
+                <p class="text-muted small mb-0">Predictive sentiment modeling, resolution trends, and department efficiency benchmarking</p>
+              </div>
+              <button class="btn btn-primary btn-sm fw-bold"><i class="bi bi-file-earmark-pdf me-1"></i>Generate Academic PDF Report</button>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <div class="p-3 border rounded bg-white">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Monthly Complaint Resolution Volume</h6>
+                  <div style="height: 220px; position: relative;">
+                    <canvas id="monthlyTrendChart"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 border rounded bg-white">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-emoji-smile-fill text-warning me-2"></i>Customer Sentiment Distribution</h6>
+                  <div style="height: 220px; position: relative;">
+                    <canvas id="sentimentChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="p-3 border rounded bg-white text-center">
+                  <small class="text-muted">AVERAGE RESOLUTION TIME</small>
+                  <h3 class="fw-bold text-primary my-1">3.4 Hours</h3>
+                  <small class="text-success">↓ 24% faster than target SLA</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 border rounded bg-white text-center">
+                  <small class="text-muted">FIRST CONTACT RESOLUTION (FCR)</small>
+                  <h3 class="fw-bold text-success my-1">87.5%</h3>
+                  <small class="text-muted">Target Benchmark: 80%</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 border rounded bg-white text-center">
+                  <small class="text-muted">OVERALL CSAT SCORE</small>
+                  <h3 class="fw-bold text-warning my-1">4.8 / 5.0</h3>
+                  <small class="text-success">↑ Based on 940 customer reviews</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        init: () => {
+          const ctx1 = document.getElementById('monthlyTrendChart');
+          if (ctx1) {
+            new Chart(ctx1, {
+              type: 'bar',
+              data: {
+                labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                datasets: [
+                  { label: 'Resolved', data: [190, 240, 280, 310, 340, 360], backgroundColor: '#10b981' },
+                  { label: 'Filed', data: [210, 260, 290, 330, 355, 380], backgroundColor: '#6366f1' }
+                ]
+              },
+              options: { responsive: true, maintainAspectRatio: false }
+            });
+          }
+
+          const ctx2 = document.getElementById('sentimentChart');
+          if (ctx2) {
+            new Chart(ctx2, {
+              type: 'pie',
+              data: {
+                labels: ['Positive (Satisfied)', 'Neutral (Informational)', 'Negative (Frustrated)'],
+                datasets: [{
+                  data: [54, 28, 18],
+                  backgroundColor: ['#10b981', '#38bdf8', '#ef4444']
+                }]
+              },
+              options: { responsive: true, maintainAspectRatio: false }
+            });
+          }
+        }
+      },
+
+      13: {
+        badge: "SECTION 3.5.13",
+        title: "3.5.13 Logout Module",
+        path: "/logout",
+        render: () => `
+          <div class="row justify-content-center align-items-center" style="min-height: 520px;">
+            <div class="col-md-7">
+              <div class="glass-card text-center p-5 border shadow">
+                <div class="rounded-circle bg-success-subtle text-success d-inline-flex p-4 mb-3 border border-success">
+                  <i class="bi bi-shield-check fs-1"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-2">Session Securely Terminated</h3>
+                <p class="text-muted mb-4">You have successfully signed out of the Intelligent Customer Complaint & Support Analysis System.</p>
+
+                <div class="p-3 bg-light rounded text-start mb-4 small">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Security Context:</span>
+                    <strong class="text-success">Cleared & Invalidated</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Session Cookie (JSESSIONID):</span>
+                    <strong class="text-success">Expired (HTTP-Only)</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-muted">Local Storage Cache:</span>
+                    <strong class="text-success">Purged</strong>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3">
+                  <a href="/login.html" class="btn btn-primary px-4 py-2 fw-bold"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In Again</a>
+                  <a href="/index.html" class="btn btn-outline-secondary px-4 py-2"><i class="bi bi-house me-1"></i>Return to Home</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    const currentMod = modules[mod] || modules[1];
+    document.getElementById('moduleBadge').innerText = currentMod.badge;
+    document.getElementById('moduleTitle').innerText = currentMod.title;
+    document.getElementById('urlPath').innerText = currentMod.path;
+    document.getElementById('viewportContent').innerHTML = currentMod.render();
+
+    if (currentMod.init) {
+      setTimeout(currentMod.init, 100);
+    }
+  </script>
+</body>
+</html>
