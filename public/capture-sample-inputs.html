@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440, initial-scale=1.0">
+  <title>Sample Input Figures - Intelligent Complaint System</title>
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --secondary: #0ea5e9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #e2e8f0;
+      --text: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #0b0f19;
+      color: var(--text);
+      padding: 24px;
+      width: 1440px;
+      min-height: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .capture-card {
+      width: 100%;
+      max-width: 1392px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Academic Header */
+    .academic-header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      color: #ffffff;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #4338ca;
+    }
+
+    .academic-badge {
+      background: rgba(99, 102, 241, 0.35);
+      border: 1px solid #818cf8;
+      color: #e0e7ff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .academic-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .project-name {
+      font-size: 0.82rem;
+      color: #c7d2fe;
+      font-weight: 500;
+    }
+
+    /* Browser Chrome */
+    .browser-chrome {
+      background: #f1f5f9;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .window-dots { display: flex; gap: 7px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .nav-buttons { display: flex; gap: 8px; color: #94a3b8; }
+
+    .address-bar {
+      flex: 1;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .address-bar i { color: #10b981; }
+    .address-bar .domain { color: #0f172a; }
+    .address-bar .path { color: #4f46e5; }
+
+    /* Viewport */
+    .viewport {
+      background: #f8fafc;
+      min-height: 680px;
+      padding: 28px;
+      overflow: hidden;
+    }
+
+    .form-card {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 28px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .sample-input-field {
+      background-color: #f8fafc !important;
+      border: 1.5px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+
+    .field-hint {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 3px;
+    }
+
+    .sample-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="capture-card">
+    <!-- Academic Header -->
+    <div class="academic-header">
+      <div class="d-flex align-items-center gap-3">
+        <span class="academic-badge" id="sectionBadge">APPENDIX D: SAMPLE INPUT</span>
+        <h4 class="academic-title" id="figureTitle">Figure D.1: Login Input</h4>
+      </div>
+      <div class="project-name">
+        <i class="bi bi-cpu-fill text-warning me-1"></i>
+        Intelligent Customer Complaint & Support Analysis System
+      </div>
+    </div>
+
+    <!-- Browser Chrome -->
+    <div class="browser-chrome">
+      <div class="window-dots">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <div class="nav-buttons">
+        <i class="bi bi-arrow-left"></i>
+        <i class="bi bi-arrow-right"></i>
+        <i class="bi bi-arrow-clockwise"></i>
+      </div>
+      <div class="address-bar">
+        <i class="bi bi-shield-lock-fill"></i>
+        <span class="domain">http://localhost:3000</span><span class="path" id="urlPath">/login</span>
+      </div>
+      <div class="d-flex gap-3 text-muted">
+        <i class="bi bi-star"></i>
+        <i class="bi bi-three-dots-vertical"></i>
+      </div>
+    </div>
+
+    <!-- Viewport Content -->
+    <div class="viewport" id="viewportContent">
+      <!-- Injected by script -->
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const fig = urlParams.get('fig') || 'D1';
+
+    const figures = {
+      'D1': {
+        badge: "APPENDIX D.1",
+        title: "Figure D.1: Login Input",
+        path: "/login",
+        render: () => `
+          <div class="row justify-content-center align-items-center" style="min-height: 560px;">
+            <div class="col-md-9 form-card shadow-lg p-0 overflow-hidden border-0">
+              <div class="row g-0">
+                <div class="col-md-5 p-4 text-white d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #1e1b4b, #4338ca);">
+                  <div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <i class="bi bi-shield-lock-fill fs-3 text-warning"></i>
+                      <h5 class="fw-bold mb-0">SupportDesk Portal</h5>
+                    </div>
+                    <p class="small text-white-50 mb-3">Enterprise Authentication Gateway</p>
+                    <div class="p-2 rounded bg-white bg-opacity-10 small mb-2">
+                      <span class="sample-badge mb-1 d-inline-block">DATA MAPPING</span>
+                      <div class="font-monospace text-white-50" style="font-size: 0.75rem;">Table: users</div>
+                      <div class="font-monospace text-white-50" style="font-size: 0.75rem;">Columns: email, password_hash</div>
+                    </div>
+                  </div>
+                  <div class="small text-white-50">Validation: RFC 5322 Email regex & BCrypt check</div>
+                </div>
+
+                <div class="col-md-7 p-4 bg-white">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">System Login Input</h5>
+                    <span class="badge bg-success-subtle text-success border border-success">Status: Ready</span>
+                  </div>
+
+                  <!-- Role Selector Pills -->
+                  <div class="btn-group w-100 mb-3" role="group">
+                    <input type="radio" class="btn-check" name="r" id="r1" autocomplete="off">
+                    <label class="btn btn-outline-primary btn-sm fw-bold" for="r1">Customer</label>
+                    <input type="radio" class="btn-check" name="r" id="r2" autocomplete="off">
+                    <label class="btn btn-outline-primary btn-sm fw-bold" for="r2">Support Lead</label>
+                    <input type="radio" class="btn-check" name="r" id="r3" autocomplete="off" checked>
+                    <label class="btn btn-primary btn-sm fw-bold" for="r3"><i class="bi bi-check2 me-1"></i>Administrator</label>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label small fw-bold">Email Address <span class="text-danger">*</span></label>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      <input type="email" class="form-control sample-input-field" value="admin@complaintsystem.com" readonly>
+                    </div>
+                    <div class="field-hint">Sample Input: Validated registered administrative account</div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label small fw-bold">Account Password <span class="text-danger">*</span></label>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text"><i class="bi bi-key"></i></span>
+                      <input type="password" class="form-control sample-input-field" value="Admin@123" readonly>
+                      <span class="input-group-text"><i class="bi bi-eye"></i></span>
+                    </div>
+                    <div class="field-hint">Sample Input: Transmitted via HTTPS; validated against BCrypt hash</div>
+                  </div>
+
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" checked id="rm">
+                    <label class="form-check-label small text-muted" for="rm">Remember credentials on this workstation</label>
+                  </div>
+
+                  <button type="button" class="btn btn-primary btn-sm w-100 py-2 fw-bold shadow-sm">
+                    <i class="bi bi-box-arrow-in-right me-1"></i>Authenticate & Submit Login Input
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      'D2': {
+        badge: "APPENDIX D.2",
+        title: "Figure D.2: User Registration Input",
+        path: "/register",
+        render: () => `
+          <div class="form-card mx-auto" style="max-width: 900px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-person-plus-fill text-primary me-2"></i>New Customer Registration Input</h5>
+                <p class="text-muted small mb-0">Captures applicant credentials, validates constraints, and commits user records</p>
+              </div>
+              <span class="sample-badge">Table: users (ROLE_USER)</span>
+            </div>
+
+            <form>
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Full Legal Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="John Doe" readonly>
+                  <div class="field-hint">Sample: String (2 - 100 chars), alphanumeric with spaces</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Email Address <span class="text-danger">*</span></label>
+                  <input type="email" class="form-control form-control-sm sample-input-field" value="john.doe@example.com" readonly>
+                  <div class="field-hint">Sample: Unique constraint; used for authentication and OTP notifications</div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Contact Phone Number <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control form-control-sm sample-input-field" value="+1-555-0199" readonly>
+                  <div class="field-hint">Sample: E.164 phone format for automated SMS dispatch</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Customer Department / Organization</label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="Retail Operations Client" readonly>
+                  <div class="field-hint">Sample: Account affiliation tag</div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control form-control-sm sample-input-field" value="User@123" readonly>
+                  <div class="field-hint">Sample: Requires min 8 chars, uppercase, lowercase, special char</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Confirm Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control form-control-sm sample-input-field" value="User@123" readonly>
+                  <div class="field-hint text-success"><i class="bi bi-check-circle me-1"></i>Passwords match</div>
+                </div>
+              </div>
+
+              <div class="p-2 rounded bg-light border mb-3 small d-flex justify-content-between align-items-center">
+                <span class="text-muted"><i class="bi bi-shield-check text-success me-1"></i>Client-side and Server-side Spring Validation Active</span>
+                <span class="badge bg-primary">ROLE_USER</span>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold"><i class="bi bi-save me-1"></i>Submit Registration</button>
+              </div>
+            </form>
+          </div>
+        `
+      },
+
+      'D3': {
+        badge: "APPENDIX D.3",
+        title: "Figure D.3: Complaint Submission Input",
+        path: "/user/submit",
+        render: () => `
+          <div class="form-card mx-auto" style="max-width: 960px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-file-earmark-plus text-primary me-2"></i>Complaint Submission Data Input</h5>
+                <p class="text-muted small mb-0">Submits structured complaint payload to Spring Boot <code>/api/user/complaints</code></p>
+              </div>
+              <span class="sample-badge">Table: complaints</span>
+            </div>
+
+            <form>
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Complaint Title / Subject <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm sample-input-field" value="Unauthorized duplicate debit charge on monthly billing cycle" readonly>
+                <div class="field-hint">Sample Input: Primary complaint title (stored in <code>complaints.title</code>)</div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Complaint Category <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="Billing & Payments" readonly>
+                  <div class="field-hint">Sample Input: Foreign key reference to <code>categories.id = 1</code></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Target Department</label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="Finance & Accounts Department" readonly>
+                  <div class="field-hint">Sample Input: Auto-derived operational routing unit</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Detailed Complaint Description <span class="text-danger">*</span></label>
+                <textarea class="form-control sample-input-field" rows="4" readonly>I noticed two consecutive charges of $89.00 on my bank statement on October 1st. My account ID is #ACC-4491. Please investigate this immediately and initiate a refund for the duplicate transaction as this has caused an overdraft fee.</textarea>
+                <div class="field-hint">Sample Input: Analyzed by NLP model for sentiment and urgency evaluation</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Document / Evidence Upload</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text"><i class="bi bi-paperclip"></i></span>
+                  <input type="text" class="form-control sample-input-field" value="bank_statement_october.pdf (245 KB)" readonly>
+                  <span class="input-group-text bg-success-subtle text-success fw-bold"><i class="bi bi-check2 me-1"></i>Uploaded</span>
+                </div>
+                <div class="field-hint">Sample Input: Multipart file stored in server filesystem / S3</div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3">Save Draft</button>
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold"><i class="bi bi-send-fill me-1"></i>File Complaint</button>
+              </div>
+            </form>
+          </div>
+        `
+      },
+
+      'D4': {
+        badge: "APPENDIX D.4",
+        title: "Figure D.4: Complaint Categorization and Priority Input",
+        path: "/admin/categories",
+        render: () => `
+          <div class="form-card mx-auto" style="max-width: 960px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-sliders2 text-primary me-2"></i>Categorization & Priority Assignment Input</h5>
+                <p class="text-muted small mb-0">Rule-based scoring, category taxonomy input, and urgency threshold mapping</p>
+              </div>
+              <span class="sample-badge">Engine: NLP + Rule Classifier</span>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <div class="p-3 border rounded bg-light">
+                  <h6 class="fw-bold mb-2 small text-primary"><i class="bi bi-tag-fill me-1"></i>CATEGORY INPUT CONFIGURATION</h6>
+                  <div class="mb-2">
+                    <label class="form-label small fw-bold mb-1">Selected Category Tag</label>
+                    <input type="text" class="form-control form-control-sm sample-input-field" value="Technical & System Glitches" readonly>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-bold mb-1">Matching Keywords Input</label>
+                    <input type="text" class="form-control form-control-sm sample-input-field" value="crash, latency, timeout, 500 error, freeze" readonly>
+                  </div>
+                  <div>
+                    <label class="form-label small fw-bold mb-1">Assigned Department</label>
+                    <input type="text" class="form-control form-control-sm sample-input-field" value="IT Tier-2 Engineering" readonly>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="p-3 border rounded bg-light">
+                  <h6 class="fw-bold mb-2 small text-danger"><i class="bi bi-lightning-fill me-1"></i>PRIORITY INPUT CLASSIFICATION</h6>
+                  <div class="mb-2">
+                    <label class="form-label small fw-bold mb-1">Calculated Polarity Score</label>
+                    <input type="text" class="form-control form-control-sm sample-input-field text-danger" value="-0.82 (Very Negative)" readonly>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-bold mb-1">Urgency Score Metric</label>
+                    <input type="text" class="form-control form-control-sm sample-input-field" value="92 / 100 (Threshold Exceeded)" readonly>
+                  </div>
+                  <div>
+                    <label class="form-label small fw-bold mb-1">Enforced Priority Level</label>
+                    <div class="d-flex gap-2">
+                      <span class="badge bg-danger px-3 py-2 fw-bold w-100">CRITICAL PRIORITY</span>
+                      <span class="badge bg-warning text-dark px-3 py-2 fw-bold w-100">SLA: 4 HOURS</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white border rounded small">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong class="text-dark">Database Destination:</strong>
+                  <span class="text-muted ms-2"><code>complaints.category_id</code> &rarr; 2 | <code>complaints.priority</code> &rarr; CRITICAL</span>
+                </div>
+                <span class="badge bg-success">Automated Validation Pass</span>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      'D5': {
+        badge: "APPENDIX D.5",
+        title: "Figure D.5: Complaint Assignment Input",
+        path: "/admin/complaints?action=assign",
+        render: () => `
+          <div class="form-card mx-auto" style="max-width: 900px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-person-check-fill text-primary me-2"></i>Staff Assignment & Dispatch Input</h5>
+                <p class="text-muted small mb-0">Assigns ticket to designated support engineer and sets investigation SLA</p>
+              </div>
+              <span class="sample-badge">Table: complaints.assigned_to</span>
+            </div>
+
+            <form>
+              <div class="p-3 rounded bg-light border mb-3">
+                <div class="row align-items-center">
+                  <div class="col-md-3">
+                    <small class="text-muted d-block">TICKET REFERENCE</small>
+                    <span class="fw-bold text-primary">#TKT-2026-0894</span>
+                  </div>
+                  <div class="col-md-6">
+                    <small class="text-muted d-block">COMPLAINT TITLE</small>
+                    <span class="fw-bold text-dark">Unauthorized duplicate debit charge ($89.00)</span>
+                  </div>
+                  <div class="col-md-3 text-end">
+                    <span class="badge bg-danger px-2 py-1">CRITICAL</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Assigned Department <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="Finance & Accounts Operations" readonly>
+                  <div class="field-hint">Sample: Organizational triage unit</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Designated Support Agent <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="Sarah Jenkins (Support Lead - Tier 2)" readonly>
+                  <div class="field-hint">Sample: User ID #USR-002 (Current capacity: 2/5 tickets)</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Assignment Instructions / Triage Notes</label>
+                <textarea class="form-control sample-input-field" rows="3" readonly>Please review the uploaded bank statement PDF and cross-verify with transaction gateway log ID #TX-9901. Expedite refund issuance within the 4-hour SLA window.</textarea>
+                <div class="field-hint">Sample Input: Stored in <code>complaints.admin_notes</code></div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3">Re-route</button>
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold"><i class="bi bi-check2-circle me-1"></i>Confirm Assignment</button>
+              </div>
+            </form>
+          </div>
+        `
+      },
+
+      'D6': {
+        badge: "APPENDIX D.6",
+        title: "Figure D.6: Feedback Input",
+        path: "/user/feedback",
+        render: () => `
+          <div class="form-card mx-auto" style="max-width: 860px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-star-fill text-warning me-2"></i>Customer Satisfaction Feedback Input</h5>
+                <p class="text-muted small mb-0">Captures customer rating and review comments for closed ticket evaluations</p>
+              </div>
+              <span class="sample-badge">Table: feedback</span>
+            </div>
+
+            <form>
+              <div class="p-3 rounded bg-light border mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="badge bg-success me-2">RESOLVED</span>
+                    <strong class="text-dark">Ticket #TKT-2026-0880:</strong> Delayed courier dispatch for hardware unit
+                  </div>
+                  <small class="text-muted">Closed: Oct 02, 2026</small>
+                </div>
+              </div>
+
+              <div class="text-center my-3 p-3 bg-light rounded border">
+                <label class="form-label small fw-bold text-muted d-block mb-1">OVERALL SERVICE RATING INPUT</label>
+                <div class="fs-2 text-warning mb-1">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <div class="fw-bold text-success small">Sample Input: 5 / 5 Stars (Numeric Score: 5.0)</div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Resolution Speed Assessment</label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="Resolved faster than expected" readonly>
+                  <div class="field-hint">Sample Input: Speed metric category</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Staff Courtesy & Helpfulness</label>
+                  <input type="text" class="form-control form-control-sm sample-input-field" value="Extremely courteous & helpful" readonly>
+                  <div class="field-hint">Sample Input: Staff performance metric</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Customer Review Comments</label>
+                <textarea class="form-control sample-input-field" rows="3" readonly>The support agent resolved my duplicate billing inquiry within 2 hours and promptly reversed the transaction. Outstanding speed and communication!</textarea>
+                <div class="field-hint">Sample Input: Qualitative text stored in <code>feedback.comments</code></div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3">Skip</button>
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold"><i class="bi bi-send-check me-1"></i>Submit Feedback Input</button>
+              </div>
+            </form>
+          </div>
+        `
+      }
+    };
+
+    const currentFig = figures[fig] || figures['D1'];
+    document.getElementById('sectionBadge').innerText = currentFig.badge;
+    document.getElementById('figureTitle').innerText = currentFig.title;
+    document.getElementById('urlPath').innerText = currentFig.path;
+    document.getElementById('viewportContent').innerHTML = currentFig.render();
+  </script>
+</body>
+</html>
