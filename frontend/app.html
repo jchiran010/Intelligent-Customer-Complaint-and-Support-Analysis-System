@@ -626,19 +626,25 @@
             <div class="col-lg-8">
               <div class="bento-card mb-4">
                 <!-- High-Visibility Prominent Ticket Reference Banner -->
-                <div class="ticket-tracker-hero p-3 mb-4 rounded border text-center">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="badge bg-primary text-white"><i class="bi bi-patch-check-fill me-1"></i> VERIFIED SUPPORT TICKET</span>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-shield-check me-1"></i> SLA Active</span>
+                <div class="ticket-tracker-hero p-4 mb-4 rounded-4 border text-center">
+                  <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <span class="badge bg-primary text-white px-3 py-1"><i class="bi bi-patch-check-fill me-1"></i> VERIFIED SUPPORT TICKET</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1"><i class="bi bi-shield-check me-1"></i> SLA Active & Monitored</span>
                   </div>
-                  <div class="d-flex align-items-center justify-content-center gap-3 my-2 flex-wrap">
-                    <h2 class="font-monospace fw-bold text-primary mb-0 letter-spacing-1" id="trackTicketNumber">#TCK-TECH-2026-8492</h2>
-                    <button class="btn btn-sm btn-outline-primary px-3 py-1" onclick="copyCurrentTrackerTicket()" title="Copy Ticket Reference">
-                      <i class="bi bi-clipboard me-1"></i> Copy
-                    </button>
+                  <div class="my-3">
+                    <div class="ticket-badge-pill">
+                      <h2 class="font-monospace fw-bold mb-0 letter-spacing-1" id="trackTicketNumber">#TCK-TECH-2026-8492</h2>
+                      <button class="btn btn-sm btn-outline-primary px-3 py-1 rounded-pill" onclick="copyCurrentTrackerTicket()" title="Copy Ticket Reference">
+                        <i class="bi bi-clipboard me-1"></i> Copy
+                      </button>
+                    </div>
                   </div>
-                  <div class="small text-muted">
-                    Official Support Tracking Reference &bull; Complaint: <strong id="trackComplaintNumber" class="text-dark">CMP-XXXX</strong> &bull; Priority: <span id="trackPriority" class="badge">MEDIUM</span>
+                  <div class="small text-muted d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                    <span>Official Support Tracking Reference</span>
+                    <span>&bull;</span>
+                    <span>Complaint ID: <strong id="trackComplaintNumber" class="text-body fw-bold">CMP-XXXX</strong></span>
+                    <span>&bull;</span>
+                    <span>Priority: <span id="trackPriority" class="badge">MEDIUM</span></span>
                   </div>
                 </div>
 
@@ -665,7 +671,7 @@
 
                 <div id="trackResolutionBox" class="p-3 rounded border bg-light d-none mb-3">
                   <h6 class="fw-bold small text-uppercase text-success mb-1"><i class="bi bi-check-circle-fill me-1"></i> Resolution Notes</h6>
-                  <p id="trackResolutionNotes" class="mb-0 text-dark"></p>
+                  <p id="trackResolutionNotes" class="mb-0 text-body"></p>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center">
@@ -696,7 +702,7 @@
                 </div>
                 <div class="d-flex justify-content-between py-2 text-muted small">
                   <span>Dispatch Window:</span>
-                  <strong class="text-dark">Within 24 Hours</strong>
+                  <strong class="text-body fw-bold">Within 24 Hours</strong>
                 </div>
                 <div class="pt-3 mt-2 border-top">
                   <button class="btn btn-sm btn-outline-primary w-100" onclick="window.print()">
@@ -957,7 +963,7 @@
             <div class="col-6">
               <div class="p-2 rounded border bg-light">
                 <span class="text-muted d-block">Complaint Type:</span>
-                <strong id="modalTicketCategory" class="text-dark">Technical & Bug Reports</strong>
+                <strong id="modalTicketCategory" class="text-body fw-bold">Technical & Bug Reports</strong>
               </div>
             </div>
             <div class="col-6">

@@ -1043,3 +1043,111 @@ body.sidebar-collapsed .unified-main {
   animation: copyPulse 0.3s ease;
 }
 
+.ticket-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-color);
+  border-radius: 9999px;
+  padding: 0.4rem 1.25rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.ticket-badge-pill #trackTicketNumber {
+  color: var(--primary-color);
+  letter-spacing: 0.05em;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   GLOBAL HIGH-CONTRAST DARK THEME FIXES & OVERRIDES
+   Ensures 100% visibility for text, tickets, and badges in Dark Mode
+   ========================================================================== */
+
+[data-theme="dark"] .text-dark,
+[data-bs-theme="dark"] .text-dark {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .text-muted,
+[data-bs-theme="dark"] .text-muted {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .bg-light {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .ticket-tracker-hero {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.15) !important;
+}
+
+[data-theme="dark"] .ticket-badge-pill {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 2px solid rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.25) !important;
+}
+
+[data-theme="dark"] #trackTicketNumber {
+  color: #38bdf8 !important;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
+}
+
+[data-theme="dark"] #dashTicketCode,
+[data-theme="dark"] #trackTicketSidebarRef,
+[data-theme="dark"] #submitPreviewTicketCode,
+[data-theme="dark"] #dashPreviewCode,
+[data-theme="dark"] #hubGeneratedCode,
+[data-theme="dark"] #modalTicketCode {
+  color: #38bdf8 !important;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.3) !important;
+}
+
+[data-theme="dark"] .ticket-code-badge {
+  background: rgba(56, 189, 248, 0.18) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+}
+
+[data-theme="dark"] .badge.bg-primary {
+  background-color: #4f46e5 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .badge.bg-primary-subtle {
+  background-color: rgba(56, 189, 248, 0.2) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+}
+
+[data-theme="dark"] .badge.bg-success-subtle {
+  background-color: rgba(34, 197, 94, 0.2) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(34, 197, 94, 0.3) !important;
+}
+
+[data-theme="dark"] .badge.bg-danger-subtle {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+[data-theme="dark"] .badge.bg-warning-subtle {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+[data-theme="dark"] .badge.bg-info-subtle {
+  background-color: rgba(6, 182, 212, 0.2) !important;
+  color: #22d3ee !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+}
+
+
