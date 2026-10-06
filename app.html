@@ -401,6 +401,90 @@
             </div>
           </div>
 
+          <!-- NEW: Dedicated Auto Ticket Generation Box (Preserves and elevates dashboard look) -->
+          <div class="bento-card mb-4 border-primary-subtle shadow-sm" id="userTicketGenerationBox">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <div class="p-2 rounded bg-primary-subtle text-primary">
+                  <i class="bi bi-ticket-perforated-fill fs-5"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0">Auto Ticket Generation & SLA Dispatch</h6>
+                  <small class="text-muted">Dynamic Ticket Reference auto-generated based on complaint type</small>
+                </div>
+              </div>
+              <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
+                <i class="bi bi-shield-check me-1"></i> Auto-Generation Ready
+              </span>
+            </div>
+
+            <div class="row g-3 align-items-stretch">
+              <!-- Left: Latest Generated Ticket Box -->
+              <div class="col-lg-6">
+                <div class="p-3 rounded border bg-surface-alt h-100 d-flex flex-column justify-content-between" id="dashLatestTicketContainer">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="text-muted small fw-semibold text-uppercase letter-spacing-1">Latest Generated Ticket</span>
+                      <span class="badge badge-status badge-pending" id="dashTicketStatus">PENDING</span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-2 flex-wrap">
+                      <h4 class="font-monospace fw-bold text-primary mb-0" id="dashTicketCode">TCK-TECH-2026-4819</h4>
+                      <span class="badge bg-primary text-white" id="dashTicketCategory">Technical & Bug Reports</span>
+                      <span class="badge bg-danger" id="dashTicketPriority">HIGH</span>
+                    </div>
+                    <p class="small text-muted mb-2 text-truncate" id="dashTicketSubject">Application UI responsive verification ticket</p>
+                    <div class="small text-muted d-flex align-items-center gap-2 mb-2 flex-wrap">
+                      <span><i class="bi bi-clock-history me-1"></i> <span id="dashTicketDate">Auto-generated</span></span>
+                      <span class="text-muted">•</span>
+                      <span><i class="bi bi-stopwatch text-warning me-1"></i> SLA Target: <strong id="dashTicketSla">12 Hours</strong></span>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2 pt-2 border-top">
+                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="copyDashTicket()">
+                      <i class="bi bi-clipboard me-1"></i> Copy Ticket ID
+                    </button>
+                    <button class="btn btn-sm btn-primary flex-fill" onclick="trackDashTicket()">
+                      <i class="bi bi-binoculars me-1"></i> Track Live Status
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Quick Ticket Generator & Type Selector -->
+              <div class="col-lg-6">
+                <div class="p-3 rounded border bg-surface-alt h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="text-muted small fw-semibold text-uppercase letter-spacing-1">Ticket Generator by Type</span>
+                      <small class="text-primary fw-semibold"><i class="bi bi-lightning-charge me-1"></i>Instant Code</small>
+                    </div>
+                    <label class="form-label small fw-semibold mb-1">Select Complaint Type to Auto-Generate:</label>
+                    <select class="form-select form-select-sm mb-2" id="dashCategorySelect" onchange="updateDashTicketPreview(this.value)">
+                      <option value="1" data-prefix="BILL" data-name="Billing & Payments" data-sla="24 Hours">💳 Billing & Payments (TCK-BILL)</option>
+                      <option value="2" data-prefix="TECH" data-name="Technical & Bug Reports" data-sla="12 Hours" selected>⚡ Technical & Bug Reports (TCK-TECH)</option>
+                      <option value="3" data-prefix="PROD" data-name="Product & Delivery" data-sla="48 Hours">📦 Product & Delivery (TCK-PROD)</option>
+                      <option value="4" data-prefix="GEN" data-name="Customer Service & General" data-sla="24 Hours">💬 Customer Service & General (TCK-GEN)</option>
+                      <option value="5" data-prefix="SEC" data-name="Account & Security" data-sla="6 Hours">🔒 Account & Security (TCK-SEC)</option>
+                      <option value="6" data-prefix="NET" data-name="Network & IT Support" data-sla="8 Hours">🌐 Network & IT Support (TCK-NET)</option>
+                    </select>
+
+                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-body border mb-2">
+                      <small class="text-muted">Live Auto-Generated Code:</small>
+                      <span class="badge bg-primary-subtle text-primary font-monospace fw-bold fs-6 px-2 py-1" id="dashPreviewCode">TCK-TECH-2026-XXXX</span>
+                    </div>
+                    <div class="small text-muted mb-2">
+                      <i class="bi bi-info-circle text-info me-1"></i> SLA Window: <span id="dashPreviewSlaText" class="fw-semibold">12 Hours Target</span>
+                    </div>
+                  </div>
+
+                  <button class="btn btn-sm btn-primary w-100 fw-semibold" onclick="quickFileWithSelectedType()">
+                    <i class="bi bi-plus-circle me-1"></i> File Complaint with this Ticket Type &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Customer Recent Complaints -->
           <div class="bento-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -458,6 +542,28 @@
                         <option value="HIGH">High</option>
                         <option value="CRITICAL">Critical</option>
                       </select>
+                    </div>
+                  </div>
+
+                  <!-- Live Auto-Generated Ticket Preview based on Complaint Type -->
+                  <div class="p-3 mb-3 rounded border bg-surface-alt" id="submitTicketPreviewBox">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="small fw-semibold text-muted text-uppercase letter-spacing-1">
+                        <i class="bi bi-ticket-perforated-fill text-primary me-1"></i> Auto-Generated Ticket Reference
+                      </span>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Auto-Allocated
+                      </span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-2">
+                      <div>
+                        <div class="small text-muted">Tracking Code:</div>
+                        <div class="font-monospace fw-bold fs-5 text-primary" id="submitPreviewTicketCode">TCK-TECH-2026-XXXX</div>
+                      </div>
+                      <div class="text-sm-end">
+                        <span class="badge bg-primary text-white" id="submitPreviewCategoryBadge">Select Category</span>
+                        <div class="small text-muted mt-1" id="submitPreviewSlaText"><i class="bi bi-stopwatch text-warning me-1"></i> SLA Target: 24h</div>
+                      </div>
                     </div>
                   </div>
 
@@ -519,21 +625,36 @@
           <div class="row g-4 justify-content-center">
             <div class="col-lg-8">
               <div class="bento-card mb-4">
+                <!-- High-Visibility Prominent Ticket Reference Banner -->
+                <div class="ticket-tracker-hero p-3 mb-4 rounded border text-center">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge bg-primary text-white"><i class="bi bi-patch-check-fill me-1"></i> VERIFIED SUPPORT TICKET</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-shield-check me-1"></i> SLA Active</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-center gap-3 my-2 flex-wrap">
+                    <h2 class="font-monospace fw-bold text-primary mb-0 letter-spacing-1" id="trackTicketNumber">#TCK-TECH-2026-8492</h2>
+                    <button class="btn btn-sm btn-outline-primary px-3 py-1" onclick="copyCurrentTrackerTicket()" title="Copy Ticket Reference">
+                      <i class="bi bi-clipboard me-1"></i> Copy
+                    </button>
+                  </div>
+                  <div class="small text-muted">
+                    Official Support Tracking Reference &bull; Complaint: <strong id="trackComplaintNumber" class="text-dark">CMP-XXXX</strong> &bull; Priority: <span id="trackPriority" class="badge">MEDIUM</span>
+                  </div>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center mb-3">
                   <div>
-                    <span class="text-muted small">Complaint Number</span>
-                    <h4 class="fw-bold text-primary mb-0" id="trackComplaintNumber">CMP-XXXX</h4>
+                    <span class="text-muted small">Status</span>
+                    <div><span id="trackStatus" class="badge badge-status">PENDING</span></div>
                   </div>
-                  <div class="d-flex gap-2">
-                    <span id="trackStatus" class="badge badge-status">PENDING</span>
-                    <span id="trackPriority" class="badge">MEDIUM</span>
+                  <div class="text-end">
+                    <span class="text-muted small">Category</span>
+                    <div class="fw-bold text-primary" id="trackCategory">General</div>
                   </div>
                 </div>
 
                 <h5 class="fw-bold mb-2" id="trackTitle">...</h5>
                 <div class="text-muted small mb-3">
-                  <i class="bi bi-folder me-1"></i> <span id="trackCategory">General</span>
-                  <span class="mx-2">•</span>
                   <i class="bi bi-clock me-1"></i> <span id="trackCreatedAt">...</span>
                 </div>
 
@@ -560,16 +681,108 @@
 
             <div class="col-lg-4">
               <div class="bento-card">
-                <h6 class="fw-bold mb-3">Ticket Information</h6>
+                <h6 class="fw-bold mb-3"><i class="bi bi-ticket-detailed text-primary me-2"></i> Ticket Information</h6>
                 <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
                   <span>Ticket Reference:</span>
-                  <strong class="text-dark" id="trackTicketNumber">#TCK-XXXX</strong>
+                  <strong class="text-primary font-monospace" id="trackTicketSidebarRef">#TCK-XXXX</strong>
                 </div>
-                <div class="d-flex justify-content-between py-2 text-muted small">
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
                   <span>Support Status:</span>
                   <span class="badge bg-primary-subtle text-primary">SLA Monitored</span>
                 </div>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
+                  <span>Priority Queue:</span>
+                  <span class="badge bg-info-subtle text-info" id="trackSidebarQueue">Auto Triage</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 text-muted small">
+                  <span>Dispatch Window:</span>
+                  <strong class="text-dark">Within 24 Hours</strong>
+                </div>
+                <div class="pt-3 mt-2 border-top">
+                  <button class="btn btn-sm btn-outline-primary w-100" onclick="window.print()">
+                    <i class="bi bi-printer me-1"></i> Print Ticket Slip
+                  </button>
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW: USER TICKET GENERATION HUB           -->
+        <!-- ========================================== -->
+        <div id="view-user-tickets" class="app-view-panel d-none">
+          <div class="bento-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-ticket-perforated-fill text-primary me-2"></i> Support Ticket Generation & Management Hub</h5>
+                <small class="text-muted">Generate instant ticket references tailored to complaint types and track SLA fulfillment</small>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="showView('user-submit')">
+                <i class="bi bi-plus-lg me-1"></i> File New Complaint
+              </button>
+            </div>
+
+            <!-- Ticket Generator Panel -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6 col-lg-4">
+                <div class="p-3 rounded border bg-surface-alt h-100">
+                  <span class="small fw-semibold text-muted text-uppercase d-block mb-2">1. Select Complaint Type</span>
+                  <select class="form-select form-select-sm mb-2" id="hubCategorySelect" onchange="updateHubTicketCode(this.value)">
+                    <option value="1">💳 Billing & Payments (TCK-BILL)</option>
+                    <option value="2" selected>⚡ Technical & Bug Reports (TCK-TECH)</option>
+                    <option value="3">📦 Product & Delivery (TCK-PROD)</option>
+                    <option value="4">💬 Customer Service & General (TCK-GEN)</option>
+                    <option value="5">🔒 Account & Security (TCK-SEC)</option>
+                    <option value="6">🌐 Network & IT Support (TCK-NET)</option>
+                  </select>
+                  <small class="text-muted d-block">Complaint type automatically sets ticket format, priority routing, and SLA window.</small>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-lg-5">
+                <div class="p-3 rounded border bg-surface-alt h-100 text-center d-flex flex-column justify-content-center">
+                  <span class="small fw-semibold text-muted text-uppercase d-block mb-1">2. Auto-Generated Ticket Code</span>
+                  <div class="fs-4 font-monospace fw-bold text-primary my-1" id="hubGeneratedCode">TCK-TECH-2026-8291</div>
+                  <div class="d-flex justify-content-center gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="copyHubGeneratedCode()">
+                      <i class="bi bi-clipboard me-1"></i> Copy Code
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="fileWithHubCode()">
+                      <i class="bi bi-arrow-right-circle me-1"></i> Use & File Complaint
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-3">
+                <div class="p-3 rounded border bg-surface-alt h-100 d-flex flex-column justify-content-center">
+                  <span class="small fw-semibold text-muted text-uppercase d-block mb-1">3. SLA Target</span>
+                  <div class="fs-5 fw-bold text-success mb-1" id="hubSlaTarget">12 Hours</div>
+                  <small class="text-muted"><i class="bi bi-clock-history me-1"></i> Monitored under automated dispatch protocol</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- List of All User Generated Tickets -->
+            <h6 class="fw-bold mb-3">All Generated Tickets for Your Complaints</h6>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Ticket Code</th>
+                    <th>Complaint Type</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Date Generated</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="hubTicketsTableBody">
+                  <tr><td colspan="7" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -710,6 +923,63 @@
               <button type="submit" class="btn btn-sm btn-primary">Submit Rating</button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- High-Visibility Ticket Generation Success Modal -->
+  <div class="modal fade" id="ticketGeneratedModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-lg border-primary">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-patch-check-fill me-2"></i> Ticket Generated Successfully!
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <div class="mb-3">
+            <span class="badge bg-success-subtle text-success fs-6 px-3 py-2 border border-success-subtle">
+              <i class="bi bi-check-circle-fill me-1"></i> Complaint Registered & Auto-Triaged
+            </span>
+          </div>
+
+          <div class="p-3 rounded border bg-surface-alt mb-3">
+            <small class="text-uppercase fw-semibold text-muted d-block mb-1">Your Official Ticket Reference</small>
+            <div class="fs-2 font-monospace fw-bold text-primary my-1" id="modalTicketCode">TCK-TECH-2026-XXXX</div>
+            <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyModalTicketCode()">
+              <i class="bi bi-clipboard me-1"></i> Copy Ticket Code
+            </button>
+          </div>
+
+          <div class="row g-2 text-start small mb-3">
+            <div class="col-6">
+              <div class="p-2 rounded border bg-light">
+                <span class="text-muted d-block">Complaint Type:</span>
+                <strong id="modalTicketCategory" class="text-dark">Technical & Bug Reports</strong>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded border bg-light">
+                <span class="text-muted d-block">Urgency Level:</span>
+                <strong id="modalTicketPriority" class="text-danger">HIGH</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info py-2 small mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            This ticket code has been added to your <strong>Dashboard Ticket Box</strong>. You can track resolution status anytime.
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="showView('user-dashboard')">
+            <i class="bi bi-grid-1x2 me-1"></i> Back to Dashboard
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="modalBtnTrackTicket">
+            <i class="bi bi-binoculars me-1"></i> Track Ticket Now
+          </button>
         </div>
       </div>
     </div>

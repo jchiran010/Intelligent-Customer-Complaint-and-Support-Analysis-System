@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const customerForm = document.getElementById('unifiedCustomerForm');
   const adminForm = document.getElementById('unifiedAdminForm');
+  const registerForm = document.getElementById('unifiedRegisterForm');
   const alertBox = document.getElementById('unifiedAlert');
 
   if (customerForm) {
@@ -26,6 +27,169 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('admPassword').value;
       handleLogin(email, password, 'ADMIN', 'admSubmitBtn');
     });
+  }
+
+  if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleRegister();
+    });
+
+    const regPassInput = document.getElementById('regPassword');
+    if (regPassInput) {
+      regPassInput.addEventListener('input', updatePasswordStrength);
+    }
+  }
+
+  function updatePasswordStrength() {
+    const val = document.getElementById('regPassword')?.value || '';
+    const bar = document.getElementById('regPassStrengthBar');
+    const text = document.getElementById('regPassStrengthText');
+    if (!bar || !text) return;
+
+    if (val.length === 0) {
+      bar.style.width = '0%';
+      bar.className = 'progress-bar bg-danger';
+      text.textContent = 'Strength: none';
+      return;
+    }
+
+    let score = 0;
+    if (val.length >= 6) score++;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    if (score <= 2) {
+      bar.style.width = '33%';
+      bar.className = 'progress-bar bg-danger';
+      text.textContent = 'Strength: Weak';
+      text.className = 'text-danger small';
+    } else if (score <= 4) {
+      bar.style.width = '66%';
+      bar.className = 'progress-bar bg-warning';
+      text.textContent = 'Strength: Moderate';
+      text.className = 'text-warning small';
+    } else {
+      bar.style.width = '100%';
+      bar.className = 'progress-bar bg-success';
+      text.textContent = 'Strength: Strong';
+      text.className = 'text-success small';
+    }
+  }
+
+  async function handleRegister() {
+    const name = document.getElementById('regName')?.value.trim();
+    const email = document.getElementById('regEmail')?.value.trim();
+    const phone = document.getElementById('regPhone')?.value.trim() || '';
+    const department = document.getElementById('regDepartment')?.value || 'Customer';
+    const password = document.getElementById('regPassword')?.value;
+    const confirmPassword = document.getElementById('regConfirmPassword')?.value;
+    const btn = document.getElementById('regSubmitBtn');
+
+    if (!name || !email || !password) {
+      showAlert('Please fill in all required fields.', 'danger');
+      return;
+    }
+
+    if (password.length < 6) {
+      showAlert('Password must be at least 6 characters long.', 'danger');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showAlert('Passwords do not match. Please verify your password confirmation.', 'danger');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Creating Account...';
+    }
+    hideAlert();
+
+    const regPayload = { name, email, password, phone, department };
+
+    try {
+      // 1. Try unified auth register endpoint
+      let res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(regPayload)
+      });
+
+      // 2. Fallback to /api/user/register if needed
+      if (!res.ok && res.status === 404) {
+        res = await fetch('/api/user/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(regPayload)
+        });
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        // Also save to localStorage for seamless cross-mode persistence
+        saveUserToLocalStorage({ name, email, password, role: 'USER', phone, department });
+
+        showAlert(`Account created successfully for ${name}! Logging you in...`, 'success');
+        sessionStorage.setItem('active_role', 'USER');
+        sessionStorage.setItem('user_name', name);
+        sessionStorage.setItem('user_email', email);
+
+        setTimeout(() => {
+          window.location.href = '/app.html';
+        }, 900);
+        return;
+      }
+
+      const errData = await res.json().catch(() => ({}));
+      if (res.status === 400 || res.status === 409) {
+        showAlert(errData.message || 'An account with this email already exists.', 'danger');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-person-check-fill me-1"></i> Register & Create Account';
+        }
+        return;
+      }
+
+      // Offline / Client fallback registration
+      handleClientFallbackRegister(regPayload, btn);
+
+    } catch (e) {
+      handleClientFallbackRegister(regPayload, btn);
+    }
+  }
+
+  function handleClientFallbackRegister(userObj, btn) {
+    try {
+      saveUserToLocalStorage({ ...userObj, role: 'USER' });
+      showAlert(`Account created successfully for ${userObj.name}! Logging you in...`, 'success');
+      sessionStorage.setItem('active_role', 'USER');
+      sessionStorage.setItem('user_name', userObj.name);
+      sessionStorage.setItem('user_email', userObj.email);
+      setTimeout(() => {
+        window.location.href = '/app.html';
+      }, 900);
+    } catch (err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-person-check-fill me-1"></i> Register & Create Account';
+      }
+      showAlert('Registration could not be completed. Please try again.', 'danger');
+    }
+  }
+
+  function saveUserToLocalStorage(user) {
+    try {
+      const list = JSON.parse(localStorage.getItem('registered_users') || '[]');
+      const filtered = list.filter(u => u.email.toLowerCase() !== user.email.toLowerCase());
+      filtered.push(user);
+      localStorage.setItem('registered_users', JSON.stringify(filtered));
+    } catch (e) {
+      console.warn('LocalStorage save error:', e);
+    }
   }
 
   async function handleLogin(email, password, roleHint, btnId) {

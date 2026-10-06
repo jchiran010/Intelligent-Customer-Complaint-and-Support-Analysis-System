@@ -91,6 +91,9 @@
         <button type="button" class="role-tab-btn" id="tabAdminBtn" onclick="selectAuthTab('admin')">
           <i class="bi bi-shield-lock me-1"></i> Admin Login
         </button>
+        <button type="button" class="role-tab-btn" id="tabRegisterBtn" onclick="selectAuthTab('register')">
+          <i class="bi bi-person-plus me-1"></i> Create Account
+        </button>
       </div>
 
       <!-- Alert Box -->
@@ -114,18 +117,23 @@
             </div>
             <div class="input-group">
               <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-lock"></i></span>
-              <input type="password" class="form-control border-start-0" id="custPassword" value="User@123" placeholder="••••••••" required>
+              <input type="password" class="form-control border-start-0 border-end-0" id="custPassword" value="User@123" placeholder="••••••••" required>
+              <button class="btn btn-outline-secondary border-start-0 bg-surface-alt" type="button" onclick="togglePasswordVisibility('custPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
             </div>
           </div>
 
           <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="custSubmitBtn">
-            Sign In as Customer
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In as Customer
           </button>
         </form>
 
         <div class="mt-4 pt-3 border-top text-center">
-          <span class="text-muted small">Need an account?</span>
-          <a href="/user/register.html" class="small fw-semibold text-decoration-none ms-1">Register Customer Account &rarr;</a>
+          <span class="text-muted small">New to SupportDesk?</span>
+          <button type="button" onclick="selectAuthTab('register')" class="btn btn-link p-0 small fw-semibold text-decoration-none ms-1">
+            Create Customer Account &rarr;
+          </button>
         </div>
       </div>
 
@@ -144,17 +152,99 @@
             <label class="form-label small fw-semibold">Master Password</label>
             <div class="input-group">
               <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-key"></i></span>
-              <input type="password" class="form-control border-start-0" id="admPassword" value="Admin@123" placeholder="••••••••" required>
+              <input type="password" class="form-control border-start-0 border-end-0" id="admPassword" value="Admin@123" placeholder="••••••••" required>
+              <button class="btn btn-outline-secondary border-start-0 bg-surface-alt" type="button" onclick="togglePasswordVisibility('admPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
             </div>
           </div>
 
           <button type="submit" class="btn text-white w-100 py-2 fw-semibold" style="background-color: #4f46e5;" id="admSubmitBtn">
-            Sign In as Administrator
+            <i class="bi bi-shield-check me-1"></i> Sign In as Administrator
           </button>
         </form>
 
         <div class="mt-4 pt-3 border-top text-center text-muted small">
-          <i class="bi bi-shield-check me-1"></i> Dedicated Administrator Portal Session
+          <i class="bi bi-shield-lock-fill text-primary me-1"></i> Dedicated Administrator Portal Session
+        </div>
+      </div>
+
+      <!-- Tab 3: Create New Account Form -->
+      <div id="registerFormContainer" class="d-none">
+        <form id="unifiedRegisterForm">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control border-start-0" id="regName" placeholder="e.g. Alex Johnson" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+              <input type="email" class="form-control border-start-0" id="regEmail" placeholder="name@domain.com" required>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label small fw-semibold">Phone Number</label>
+              <div class="input-group">
+                <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-telephone"></i></span>
+                <input type="tel" class="form-control border-start-0" id="regPhone" placeholder="+1 (555) 000-0000">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label small fw-semibold">Account Tier</label>
+              <select class="form-select" id="regDepartment">
+                <option value="Customer">Standard Consumer</option>
+                <option value="Premium Client">Premium Client</option>
+                <option value="Business Customer">Business Account</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Create Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+              <input type="password" class="form-control border-start-0 border-end-0" id="regPassword" placeholder="Minimum 6 characters" required minlength="6">
+              <button class="btn btn-outline-secondary border-start-0 bg-surface-alt" type="button" onclick="togglePasswordVisibility('regPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <div class="progress mt-1" style="height: 4px;">
+              <div id="regPassStrengthBar" class="progress-bar bg-danger" style="width: 0%; transition: width 0.3s;"></div>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+              <small class="text-muted" style="font-size: 0.72rem;" id="regPassStrengthText">Strength: none</small>
+              <small class="text-muted" style="font-size: 0.72rem;">Min 6 chars</small>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-shield-lock"></i></span>
+              <input type="password" class="form-control border-start-0 border-end-0" id="regConfirmPassword" placeholder="Re-enter password" required minlength="6">
+              <button class="btn btn-outline-secondary border-start-0 bg-surface-alt" type="button" onclick="togglePasswordVisibility('regConfirmPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="regSubmitBtn">
+            <i class="bi bi-person-check-fill me-1"></i> Register & Create Account
+          </button>
+        </form>
+
+        <div class="mt-4 pt-3 border-top text-center">
+          <span class="text-muted small">Already have an account?</span>
+          <button type="button" onclick="selectAuthTab('customer')" class="btn btn-link p-0 small fw-semibold text-decoration-none ms-1">
+            Sign In as Customer &rarr;
+          </button>
         </div>
       </div>
 
@@ -168,25 +258,54 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/js/unified-auth.js"></script>
   <script>
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+          icon.classList.remove('bi-eye');
+          icon.classList.add('bi-eye-slash');
+        }
+      } else {
+        input.type = 'password';
+        if (icon) {
+          icon.classList.remove('bi-eye-slash');
+          icon.classList.add('bi-eye');
+        }
+      }
+    }
+
     function selectAuthTab(role) {
       const btnCust = document.getElementById('tabCustomerBtn');
       const btnAdm = document.getElementById('tabAdminBtn');
+      const btnReg = document.getElementById('tabRegisterBtn');
       const formCust = document.getElementById('customerFormContainer');
       const formAdm = document.getElementById('adminFormContainer');
+      const formReg = document.getElementById('registerFormContainer');
       const hint = document.getElementById('demoHintText');
+
+      // Reset active classes
+      btnCust.className = 'role-tab-btn';
+      btnAdm.className = 'role-tab-btn';
+      if (btnReg) btnReg.className = 'role-tab-btn';
+      formCust.classList.add('d-none');
+      formAdm.classList.add('d-none');
+      if (formReg) formReg.classList.add('d-none');
 
       if (role === 'customer') {
         btnCust.className = 'role-tab-btn active';
-        btnAdm.className = 'role-tab-btn';
         formCust.classList.remove('d-none');
-        formAdm.classList.add('d-none');
         hint.innerHTML = 'Demo Customer: <code>john.doe@example.com</code> | <code>User@123</code>';
-      } else {
-        btnCust.className = 'role-tab-btn';
+      } else if (role === 'admin') {
         btnAdm.className = 'role-tab-btn active admin-tab';
-        formCust.classList.add('d-none');
         formAdm.classList.remove('d-none');
         hint.innerHTML = 'Demo Admin: <code>admin@complaintsystem.com</code> | <code>Admin@123</code>';
+      } else if (role === 'register') {
+        if (btnReg) btnReg.className = 'role-tab-btn active register-tab';
+        if (formReg) formReg.classList.remove('d-none');
+        hint.innerHTML = '<i class="bi bi-info-circle me-1"></i> Fill in your details above to create a new customer account immediately.';
       }
     }
 

@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import com.complaintsystem.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -28,10 +29,29 @@ public class UnifiedAuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UnifiedAuthController(AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public UnifiedAuthController(AuthenticationManager authenticationManager,
+                                 UserRepository userRepository,
+                                 UserService userService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
+        this.userService = userService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthDtos.AuthResponse> unifiedRegister(@Valid @RequestBody AuthDtos.RegisterRequest req) {
+        User user = userService.registerUser(req);
+        AuthDtos.AuthResponse response = new AuthDtos.AuthResponse(
+                true,
+                "Account created successfully! You can now log in.",
+                "USER",
+                "/login.html",
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")

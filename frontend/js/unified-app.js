@@ -345,6 +345,11 @@ function renderNavigationForRole(role) {
         </a>
       </li>
       <li class="sidebar-item">
+        <a class="sidebar-link" onclick="showView('user-tickets')">
+          <i class="bi bi-ticket-perforated"></i> Ticket Generator Hub
+        </a>
+      </li>
+      <li class="sidebar-item">
         <a class="sidebar-link" onclick="showView('user-submit')">
           <i class="bi bi-plus-circle-dotted"></i> File Complaint
         </a>
@@ -453,6 +458,7 @@ function showView(viewName) {
   if (viewName === 'admin-categories') loadAdminCategories();
   if (viewName === 'admin-analytics') loadAdminAnalytics();
   if (viewName === 'user-dashboard') loadUserDashboard();
+  if (viewName === 'user-tickets') loadUserTicketsHub();
   if (viewName === 'user-complaints') loadUserComplaints();
   if (viewName === 'user-submit') initUserSubmitForm();
   if (viewName === 'user-notifications') loadUserNotifications();
@@ -876,6 +882,9 @@ async function loadUserDashboard() {
   animateCounter('usrInProgressComplaints', data.inProgressComplaints || 0);
   animateCounter('usrResolvedComplaints', data.resolvedComplaints || 0);
 
+  // Render the Dedicated Dashboard Ticket Generation Box
+  renderUserTicketGenerationBox(data.recentComplaints && data.recentComplaints.length ? data.recentComplaints[0] : null);
+
   const tbody = document.getElementById('usrRecentComplaintsTable');
   if (!tbody) return;
 
@@ -900,6 +909,219 @@ async function loadUserDashboard() {
       </td>
     </tr>
   `).join('');
+}
+
+// ==========================================
+// AUTO TICKET GENERATION UTILITIES & HUB
+// ==========================================
+
+function getTicketPrefixForCategory(cat) {
+  const str = String(cat || '').toLowerCase();
+  if (str.includes('bill') || str === '1') return 'BILL';
+  if (str.includes('tech') || str === '2' || str.includes('bug')) return 'TECH';
+  if (str.includes('prod') || str.includes('deliv') || str === '3') return 'PROD';
+  if (str.includes('cust') || str.includes('gen') || str === '4') return 'GEN';
+  if (str.includes('sec') || str.includes('acc') || str === '5') return 'SEC';
+  if (str.includes('net') || str.includes('it') || str === '6') return 'NET';
+  return 'GEN';
+}
+
+function getSlaForCategory(cat) {
+  const p = getTicketPrefixForCategory(cat);
+  if (p === 'SEC') return '6 Hours';
+  if (p === 'NET') return '8 Hours';
+  if (p === 'TECH') return '12 Hours';
+  if (p === 'BILL') return '24 Hours';
+  if (p === 'PROD') return '48 Hours';
+  return '24 Hours';
+}
+
+function generateTicketCode(cat) {
+  const prefix = getTicketPrefixForCategory(cat);
+  const year = new Date().getFullYear();
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `TCK-${prefix}-${year}-${rand}`;
+}
+
+function renderUserTicketGenerationBox(latest) {
+  const codeEl = document.getElementById('dashTicketCode');
+  const catEl = document.getElementById('dashTicketCategory');
+  const prioEl = document.getElementById('dashTicketPriority');
+  const statEl = document.getElementById('dashTicketStatus');
+  const subjEl = document.getElementById('dashTicketSubject');
+  const dateEl = document.getElementById('dashTicketDate');
+  const slaEl = document.getElementById('dashTicketSla');
+
+  if (!latest) {
+    const all = LocalComplaintStore.getComplaints();
+    const userAll = all.filter(c => !currentUser?.email || c.userEmail === currentUser?.email || c.userEmail === 'john.doe@example.com');
+    latest = userAll && userAll.length ? userAll[0] : (all && all.length ? all[0] : null);
+  }
+
+  if (latest) {
+    const tCode = latest.ticketNumber ? (latest.ticketNumber.startsWith('TCK') ? latest.ticketNumber : '#' + latest.ticketNumber) : generateTicketCode(latest.categoryName || 'General');
+    if (codeEl) codeEl.textContent = tCode;
+    if (catEl) catEl.textContent = latest.categoryName || 'General Support';
+    if (prioEl) {
+      prioEl.textContent = latest.priority || 'MEDIUM';
+      prioEl.className = `badge bg-${(latest.priority || 'MEDIUM').toLowerCase() === 'critical' || (latest.priority || 'MEDIUM').toLowerCase() === 'high' ? 'danger' : 'secondary'}`;
+    }
+    if (statEl) {
+      statEl.textContent = (latest.status || 'PENDING').replace('_', ' ');
+      statEl.className = `badge badge-status badge-${(latest.status || 'PENDING').toLowerCase().replace('_', '-')}`;
+    }
+    if (subjEl) subjEl.textContent = latest.title || 'Support Complaint';
+    if (dateEl) {
+      const d = latest.createdAt ? new Date(latest.createdAt) : new Date();
+      dateEl.textContent = d.toLocaleDateString() + ' • ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (slaEl) slaEl.textContent = getSlaForCategory(latest.categoryId || latest.categoryName);
+
+    window.latestDashComplaintId = latest.id;
+    window.latestDashTicketCode = tCode;
+  } else {
+    if (codeEl) codeEl.textContent = 'TCK-TECH-2026-AUTO';
+    if (catEl) catEl.textContent = 'Select Category Below';
+    if (subjEl) subjEl.textContent = 'No complaints filed yet. Select complaint type below to auto-generate tracking ticket!';
+    if (dateEl) dateEl.textContent = 'Auto-ready';
+    if (slaEl) slaEl.textContent = 'Standard SLA';
+  }
+
+  const catSelect = document.getElementById('dashCategorySelect');
+  if (catSelect) {
+    updateDashTicketPreview(catSelect.value);
+  }
+}
+
+function updateDashTicketPreview(val) {
+  const prefix = getTicketPrefixForCategory(val);
+  const year = new Date().getFullYear();
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  const code = `TCK-${prefix}-${year}-${rand}`;
+  const codeEl = document.getElementById('dashPreviewCode');
+  const slaEl = document.getElementById('dashPreviewSlaText');
+  if (codeEl) codeEl.textContent = code;
+  if (slaEl) slaEl.textContent = getSlaForCategory(val) + ' Target';
+  window.lastGeneratedDashTicket = code;
+}
+
+function quickFileWithSelectedType() {
+  const catSelect = document.getElementById('dashCategorySelect');
+  const val = catSelect ? catSelect.value : '2';
+  showView('user-submit');
+  const formCat = document.getElementById('usrSubmitCategory');
+  if (formCat) {
+    formCat.value = val;
+    formCat.dispatchEvent(new Event('change'));
+  }
+  const title = document.getElementById('usrSubmitTitle');
+  if (title) title.focus();
+}
+
+function copyDashTicket() {
+  const code = document.getElementById('dashTicketCode')?.textContent || window.latestDashTicketCode;
+  if (code) {
+    navigator.clipboard.writeText(code.replace(/^#/, ''));
+    showToast(`Ticket Reference ${code} copied to clipboard!`, 'success');
+  }
+}
+
+function trackDashTicket() {
+  if (window.latestDashComplaintId) {
+    viewComplaintDetails(window.latestDashComplaintId);
+  } else {
+    showView('user-complaints');
+  }
+}
+
+function copyCurrentTrackerTicket() {
+  const code = document.getElementById('trackTicketNumber')?.textContent || window.currentTrackedTicketCode;
+  if (code) {
+    navigator.clipboard.writeText(code.replace(/^#/, ''));
+    showToast(`Ticket reference ${code} copied to clipboard!`, 'success');
+  }
+}
+
+function copyModalTicketCode() {
+  const code = document.getElementById('modalTicketCode')?.textContent;
+  if (code) {
+    navigator.clipboard.writeText(code.replace(/^#/, ''));
+    showToast(`Ticket reference ${code} copied to clipboard!`, 'success');
+  }
+}
+
+function loadUserTicketsHub() {
+  const tbody = document.getElementById('hubTicketsTableBody');
+  if (!tbody) return;
+
+  const complaints = LocalComplaintStore.getComplaints();
+  const userComplaints = complaints.filter(c => !currentUser?.email || c.userEmail === currentUser?.email || c.userEmail === 'john.doe@example.com');
+
+  if (!userComplaints.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No tickets generated yet. Select a complaint type above to file and auto-generate!</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = userComplaints.map(c => {
+    const tCode = c.ticketNumber ? (c.ticketNumber.startsWith('TCK') ? c.ticketNumber : '#' + c.ticketNumber) : generateTicketCode(c.categoryName);
+    return `
+      <tr>
+        <td>
+          <span class="ticket-code-badge">${tCode}</span>
+        </td>
+        <td>
+          <span class="badge bg-primary-subtle text-primary">${c.categoryName || 'General Support'}</span>
+        </td>
+        <td>
+          <div class="fw-semibold text-truncate" style="max-width: 200px;">${c.title}</div>
+          <small class="text-muted">${c.complaintNumber}</small>
+        </td>
+        <td>
+          <span class="badge badge-status badge-${(c.status || 'PENDING').toLowerCase().replace('_', '-')}">${(c.status || 'PENDING').replace('_', ' ')}</span>
+        </td>
+        <td>
+          <span class="badge bg-${(c.priority || 'MEDIUM').toLowerCase() === 'critical' ? 'danger' : 'secondary'}">${c.priority || 'MEDIUM'}</span>
+        </td>
+        <td><small class="text-muted">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'Today'}</small></td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-primary" onclick="viewComplaintDetails(${c.id})">
+            <i class="bi bi-binoculars"></i> Track
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  updateHubTicketCode(document.getElementById('hubCategorySelect')?.value || '2');
+}
+
+function updateHubTicketCode(val) {
+  const code = generateTicketCode(val);
+  const codeEl = document.getElementById('hubGeneratedCode');
+  const slaEl = document.getElementById('hubSlaTarget');
+  if (codeEl) codeEl.textContent = code;
+  if (slaEl) slaEl.textContent = getSlaForCategory(val);
+  window.lastHubGeneratedCode = code;
+}
+
+function copyHubGeneratedCode() {
+  const code = window.lastHubGeneratedCode || document.getElementById('hubGeneratedCode')?.textContent;
+  if (code) {
+    navigator.clipboard.writeText(code);
+    showToast(`Generated ticket code ${code} copied!`, 'success');
+  }
+}
+
+function fileWithHubCode() {
+  const val = document.getElementById('hubCategorySelect')?.value || '2';
+  showView('user-submit');
+  const formCat = document.getElementById('usrSubmitCategory');
+  if (formCat) {
+    formCat.value = val;
+    formCat.dispatchEvent(new Event('change'));
+  }
+  const title = document.getElementById('usrSubmitTitle');
+  if (title) title.focus();
 }
 
 async function loadUserComplaints() {
@@ -963,6 +1185,25 @@ async function initUserSubmitForm() {
       cats.map(c => `<option value="${c.id}">${c.name} (${c.slaHours}h SLA)</option>`).join('');
   }
 
+  if (catSelect) {
+    catSelect.onchange = () => {
+      const val = catSelect.value;
+      const previewCode = document.getElementById('submitPreviewTicketCode');
+      const previewBadge = document.getElementById('submitPreviewCategoryBadge');
+      const previewSla = document.getElementById('submitPreviewSlaText');
+      if (val) {
+        const generated = generateTicketCode(val);
+        if (previewCode) previewCode.textContent = generated;
+        const opt = catSelect.options[catSelect.selectedIndex];
+        if (previewBadge) previewBadge.textContent = opt ? opt.text : 'Selected Category';
+        if (previewSla) previewSla.innerHTML = `<i class="bi bi-stopwatch text-warning me-1"></i> SLA Target: ${getSlaForCategory(val)}`;
+        window.currentSubmitTicketCode = generated;
+      }
+    };
+    // Initialize preview if value is present
+    if (catSelect.value) catSelect.dispatchEvent(new Event('change'));
+  }
+
   // Real-time NLP sentiment preview
   const descInput = document.getElementById('usrSubmitDesc');
   const previewBox = document.getElementById('usrSentimentPreview');
@@ -999,6 +1240,14 @@ async function handleUserSubmitComplaint(e) {
     return;
   }
 
+  const catNames = { 1: 'Billing & Payments', 2: 'Technical & Bug Reports', 3: 'Product & Delivery', 4: 'Customer Service & General', 5: 'Account & Security', 6: 'Network & IT Support' };
+  const num = Math.floor(1000 + Math.random() * 9000);
+  const isUrgent = description.toLowerCase().includes('charge') || description.toLowerCase().includes('crash') || description.toLowerCase().includes('refund');
+  const assignedTicketNumber = window.currentSubmitTicketCode || generateTicketCode(categoryId || catNames[categoryId]);
+
+  let createdId = Date.now();
+  let createdObj = null;
+
   try {
     const res = await fetch('/api/user/complaints', {
       method: 'POST',
@@ -1008,43 +1257,62 @@ async function handleUserSubmitComplaint(e) {
 
     if (res.ok) {
       const saved = await res.json();
-      showToast('Complaint successfully lodged! Ticket created.', 'success');
-      document.getElementById('userComplaintForm').reset();
-      document.getElementById('usrSentimentPreview')?.classList.add('d-none');
-      viewComplaintDetails(saved.id);
-      return;
+      createdId = saved.id;
+      createdObj = saved;
     }
   } catch (err) {
     console.warn('API error, using local fallback:', err);
   }
 
-  // Client Fallback for Vercel / Offline
-  const catNames = { 1: 'Billing & Payments', 2: 'Technical & Bug Reports', 3: 'Product & Delivery', 4: 'Customer Service & General' };
-  const num = Math.floor(1000 + Math.random() * 9000);
-  const isUrgent = description.toLowerCase().includes('charge') || description.toLowerCase().includes('crash') || description.toLowerCase().includes('refund');
-  const newComplaint = {
-    id: Date.now(),
-    complaintNumber: `CMP-2026-${num}`,
-    ticketNumber: `TKT-${num}`,
-    title,
-    categoryId: Number(categoryId),
-    categoryName: catNames[categoryId] || 'General Support',
-    description,
-    priority: priority || (isUrgent ? 'HIGH' : 'MEDIUM'),
-    status: 'PENDING',
-    sentimentScore: isUrgent ? -0.85 : 0.15,
-    sentimentLabel: isUrgent ? 'VERY_NEGATIVE' : 'NEUTRAL',
-    assignedToName: 'Auto Triage Queue',
-    createdAt: new Date().toISOString(),
-    userEmail: currentUser?.email || 'john.doe@example.com',
-    userName: currentUser?.name || 'John Doe'
-  };
+  if (!createdObj) {
+    createdObj = {
+      id: createdId,
+      complaintNumber: `CMP-2026-${num}`,
+      ticketNumber: assignedTicketNumber,
+      title,
+      categoryId: Number(categoryId),
+      categoryName: catNames[categoryId] || 'General Support',
+      description,
+      priority: priority || (isUrgent ? 'HIGH' : 'MEDIUM'),
+      status: 'PENDING',
+      sentimentScore: isUrgent ? -0.85 : 0.15,
+      sentimentLabel: isUrgent ? 'VERY_NEGATIVE' : 'NEUTRAL',
+      assignedToName: 'Auto Triage Queue',
+      createdAt: new Date().toISOString(),
+      userEmail: currentUser?.email || 'john.doe@example.com',
+      userName: currentUser?.name || 'John Doe'
+    };
+    LocalComplaintStore.addComplaint(createdObj);
+  }
 
-  LocalComplaintStore.addComplaint(newComplaint);
-  showToast('Complaint successfully lodged! Ticket created.', 'success');
+  // Update Ticket Generation Success Modal
+  const modalTicketEl = document.getElementById('modalTicketCode');
+  const modalCatEl = document.getElementById('modalTicketCategory');
+  const modalPrioEl = document.getElementById('modalTicketPriority');
+  const modalBtn = document.getElementById('modalBtnTrackTicket');
+
+  if (modalTicketEl) modalTicketEl.textContent = createdObj.ticketNumber || assignedTicketNumber;
+  if (modalCatEl) modalCatEl.textContent = createdObj.categoryName || catNames[categoryId] || 'General';
+  if (modalPrioEl) modalPrioEl.textContent = createdObj.priority || 'MEDIUM';
+  if (modalBtn) modalBtn.onclick = () => viewComplaintDetails(createdObj.id);
+
+  // Update Dashboard Ticket Box
+  renderUserTicketGenerationBox(createdObj);
+
+  // Reset form
   document.getElementById('userComplaintForm').reset();
   document.getElementById('usrSentimentPreview')?.classList.add('d-none');
-  viewComplaintDetails(newComplaint.id);
+
+  showToast(`Complaint lodged! Auto-generated ticket #${createdObj.ticketNumber || assignedTicketNumber}`, 'success');
+
+  // Trigger high-visibility modal
+  const modalEl = document.getElementById('ticketGeneratedModal');
+  if (modalEl) {
+    const m = bootstrap.Modal.getOrCreateInstance(modalEl);
+    m.show();
+  } else {
+    viewComplaintDetails(createdObj.id);
+  }
 }
 
 async function viewComplaintDetails(id) {
@@ -1067,8 +1335,15 @@ async function viewComplaintDetails(id) {
     return;
   }
 
+  const ticketFormatted = c.ticketNumber ? (c.ticketNumber.startsWith('#') || c.ticketNumber.startsWith('TCK') ? c.ticketNumber : '#' + c.ticketNumber) : generateTicketCode(c.categoryName || 'General');
+
   document.getElementById('trackComplaintNumber').textContent = c.complaintNumber;
-  document.getElementById('trackTicketNumber').textContent = c.ticketNumber ? '#' + c.ticketNumber : 'Generating...';
+  const trackTicketEl = document.getElementById('trackTicketNumber');
+  if (trackTicketEl) trackTicketEl.textContent = ticketFormatted.startsWith('#') ? ticketFormatted : '#' + ticketFormatted;
+  const sideRef = document.getElementById('trackTicketSidebarRef');
+  if (sideRef) sideRef.textContent = ticketFormatted.startsWith('#') ? ticketFormatted : '#' + ticketFormatted;
+  window.currentTrackedTicketCode = ticketFormatted;
+
   document.getElementById('trackTitle').textContent = c.title;
   document.getElementById('trackCategory').textContent = c.categoryName || 'General';
   document.getElementById('trackDesc').textContent = c.description;

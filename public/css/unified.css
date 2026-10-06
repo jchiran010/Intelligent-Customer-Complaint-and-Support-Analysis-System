@@ -975,3 +975,71 @@ body.sidebar-collapsed .unified-main {
   background-color: #162033 !important;
   border-color: var(--border-color) !important;
 }
+
+/* ==========================================================================
+   TICKET GENERATION & SLA HUB UI/UX ENHANCEMENTS
+   ========================================================================== */
+
+.ticket-tracker-hero {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 14px -2px rgba(79, 70, 229, 0.1);
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .ticket-tracker-hero {
+  background: linear-gradient(135deg, rgba(129, 140, 248, 0.12) 0%, rgba(34, 211, 238, 0.1) 100%);
+  border-color: rgba(129, 140, 248, 0.25);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.ticket-code-display {
+  font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--primary-color);
+}
+
+.ticket-code-badge {
+  font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+[data-theme="dark"] .ticket-code-badge {
+  background: rgba(129, 140, 248, 0.2);
+  color: #a5b4fc;
+  border-color: rgba(129, 140, 248, 0.35);
+}
+
+/* Ticket slip card styling */
+.ticket-slip {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ticket-slip:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Copy notification toast animation */
+@keyframes copyPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.copy-pulse {
+  animation: copyPulse 0.3s ease;
+}
+
