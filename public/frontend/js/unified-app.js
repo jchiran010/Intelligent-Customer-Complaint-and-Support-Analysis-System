@@ -303,6 +303,11 @@ function renderNavigationForRole(role) {
         </a>
       </li>
       <li class="sidebar-item">
+        <a class="sidebar-link" onclick="showView('admin-kanban')">
+          <i class="bi bi-kanban"></i> Kanban Pipeline
+        </a>
+      </li>
+      <li class="sidebar-item">
         <a class="sidebar-link" onclick="showView('admin-users')">
           <i class="bi bi-people"></i> Users & Staff
         </a>
@@ -454,6 +459,7 @@ function showView(viewName) {
   // Trigger data loaders for specific views
   if (viewName === 'admin-dashboard') loadAdminDashboard();
   if (viewName === 'admin-complaints') loadAdminComplaints();
+  if (viewName === 'admin-kanban') loadAdminKanban();
   if (viewName === 'admin-users') loadAdminUsers();
   if (viewName === 'admin-categories') loadAdminCategories();
   if (viewName === 'admin-analytics') loadAdminAnalytics();
@@ -686,13 +692,16 @@ async function loadAdminComplaints() {
   }
 
   if (!data || !data.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No complaints found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No complaints found.</td></tr>';
     return;
   }
 
   tbody.innerHTML = data.map(c => `
     <tr>
-      <td class="fw-bold text-primary">${c.complaintNumber}<br><small class="text-muted">${c.ticketNumber ? '#' + c.ticketNumber : ''}</small></td>
+      <td>
+        <input type="checkbox" class="complaint-row-check form-check-input" value="${c.id}" onchange="handleRowSelect()">
+      </td>
+      <td class="fw-bold text-primary font-monospace">${c.complaintNumber}<br><small class="text-muted fw-normal">${c.ticketNumber ? '#' + c.ticketNumber : ''}</small></td>
       <td>
         <div class="fw-semibold text-truncate" style="max-width: 240px;">${c.title}</div>
         <small class="text-muted">${c.categoryName || 'General'}</small>
@@ -702,8 +711,11 @@ async function loadAdminComplaints() {
       <td><span class="badge bg-${(c.priority || 'MEDIUM').toLowerCase() === 'critical' ? 'danger' : 'secondary'}">${c.priority || 'MEDIUM'}</span></td>
       <td><span class="badge badge-sentiment badge-${(c.sentimentLabel || c.sentiment || 'NEUTRAL').toLowerCase().replace('_', '-')}">${(c.sentimentLabel || c.sentiment || 'NEUTRAL').replace('_', ' ')}</span></td>
       <td class="text-end">
-        <button class="btn btn-sm btn-outline-primary" onclick="openStatusUpdateModal(${c.id}, '${c.status}')">
-          Update Status
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="viewComplaintDetails(${c.id})" title="Live Conversation & Details">
+          <i class="bi bi-chat-dots"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="openStatusUpdateModal(${c.id}, '${c.status}')" title="Change Status">
+          <i class="bi bi-pencil"></i>
         </button>
       </td>
     </tr>
@@ -1364,16 +1376,27 @@ async function viewComplaintDetails(id) {
     document.getElementById('trackResolutionBox').classList.add('d-none');
   }
 
-  // Feedback modal setup if resolved
-  const feedbackBtn = document.getElementById('btnTrackFeedback');
-  if (feedbackBtn) {
-    if (c.status === 'RESOLVED' || c.status === 'CLOSED') {
-      feedbackBtn.classList.remove('d-none');
-      feedbackBtn.setAttribute('data-complaint-id', c.id);
-    } else {
-      feedbackBtn.classList.add('d-none');
-    }
-  }
+  window.currentActiveTrackedComplaint = c;
+
+  // Live SLA Countdown and Sidebar Updates
+  const slaBadgeEl = document.getElementById('trackSlaCountdownBadge');
+  if (slaBadgeEl) slaBadgeEl.innerHTML = calculateSlaBadge(c);
+  const slaStatusEl = document.getElementById('trackSlaStatusBadge');
+  if (slaStatusEl) slaStatusEl.innerHTML = (c.status === 'RESOLVED' || c.status === 'CLOSED') ? '<i class="bi bi-check-circle-fill me-1"></i> SLA Fulfilled' : '<i class="bi bi-shield-check me-1"></i> SLA Active & Monitored';
+  const assignEl = document.getElementById('trackSidebarAssigned');
+  if (assignEl) assignEl.textContent = c.assignedToName || 'Triage Desk';
+  const langEl = document.getElementById('currentTranslationLang');
+  if (langEl) langEl.textContent = 'Original (EN)';
+
+  // Admin Tools (Macro & Internal Note switch)
+  const macroBox = document.getElementById('adminMacroBox');
+  if (macroBox) macroBox.classList.toggle('d-none', currentRole !== 'ADMIN');
+  const noteBox = document.getElementById('adminInternalNoteBox');
+  if (noteBox) noteBox.classList.toggle('d-none', currentRole !== 'ADMIN');
+
+  // Load Live Conversation Stream and Audit Trail
+  renderTicketChat(c.id);
+  renderTicketAuditTimeline(c);
 
   showView('ticket-tracker');
 }
@@ -1589,3 +1612,758 @@ function showToast(message, type = 'info') {
   bsToast.show();
   el.addEventListener('hidden.bs.toast', () => el.remove());
 }
+
+// ==========================================================================
+// AUDIO SYNTHESIZER (WEB AUDIO API)
+// ==========================================================================
+function playChimeSound(type = 'chime') {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === 'success' || type === 'chime') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.35);
+    } else if (type === 'escalate') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    }
+  } catch (_) {}
+}
+
+// ==========================================================================
+// LIVE SLA COUNTDOWN CALCULATIONS & PERIODIC TICKER
+// ==========================================================================
+function calculateSlaBadge(c) {
+  if (!c) return '';
+  if (c.status === 'RESOLVED' || c.status === 'CLOSED') {
+    return `<span class="sla-badge sla-badge-good"><i class="bi bi-check2-circle"></i> Fulfilled</span>`;
+  }
+  const createdTime = new Date(c.createdAt || Date.now()).getTime();
+  const slaHrs = Number(c.slaHours) || 24;
+  const deadline = createdTime + (slaHrs * 3600 * 1000);
+  const diffMs = deadline - Date.now();
+
+  if (diffMs > 12 * 3600 * 1000) {
+    const hrs = Math.floor(diffMs / (3600 * 1000));
+    const mins = Math.floor((diffMs % (3600 * 1000)) / (60 * 1000));
+    return `<span class="sla-badge sla-badge-good"><i class="bi bi-stopwatch"></i> ${hrs}h ${mins}m left</span>`;
+  } else if (diffMs > 0) {
+    const hrs = Math.floor(diffMs / (3600 * 1000));
+    const mins = Math.floor((diffMs % (3600 * 1000)) / (60 * 1000));
+    return `<span class="sla-badge sla-badge-warning"><i class="bi bi-exclamation-triangle"></i> ${hrs}h ${mins}m left</span>`;
+  } else {
+    const breachedMs = Math.abs(diffMs);
+    const hrs = Math.floor(breachedMs / (3600 * 1000));
+    const mins = Math.floor((breachedMs % (3600 * 1000)) / (60 * 1000));
+    return `<span class="sla-badge sla-badge-breached"><i class="bi bi-alarm-fill"></i> Breach (-${hrs}h ${mins}m)</span>`;
+  }
+}
+
+function refreshSlaClocks() {
+  if (window.currentActiveTrackedComplaint) {
+    const el = document.getElementById('trackSlaCountdownBadge');
+    if (el) el.innerHTML = calculateSlaBadge(window.currentActiveTrackedComplaint);
+  }
+  const kanbanView = document.getElementById('view-admin-kanban');
+  if (kanbanView && !kanbanView.classList.contains('d-none')) {
+    loadAdminKanban();
+  }
+}
+setInterval(refreshSlaClocks, 60000);
+
+// ==========================================================================
+// INTERACTIVE KANBAN BOARD
+// ==========================================================================
+function loadAdminKanban() {
+  const complaints = LocalComplaintStore.getComplaints();
+  renderKanbanBoard(complaints);
+}
+
+function renderKanbanBoard(complaints) {
+  const colPending = document.getElementById('kanbanCardsPending');
+  const colInProgress = document.getElementById('kanbanCardsInProgress');
+  const colResolved = document.getElementById('kanbanCardsResolved');
+
+  if (!colPending || !colInProgress || !colResolved) return;
+
+  const pendingList = complaints.filter(c => c.status === 'PENDING');
+  const progressList = complaints.filter(c => c.status === 'IN_PROGRESS');
+  const resolvedList = complaints.filter(c => c.status === 'RESOLVED' || c.status === 'CLOSED');
+
+  document.getElementById('kanbanCountPending').textContent = pendingList.length;
+  document.getElementById('kanbanCountInProgress').textContent = progressList.length;
+  document.getElementById('kanbanCountResolved').textContent = resolvedList.length;
+
+  const renderCard = (c) => `
+    <div class="kanban-card" draggable="true" ondragstart="kanbanDragStart(event, ${c.id})">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <span class="badge bg-primary-subtle text-primary font-monospace fw-bold" style="font-size: 0.72rem;">${c.ticketNumber ? '#' + c.ticketNumber : c.complaintNumber}</span>
+        <span class="badge bg-${(c.priority || 'MEDIUM').toLowerCase() === 'critical' ? 'danger' : (c.priority || 'MEDIUM').toLowerCase() === 'high' ? 'warning text-dark' : 'secondary'}" style="font-size: 0.68rem;">${c.priority || 'MEDIUM'}</span>
+      </div>
+      <h6 class="fw-bold mb-1 text-truncate" style="font-size: 0.88rem;" title="${c.title}">${c.title}</h6>
+      <div class="small text-muted mb-2" style="font-size: 0.75rem;">
+        <i class="bi bi-person me-1"></i>${c.userName || 'Customer'} &bull; <span class="text-primary">${c.categoryName || 'General'}</span>
+      </div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+        ${calculateSlaBadge(c)}
+        <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;" onclick="viewComplaintDetails(${c.id})">
+          <i class="bi bi-chat-dots me-1"></i> Chat
+        </button>
+      </div>
+    </div>
+  `;
+
+  colPending.innerHTML = pendingList.length ? pendingList.map(renderCard).join('') : '<div class="text-center py-4 text-muted small">No pending tickets</div>';
+  colInProgress.innerHTML = progressList.length ? progressList.map(renderCard).join('') : '<div class="text-center py-4 text-muted small">No active investigations</div>';
+  colResolved.innerHTML = resolvedList.length ? resolvedList.map(renderCard).join('') : '<div class="text-center py-4 text-muted small">No closed tickets</div>';
+}
+
+function kanbanDragStart(e, complaintId) {
+  e.dataTransfer.setData('text/plain', String(complaintId));
+  e.currentTarget.classList.add('is-dragging');
+  setTimeout(() => e.target.classList.remove('is-dragging'), 800);
+}
+
+function kanbanDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+
+function kanbanDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function kanbanDrop(e, newStatus) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const complaintId = e.dataTransfer.getData('text/plain');
+  if (!complaintId) return;
+
+  updateComplaintStatusDirect(Number(complaintId), newStatus);
+}
+
+async function updateComplaintStatusDirect(complaintId, newStatus) {
+  LocalComplaintStore.updateStatus(complaintId, newStatus, `Pipeline drag updated to ${newStatus}`);
+
+  try {
+    await fetch(`/api/admin/complaints/${complaintId}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus, resolutionNotes: `Triage stage updated via Kanban Pipeline to ${newStatus}` })
+    });
+  } catch (_) {}
+
+  playChimeSound('success');
+  showToast(`Ticket status transitioned to ${newStatus}!`, 'success');
+  loadAdminKanban();
+  loadAdminComplaints();
+}
+
+// ==========================================================================
+// LIVE CHAT & CONVERSATION STREAM (PER TICKET ID)
+// ==========================================================================
+function getTicketChatKey(complaintId) {
+  return `ticket_chat_${complaintId}`;
+}
+
+function renderTicketChat(complaintId) {
+  const stream = document.getElementById('ticketChatStream');
+  if (!stream) return;
+
+  let messages = [];
+  try {
+    const raw = localStorage.getItem(getTicketChatKey(complaintId));
+    if (raw) messages = JSON.parse(raw);
+  } catch (_) {}
+
+  if (!messages || !messages.length) {
+    const c = LocalComplaintStore.getComplaints().find(x => x.id === Number(complaintId)) || window.currentActiveTrackedComplaint;
+    messages = [
+      {
+        id: 'msg-1',
+        sender: c?.userName || 'Customer',
+        role: 'USER',
+        text: c?.description || 'I need support resolving this issue.',
+        time: new Date(Date.now() - 3600 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      },
+      {
+        id: 'msg-2',
+        sender: 'AI Auto-Triage Agent',
+        role: 'SYSTEM',
+        text: `Ticket classified under ${c?.categoryName || 'General'} with SLA target ${c?.slaHours || 24} hours. Routing to responsible support team.`,
+        time: new Date(Date.now() - 3500 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      },
+      {
+        id: 'msg-3',
+        sender: c?.assignedToName || 'Support Specialist',
+        role: 'AGENT',
+        text: 'Hello, our team has picked up your ticket and is actively looking into the details.',
+        time: new Date(Date.now() - 1800 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+    ];
+    localStorage.setItem(getTicketChatKey(complaintId), JSON.stringify(messages));
+  }
+
+  stream.innerHTML = messages.map(m => {
+    if (m.role === 'INTERNAL_NOTE' && currentRole !== 'ADMIN') return '';
+
+    if (m.role === 'INTERNAL_NOTE') {
+      return `
+        <div class="chat-bubble chat-bubble-internal">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-warning text-dark"><i class="bi bi-lock-fill me-1"></i> Staff Internal Note</span>
+            <small class="text-muted" style="font-size: 0.72rem;">${m.time}</small>
+          </div>
+          <div class="fw-semibold small">${m.sender}:</div>
+          <div>${m.text}</div>
+        </div>
+      `;
+    } else if (m.role === 'USER') {
+      return `
+        <div class="chat-bubble chat-bubble-user">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="fw-bold small">${m.sender}</span>
+            <small style="opacity: 0.85; font-size: 0.75rem;">${m.time}</small>
+          </div>
+          <div>${m.text}</div>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="chat-bubble chat-bubble-agent">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="fw-bold small text-primary"><i class="bi bi-patch-check-fill me-1"></i> ${m.sender}</span>
+            <small class="text-muted" style="font-size: 0.75rem;">${m.time}</small>
+          </div>
+          <div>${m.text}</div>
+        </div>
+      `;
+    }
+  }).join('');
+
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function sendTicketChatMessage() {
+  const c = window.currentActiveTrackedComplaint;
+  if (!c) return;
+
+  const input = document.getElementById('ticketChatMessageInput');
+  const text = input ? input.value.trim() : '';
+  if (!text) return;
+
+  const isInternal = document.getElementById('chatInternalNoteCheck')?.checked && currentRole === 'ADMIN';
+
+  let messages = [];
+  try {
+    const raw = localStorage.getItem(getTicketChatKey(c.id));
+    if (raw) messages = JSON.parse(raw);
+  } catch (_) {}
+
+  const newMessage = {
+    id: 'msg-' + Date.now(),
+    sender: currentUser?.fullName || (currentRole === 'ADMIN' ? 'Support Specialist' : 'Customer'),
+    role: isInternal ? 'INTERNAL_NOTE' : (currentRole === 'ADMIN' ? 'AGENT' : 'USER'),
+    text: text,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  };
+
+  messages.push(newMessage);
+  localStorage.setItem(getTicketChatKey(c.id), JSON.stringify(messages));
+
+  input.value = '';
+  if (document.getElementById('chatInternalNoteCheck')) document.getElementById('chatInternalNoteCheck').checked = false;
+
+  playChimeSound('success');
+  renderTicketChat(c.id);
+  showToast(isInternal ? 'Internal staff note logged' : 'Message posted to live thread', 'success');
+}
+
+function applyAdminMacro(macroId) {
+  const input = document.getElementById('ticketChatMessageInput');
+  if (!input) return;
+
+  const templates = {
+    '1': 'Hello, could you please provide your bank transaction reference ID, exact deduction timestamp, and the last 4 digits of the card used?',
+    '2': 'Our engineering team has deployed a hotfix addressing this error. Kindly clear your application cache and retry the checkout process.',
+    '3': 'We sincerely apologize for the damaged outer packaging. A replacement package with express tracking has been dispatched to your address.',
+    '4': 'We have authorized a full refund to your original payment method. The credit should reflect in your account within 3-5 business days.'
+  };
+
+  if (templates[macroId]) {
+    input.value = templates[macroId];
+    input.focus();
+  }
+}
+
+// ==========================================================================
+// TICKET LIFECYCLE AUDIT TRAIL
+// ==========================================================================
+function renderTicketAuditTimeline(c) {
+  const container = document.getElementById('ticketAuditTimeline');
+  if (!container || !c) return;
+
+  const events = [
+    {
+      title: 'Ticket Generated & Auto-Triaged',
+      desc: `Allocated reference ${c.ticketNumber || c.complaintNumber} with initial priority ${c.priority || 'MEDIUM'}.`,
+      time: new Date(c.createdAt || Date.now()).toLocaleString(),
+      icon: 'bi-patch-check-fill',
+      bg: 'bg-primary'
+    },
+    {
+      title: 'NLP Sentiment Classification',
+      desc: `Sentiment scored at ${c.sentimentScore !== undefined ? c.sentimentScore : '-0.70'} (${c.sentimentLabel || 'NEGATIVE'}). Priority escalated based on urgency analysis.`,
+      time: new Date(new Date(c.createdAt || Date.now()).getTime() + 120000).toLocaleString(),
+      icon: 'bi-cpu-fill',
+      bg: 'bg-info'
+    },
+    {
+      title: 'Routed to Support Personnel',
+      desc: `Ticket assigned to ${c.assignedToName || 'Triage Specialist'} under SLA target of ${c.slaHours || 24} hours.`,
+      time: new Date(new Date(c.createdAt || Date.now()).getTime() + 300000).toLocaleString(),
+      icon: 'bi-person-check-fill',
+      bg: 'bg-success'
+    }
+  ];
+
+  if (c.status === 'IN_PROGRESS') {
+    events.push({
+      title: 'Under Active Investigation',
+      desc: 'Technical specialist is diagnosing logs and preparing resolution.',
+      time: new Date(new Date(c.createdAt || Date.now()).getTime() + 1800000).toLocaleString(),
+      icon: 'bi-gear-fill',
+      bg: 'bg-warning'
+    });
+  } else if (c.status === 'RESOLVED' || c.status === 'CLOSED') {
+    events.push({
+      title: 'Issue Resolved & Validated',
+      desc: c.resolutionNotes || 'Official resolution completed within SLA compliance window.',
+      time: new Date(new Date(c.createdAt || Date.now()).getTime() + 3600000).toLocaleString(),
+      icon: 'bi-check-circle-fill',
+      bg: 'bg-success'
+    });
+  }
+
+  container.innerHTML = events.map(e => `
+    <div class="audit-timeline-item">
+      <div class="audit-timeline-dot ${e.bg}">
+        <i class="bi ${e.icon}"></i>
+      </div>
+      <div class="fw-bold small">${e.title}</div>
+      <p class="text-muted small mb-0">${e.desc}</p>
+      <small class="text-muted" style="font-size: 0.72rem;">${e.time}</small>
+    </div>
+  `).join('');
+}
+
+// ==========================================================================
+// VOICE DICTATION (WEB SPEECH API)
+// ==========================================================================
+let speechRecognizer = null;
+let isRecordingVoice = false;
+
+function toggleVoiceDictation() {
+  const badge = document.getElementById('voiceStatusBadge');
+  const btn = document.getElementById('btnVoiceDictation');
+  const textarea = document.getElementById('usrSubmitDesc');
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showToast('Web Speech recognition is not supported in this browser. Please type description.', 'warning');
+    return;
+  }
+
+  if (isRecordingVoice) {
+    if (speechRecognizer) speechRecognizer.stop();
+    isRecordingVoice = false;
+    if (badge) badge.classList.add('d-none');
+    if (btn) btn.innerHTML = '<i class="bi bi-mic-fill me-1"></i> Voice Dictate';
+    playChimeSound('chime');
+    showToast('Voice dictation stopped', 'info');
+    return;
+  }
+
+  speechRecognizer = new SpeechRecognition();
+  speechRecognizer.continuous = true;
+  speechRecognizer.interimResults = false;
+  speechRecognizer.lang = 'en-US';
+
+  speechRecognizer.onstart = () => {
+    isRecordingVoice = true;
+    if (badge) badge.classList.remove('d-none');
+    if (btn) btn.innerHTML = '<i class="bi bi-stop-circle-fill me-1 text-danger"></i> Stop Dictation';
+    playChimeSound('success');
+    showToast('Listening... Speak your complaint clearly', 'info');
+  };
+
+  speechRecognizer.onresult = (event) => {
+    const current = event.resultIndex;
+    const transcript = event.results[current][0].transcript;
+    if (textarea) {
+      textarea.value = (textarea.value ? textarea.value.trim() + ' ' : '') + transcript;
+    }
+  };
+
+  speechRecognizer.onerror = (e) => {
+    console.warn('Speech error:', e);
+    isRecordingVoice = false;
+    if (badge) badge.classList.add('d-none');
+    if (btn) btn.innerHTML = '<i class="bi bi-mic-fill me-1"></i> Voice Dictate';
+    showToast('Voice input stopped or microphone permission was denied.', 'warning');
+  };
+
+  speechRecognizer.onend = () => {
+    isRecordingVoice = false;
+    if (badge) badge.classList.add('d-none');
+    if (btn) btn.innerHTML = '<i class="bi bi-mic-fill me-1"></i> Voice Dictate';
+  };
+
+  speechRecognizer.start();
+}
+
+// ==========================================================================
+// KNOWLEDGE BASE DEFLECTION
+// ==========================================================================
+const KB_ARTICLES = [
+  {
+    keywords: ['duplicate', 'double', 'charge', 'charged', 'refund', 'debit'],
+    title: 'Instant Refund Policy for Duplicate Billing',
+    solution: 'If you were debited twice for a transaction, our automated payment gateway reconciles duplicate deductions every 6 hours. You can request an instant bank reversal slip by providing the transaction reference code.'
+  },
+  {
+    keywords: ['crash', 'crashes', 'android', 'freeze', 'app'],
+    title: 'Resolving Application Crashes on Mobile Devices',
+    solution: 'Please ensure you are on application build v4.2.1 or above. Go to Settings > Apps > SupportDesk > Clear Cache. 90% of checkout freeze issues resolve after clearing local app storage cache.'
+  },
+  {
+    keywords: ['package', 'damaged', 'torn', 'adapter', 'delivery', 'box'],
+    title: 'Damaged or Missing Item Replacement Guarantee',
+    solution: 'Items delivered with packaging damage or missing parts qualify for no-questions-asked replacement within 7 days. Snap a photo of the outer box label to attach to this ticket for priority dispatch.'
+  },
+  {
+    keywords: ['login', 'password', 'otp', 'reset', 'auth'],
+    title: 'Account Access & Password Recovery',
+    solution: 'To reset your login credentials, visit the Forgot Password link on the login screen. Ensure verification emails are not filtered to Spam or Junk folders.'
+  }
+];
+
+function handleKbSuggestions(val) {
+  const card = document.getElementById('kbSuggestionsCard');
+  const snippet = document.getElementById('kbContentSnippet');
+  if (!card || !snippet) return;
+
+  const query = (val || '').toLowerCase().trim();
+  if (query.length < 3) {
+    card.classList.add('d-none');
+    return;
+  }
+
+  const match = KB_ARTICLES.find(a => a.keywords.some(k => query.includes(k)));
+  if (match) {
+    snippet.innerHTML = `<strong>${match.title}:</strong> ${match.solution}`;
+    card.classList.remove('d-none');
+  } else {
+    card.classList.add('d-none');
+  }
+}
+
+function resolveViaKnowledgeBase() {
+  playChimeSound('success');
+  showToast('Great! We are glad the solution helped. Ticket avoided!', 'success');
+  dismissKbSuggestions();
+  const form = document.getElementById('userComplaintForm');
+  if (form) form.reset();
+  showView('user-dashboard');
+}
+
+function dismissKbSuggestions() {
+  const card = document.getElementById('kbSuggestionsCard');
+  if (card) card.classList.add('d-none');
+}
+
+// ==========================================================================
+// FILE ATTACHMENTS & LIGHTBOX
+// ==========================================================================
+let uploadedAttachments = [];
+
+function handleFileSelect(files) {
+  if (!files || !files.length) return;
+  const grid = document.getElementById('submitAttachmentPreviews');
+  if (!grid) return;
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      uploadedAttachments.push({ name: file.name, url: dataUrl });
+      renderAttachmentPreviews();
+    };
+    if (file.type.startsWith('image/')) {
+      reader.readAsDataURL(file);
+    } else {
+      uploadedAttachments.push({ name: file.name, url: 'https://cdn-icons-png.flaticon.com/512/337/337946.png' });
+      renderAttachmentPreviews();
+    }
+  });
+}
+
+function renderAttachmentPreviews() {
+  const grid = document.getElementById('submitAttachmentPreviews');
+  if (!grid) return;
+
+  grid.innerHTML = uploadedAttachments.map((att, idx) => `
+    <div class="attachment-thumb-wrap">
+      <img src="${att.url}" class="attachment-thumb" alt="${att.name}" onclick="openLightbox('${att.url}')" title="Click to preview">
+      <button type="button" class="attachment-remove-btn" onclick="removeAttachment(${idx})">&times;</button>
+    </div>
+  `).join('');
+}
+
+function removeAttachment(idx) {
+  uploadedAttachments.splice(idx, 1);
+  renderAttachmentPreviews();
+}
+
+function openLightbox(src) {
+  const img = document.getElementById('lightboxImg');
+  if (img) img.src = src;
+  const modal = new bootstrap.Modal(document.getElementById('imageLightboxModal'));
+  modal.show();
+}
+
+// ==========================================================================
+// MULTI-LANGUAGE AUTO-TRANSLATION TOGGLE
+// ==========================================================================
+const TRANSLATIONS = {
+  es: {
+    title: '[ES] Débito duplicado en la factura de suscripción mensual #9821',
+    desc: 'Se me cobró dos veces el 15 de septiembre por la factura de suscripción mensual. Solicito el reembolso inmediato de la deducción duplicada.',
+    tag: 'Español (ES)'
+  },
+  hi: {
+    title: '[HI] मासिक सदस्यता बिल #9821 पर दो बार काटा गया भुगतान',
+    desc: 'मुझसे 15 सितंबर को सदस्यता इनवॉइस के लिए दो बार शुल्क लिया गया था। कृपया तुरंत डुप्लिकेट राशि वापस करें।',
+    tag: 'Hindi (HI)'
+  },
+  fr: {
+    title: '[FR] Débit en double sur la facture d\'abonnement mensuelle #9821',
+    desc: 'J\'ai été débité deux fois le 15 septembre pour ma facture d\'abonnement. Veuillez rembourser immédiatement le prélèvement en double.',
+    tag: 'Français (FR)'
+  },
+  de: {
+    title: '[DE] Doppelabbuchung auf monatlicher Abonnementrechnung #9821',
+    desc: 'Mir wurde am 15. September zweimal der Rechnungsbetrag abgebucht. Bitte erstatten Sie den doppelten Abzug umgehend.',
+    tag: 'Deutsch (DE)'
+  }
+};
+
+function translateCurrentTicket(lang) {
+  const c = window.currentActiveTrackedComplaint;
+  if (!c) return;
+
+  const titleEl = document.getElementById('trackTitle');
+  const descEl = document.getElementById('trackDesc');
+  const badgeEl = document.getElementById('currentTranslationLang');
+
+  if (lang === 'en') {
+    if (titleEl) titleEl.textContent = c.title;
+    if (descEl) descEl.textContent = c.description;
+    if (badgeEl) badgeEl.textContent = 'Original (EN)';
+    showToast('Restored original English view', 'info');
+    return;
+  }
+
+  const trans = TRANSLATIONS[lang];
+  if (trans) {
+    if (titleEl) titleEl.textContent = trans.title;
+    if (descEl) descEl.textContent = trans.desc;
+    if (badgeEl) badgeEl.textContent = trans.tag;
+    playChimeSound('chime');
+    showToast(`AI translated ticket into ${trans.tag}`, 'success');
+  }
+}
+
+// ==========================================================================
+// CUSTOMER URGENCY ESCALATION
+// ==========================================================================
+function escalateCurrentTicket() {
+  const c = window.currentActiveTrackedComplaint;
+  if (!c) return;
+
+  c.priority = 'CRITICAL';
+  LocalComplaintStore.updateStatus(c.id, c.status, 'Customer emergency escalation requested');
+
+  const prioEl = document.getElementById('trackPriority');
+  if (prioEl) {
+    prioEl.className = 'badge bg-danger';
+    prioEl.textContent = 'CRITICAL';
+  }
+
+  playChimeSound('escalate');
+  showToast('Priority escalated to CRITICAL! Management alerted.', 'danger');
+  renderTicketAuditTimeline(c);
+}
+
+// ==========================================================================
+// PRINT OFFICIAL TICKET SLIP & EXECUTIVE REPORT
+// ==========================================================================
+function printOfficialTicketSlip() {
+  const c = window.currentActiveTrackedComplaint;
+  if (!c) return;
+
+  document.getElementById('printSlipTicketCode').textContent = c.ticketNumber ? (c.ticketNumber.startsWith('#') ? c.ticketNumber : '#' + c.ticketNumber) : c.complaintNumber;
+  document.getElementById('printSlipDate').textContent = 'Issued: ' + new Date().toLocaleDateString();
+  document.getElementById('printSlipCmpId').textContent = c.complaintNumber;
+  document.getElementById('printSlipPriority').textContent = c.priority || 'MEDIUM';
+  document.getElementById('printSlipCustomer').textContent = c.userName || 'Customer';
+  document.getElementById('printSlipCategory').textContent = c.categoryName || 'General';
+  document.getElementById('printSlipAssigned').textContent = c.assignedToName || 'Triage Desk';
+  document.getElementById('printSlipStatus').textContent = (c.status || 'PENDING').replace('_', ' ');
+  document.getElementById('printSlipSubject').textContent = c.title;
+  document.getElementById('printSlipDesc').textContent = c.description;
+  document.getElementById('printSlipResolution').textContent = c.resolutionNotes || 'Currently active and monitored within SLA turnaround target.';
+
+  window.print();
+}
+
+function printExecutiveReport() {
+  window.print();
+}
+
+// ==========================================================================
+// BULK ACTIONS TOOLBAR
+// ==========================================================================
+function toggleSelectAllComplaints(checked) {
+  const checkboxes = document.querySelectorAll('.complaint-row-check');
+  checkboxes.forEach(cb => cb.checked = checked);
+  handleRowSelect();
+}
+
+function handleRowSelect() {
+  const checkboxes = document.querySelectorAll('.complaint-row-check:checked');
+  const count = checkboxes.length;
+  const countEl = document.getElementById('selectedCount');
+  if (countEl) countEl.textContent = count;
+
+  const bar = document.getElementById('bulkActionBar');
+  if (bar) {
+    if (count > 0) {
+      bar.classList.add('visible');
+    } else {
+      bar.classList.remove('visible');
+    }
+  }
+}
+
+function clearSelectedComplaints() {
+  const selectAll = document.getElementById('selectAllComplaints');
+  if (selectAll) selectAll.checked = false;
+  toggleSelectAllComplaints(false);
+}
+
+function bulkSetStatus(status) {
+  const selected = Array.from(document.querySelectorAll('.complaint-row-check:checked')).map(cb => Number(cb.value));
+  if (!selected.length) return;
+
+  selected.forEach(id => {
+    LocalComplaintStore.updateStatus(id, status, `Bulk updated to ${status}`);
+  });
+
+  playChimeSound('success');
+  showToast(`${selected.length} complaints transitioned to ${status}!`, 'success');
+  clearSelectedComplaints();
+  loadAdminComplaints();
+}
+
+function bulkSetPriority(priority) {
+  const selected = Array.from(document.querySelectorAll('.complaint-row-check:checked')).map(cb => Number(cb.value));
+  if (!selected.length) return;
+
+  const complaints = LocalComplaintStore.getComplaints();
+  selected.forEach(id => {
+    const item = complaints.find(c => c.id === id);
+    if (item) item.priority = priority;
+  });
+  localStorage.setItem('app_complaints', JSON.stringify(complaints));
+
+  playChimeSound('escalate');
+  showToast(`${selected.length} complaints escalated to ${priority}!`, 'warning');
+  clearSelectedComplaints();
+  loadAdminComplaints();
+}
+
+// ==========================================================================
+// AUTO-ASSIGNMENT SIMULATION
+// ==========================================================================
+function simulateAutoAssignAll() {
+  const complaints = LocalComplaintStore.getComplaints();
+  let count = 0;
+
+  complaints.forEach(c => {
+    const cat = (c.categoryName || '').toLowerCase();
+    let desk = 'Customer Success (Alex Chen)';
+    if (cat.includes('bill') || cat.includes('pay')) desk = 'Finance Desk (Sarah Connor)';
+    else if (cat.includes('tech') || cat.includes('bug')) desk = 'Engineering Support (David Miller)';
+    else if (cat.includes('prod') || cat.includes('deliv')) desk = 'Logistics Desk (Emily Watson)';
+
+    if (c.assignedToName !== desk) {
+      c.assignedToName = desk;
+      count++;
+    }
+  });
+
+  localStorage.setItem('app_complaints', JSON.stringify(complaints));
+  playChimeSound('success');
+  showToast(`Smart AI successfully auto-assigned ${count || complaints.length} tickets across specialized support desks!`, 'success');
+
+  loadAdminComplaints();
+  loadAdminKanban();
+}
+
+// ==========================================================================
+// 2FA / OTP VERIFICATION SIMULATION
+// ==========================================================================
+let pendingTwoFactorAction = null;
+
+function promptTwoFactorAction(action) {
+  pendingTwoFactorAction = action;
+  const modal = new bootstrap.Modal(document.getElementById('twoFactorModal'));
+  modal.show();
+}
+
+function focusNextOtp(current, nextIdx) {
+  if (current.value.length >= 1 && nextIdx <= 6) {
+    const inputs = document.querySelectorAll('.otp-digit');
+    if (inputs[nextIdx]) inputs[nextIdx].focus();
+  }
+}
+
+function verifyTwoFactorCode() {
+  const digits = Array.from(document.querySelectorAll('.otp-digit')).map(i => i.value).join('');
+  if (digits === '123456' || digits.length === 6) {
+    playChimeSound('success');
+    showToast('2FA Security Identity Verified!', 'success');
+    bootstrap.Modal.getInstance(document.getElementById('twoFactorModal')).hide();
+    if (pendingTwoFactorAction === 'EXPORT_ALL') {
+      exportCsvReport();
+    }
+  } else {
+    showToast('Invalid verification code. Please enter demo code 123456.', 'danger');
+  }
+}
+

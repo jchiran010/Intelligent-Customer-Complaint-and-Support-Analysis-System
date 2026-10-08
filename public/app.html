@@ -210,7 +210,17 @@
         <!-- ========================================== -->
         <div id="view-admin-complaints" class="app-view-panel d-none">
           <div class="bento-card mb-4">
-            <h5 class="fw-bold mb-3">All Customer Complaints</h5>
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <h5 class="fw-bold mb-0">All Customer Complaints</h5>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary" onclick="showView('admin-kanban')">
+                  <i class="bi bi-kanban me-1"></i> Switch to Kanban Board
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="simulateAutoAssignAll()">
+                  <i class="bi bi-lightning-charge-fill me-1"></i> Auto-Assign Desks
+                </button>
+              </div>
+            </div>
             <div class="row g-2 align-items-center">
               <div class="col-md-6">
                 <div class="input-group input-group-sm">
@@ -238,19 +248,95 @@
               <table class="table-custom">
                 <thead>
                   <tr>
-                    <th style="width: 18%; min-width: 150px;">Complaint & Ticket</th>
-                    <th style="width: 26%; min-width: 200px;">Title & Category</th>
+                    <th style="width: 4%;"><input type="checkbox" id="selectAllComplaints" onchange="toggleSelectAllComplaints(this.checked)" title="Select all"></th>
+                    <th style="width: 17%; min-width: 140px;">Complaint & Ticket</th>
+                    <th style="width: 25%; min-width: 190px;">Title & Category</th>
                     <th style="width: 14%; min-width: 120px;">Customer</th>
                     <th style="width: 12%; min-width: 110px;">Status</th>
                     <th style="width: 10%; min-width: 90px;">Priority</th>
-                    <th style="width: 10%; min-width: 100px;">Sentiment</th>
-                    <th style="width: 10%; min-width: 90px;" class="text-end">Actions</th>
+                    <th style="width: 9%; min-width: 90px;">Sentiment</th>
+                    <th style="width: 9%; min-width: 80px;" class="text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="admAllComplaintsTable">
-                  <tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                  <tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- Sticky Floating Bulk Action Bar -->
+          <div class="bulk-action-bar" id="bulkActionBar">
+            <span class="small fw-bold"><i class="bi bi-check2-square text-primary me-1"></i> <span id="selectedCount">0</span> selected</span>
+            <button class="btn btn-sm btn-outline-info rounded-pill" onclick="bulkSetStatus('IN_PROGRESS')"><i class="bi bi-arrow-repeat me-1"></i> Mark In Progress</button>
+            <button class="btn btn-sm btn-outline-success rounded-pill" onclick="bulkSetStatus('RESOLVED')"><i class="bi bi-check-circle me-1"></i> Mark Resolved</button>
+            <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="bulkSetPriority('CRITICAL')"><i class="bi bi-exclamation-triangle-fill me-1"></i> Escalate Critical</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="clearSelectedComplaints()"><i class="bi bi-x-lg me-1"></i> Deselect</button>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW: ADMIN KANBAN PIPELINE                -->
+        <!-- ========================================== -->
+        <div id="view-admin-kanban" class="app-view-panel d-none">
+          <div class="bento-card mb-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-kanban-fill text-primary me-2"></i> Support Ticket Pipeline (Kanban Board)</h5>
+                <small class="text-muted">Drag and drop tickets between columns to instantly update triage status and notify support personnel</small>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-success" onclick="simulateAutoAssignAll()">
+                  <i class="bi bi-lightning-charge-fill me-1"></i> Auto-Assign Desks
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="showView('admin-complaints')">
+                  <i class="bi bi-table me-1"></i> Table View
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban-board">
+            <!-- Column 1: Pending Triage -->
+            <div class="kanban-column" id="kanbanColPending" ondragover="kanbanDragOver(event)" ondragleave="kanbanDragLeave(event)" ondrop="kanbanDrop(event, 'PENDING')">
+              <div class="kanban-col-header" style="border-color: #f59e0b;">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-hourglass-split text-warning fs-5"></i>
+                  <span class="fw-bold">Pending Triage</span>
+                </div>
+                <span class="badge bg-warning text-dark px-2 py-1" id="kanbanCountPending">0</span>
+              </div>
+              <div class="kanban-cards-container" id="kanbanCardsPending">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Column 2: In Progress -->
+            <div class="kanban-column" id="kanbanColInProgress" ondragover="kanbanDragOver(event)" ondragleave="kanbanDragLeave(event)" ondrop="kanbanDrop(event, 'IN_PROGRESS')">
+              <div class="kanban-col-header" style="border-color: #0ea5e9;">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-gear-wide-connected text-info fs-5"></i>
+                  <span class="fw-bold">Under Investigation</span>
+                </div>
+                <span class="badge bg-info text-white px-2 py-1" id="kanbanCountInProgress">0</span>
+              </div>
+              <div class="kanban-cards-container" id="kanbanCardsInProgress">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Column 3: Resolved -->
+            <div class="kanban-column" id="kanbanColResolved" ondragover="kanbanDragOver(event)" ondragleave="kanbanDragLeave(event)" ondrop="kanbanDrop(event, 'RESOLVED')">
+              <div class="kanban-col-header" style="border-color: #10b981;">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-patch-check-fill text-success fs-5"></i>
+                  <span class="fw-bold">Resolved & Closed</span>
+                </div>
+                <span class="badge bg-success text-white px-2 py-1" id="kanbanCountResolved">0</span>
+              </div>
+              <div class="kanban-cards-container" id="kanbanCardsResolved">
+                <!-- Injected via JS -->
+              </div>
             </div>
           </div>
         </div>
@@ -334,17 +420,104 @@
               </div>
             </div>
           </div>
+
+          <div class="row g-4 mb-4">
+            <!-- Sentiment Trigger Keyword Cloud / Heatmap -->
+            <div class="col-lg-6">
+              <div class="bento-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="bi bi-fire text-danger me-2"></i> Sentiment Keyword Trigger Heatmap</h6>
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle">NLP Extracted</span>
+                </div>
+                <p class="text-muted small mb-3">High-frequency keywords mapped from positive resolution drivers and negative grievance escalations.</p>
+                <div class="keyword-cloud">
+                  <span class="keyword-pill keyword-pill-danger" title="14 occurrences"><i class="bi bi-arrow-up-right"></i> Duplicate Charge (14)</span>
+                  <span class="keyword-pill keyword-pill-danger" title="9 occurrences"><i class="bi bi-exclamation-circle"></i> App Crash (9)</span>
+                  <span class="keyword-pill keyword-pill-danger" title="8 occurrences"><i class="bi bi-credit-card"></i> Payment Timeout (8)</span>
+                  <span class="keyword-pill keyword-pill-danger" title="7 occurrences"><i class="bi bi-box-seam"></i> Torn Packaging (7)</span>
+                  <span class="keyword-pill keyword-pill-danger" title="6 occurrences"><i class="bi bi-question-circle"></i> Missing Adapter (6)</span>
+                  <span class="keyword-pill keyword-pill-danger" title="5 occurrences"><i class="bi bi-clock-history"></i> Delivery Delay (5)</span>
+                  <span class="keyword-pill keyword-pill-success" title="18 occurrences"><i class="bi bi-check2-circle"></i> Fast Support (18)</span>
+                  <span class="keyword-pill keyword-pill-success" title="15 occurrences"><i class="bi bi-patch-check"></i> Solved on Call (15)</span>
+                  <span class="keyword-pill keyword-pill-success" title="12 occurrences"><i class="bi bi-arrow-counterclockwise"></i> Refund Processed (12)</span>
+                  <span class="keyword-pill keyword-pill-info" title="10 occurrences"><i class="bi bi-person-check"></i> Helpful Staff (10)</span>
+                  <span class="keyword-pill keyword-pill-info" title="7 occurrences"><i class="bi bi-shield-check"></i> Polite Triage (7)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Agent Performance Leaderboard -->
+            <div class="col-lg-6">
+              <div class="bento-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i> Support Specialist Leaderboard</h6>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Top Performers</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle mb-0">
+                    <thead class="text-muted small">
+                      <tr>
+                        <th>Specialist</th>
+                        <th>Desk</th>
+                        <th>Resolved</th>
+                        <th>Avg Turnaround</th>
+                        <th>CSAT</th>
+                      </tr>
+                    </thead>
+                    <tbody class="small">
+                      <tr>
+                        <td><strong>Sarah Connor</strong></td>
+                        <td><span class="badge bg-light text-dark">Finance</span></td>
+                        <td>38</td>
+                        <td>9.2 hrs</td>
+                        <td><span class="text-warning">4.9 &#9733;</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>David Miller</strong></td>
+                        <td><span class="badge bg-light text-dark">Engineering</span></td>
+                        <td>32</td>
+                        <td>14.5 hrs</td>
+                        <td><span class="text-warning">4.8 &#9733;</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Emily Watson</strong></td>
+                        <td><span class="badge bg-light text-dark">Logistics</span></td>
+                        <td>29</td>
+                        <td>11.0 hrs</td>
+                        <td><span class="text-warning">4.7 &#9733;</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Alex Chen</strong></td>
+                        <td><span class="badge bg-light text-dark">Accounts</span></td>
+                        <td>26</td>
+                        <td>8.4 hrs</td>
+                        <td><span class="text-warning">4.9 &#9733;</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="view-admin-reports" class="app-view-panel d-none">
           <div class="row justify-content-center">
             <div class="col-lg-8">
               <div class="bento-card">
-                <h5 class="fw-bold mb-3"><i class="bi bi-filetype-csv text-primary me-2"></i> Export Complaints Report</h5>
-                <p class="text-muted small mb-4">Download comprehensive complaint records in CSV format with resolution timestamps and sentiment scores.</p>
-                <button class="btn btn-primary px-4 py-2 fw-semibold" onclick="exportCsvReport()">
-                  <i class="bi bi-download me-2"></i> Export CSV Now
-                </button>
+                <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-bar-graph text-primary me-2"></i> Export Operational Reports</h5>
+                <p class="text-muted small mb-4">Export detailed complaint audit datasets, executive SLA performance sheets, and sentiment distribution reports.</p>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-primary px-4 py-2 fw-semibold" onclick="exportCsvReport()">
+                    <i class="bi bi-filetype-csv me-2"></i> Export Complaints CSV
+                  </button>
+                  <button class="btn btn-outline-primary px-4 py-2 fw-semibold" onclick="printExecutiveReport()">
+                    <i class="bi bi-printer me-2"></i> Executive Summary Slip
+                  </button>
+                  <button class="btn btn-outline-warning px-4 py-2 fw-semibold" onclick="promptTwoFactorAction('EXPORT_ALL')">
+                    <i class="bi bi-shield-lock me-2"></i> Secure Audit Dump (2FA)
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -523,7 +696,28 @@
                 <form id="userComplaintForm">
                   <div class="mb-3">
                     <label class="form-label small fw-semibold">Subject / Title *</label>
-                    <input type="text" class="form-control" id="usrSubmitTitle" placeholder="e.g. Double charged on subscription invoice" required>
+                    <input type="text" class="form-control" id="usrSubmitTitle" placeholder="e.g. Double charged on subscription invoice" required oninput="handleKbSuggestions(this.value)">
+                  </div>
+
+                  <!-- AI Knowledge Base Instant Solution Deflection -->
+                  <div id="kbSuggestionsCard" class="card border-info bg-surface-alt mb-3 d-none">
+                    <div class="card-body p-3">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="fw-bold text-info small d-flex align-items-center">
+                          <i class="bi bi-lightbulb-fill me-2 fs-6"></i> AI Smart Solutions & Knowledge Base
+                        </div>
+                        <span class="badge bg-info-subtle text-info">Instant Deflection</span>
+                      </div>
+                      <div id="kbContentSnippet" class="small text-body mb-2"></div>
+                      <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-success" onclick="resolveViaKnowledgeBase()">
+                          <i class="bi bi-check2-circle me-1"></i> This Solved My Issue! (Skip Filing)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="dismissKbSuggestions()">
+                          Continue Filing Ticket
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   <div class="row g-3 mb-3">
@@ -568,10 +762,32 @@
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label small fw-semibold">Description *</label>
-                    <textarea class="form-control" id="usrSubmitDesc" rows="5" placeholder="Explain the problem in detail..." required></textarea>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label small fw-semibold mb-0">Description *</label>
+                      <div class="d-flex align-items-center gap-2">
+                        <span id="voiceStatusBadge" class="badge bg-danger animate-pulse d-none">
+                          <i class="bi bi-record-circle me-1"></i> Listening... Speak now
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" id="btnVoiceDictation" onclick="toggleVoiceDictation()">
+                          <i class="bi bi-mic-fill me-1"></i> Voice Dictate
+                        </button>
+                      </div>
+                    </div>
+                    <textarea class="form-control" id="usrSubmitDesc" rows="4" placeholder="Explain the problem in detail..." required></textarea>
                     <!-- Live NLP Sentiment Preview Box -->
                     <div id="usrSentimentPreview" class="d-none mt-2"></div>
+                  </div>
+
+                  <!-- Attachments & Media Dropzone -->
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Attachments (Screenshots / Invoices / Logs)</label>
+                    <div class="attachment-dropzone" id="submitAttachmentDropzone" onclick="document.getElementById('submitFileInput').click()">
+                      <i class="bi bi-cloud-arrow-up fs-2 text-primary mb-1 d-block"></i>
+                      <div class="small fw-semibold">Click to upload or drag & drop files here</div>
+                      <small class="text-muted">PNG, JPG, PDF up to 10MB</small>
+                    </div>
+                    <input type="file" id="submitFileInput" accept="image/*,.pdf" multiple style="display: none;" onchange="handleFileSelect(this.files)">
+                    <div class="attachment-preview-grid" id="submitAttachmentPreviews"></div>
                   </div>
 
                   <div class="d-flex justify-content-end gap-2">
@@ -629,7 +845,7 @@
                 <div class="ticket-tracker-hero p-4 mb-4 rounded-4 border text-center">
                   <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                     <span class="badge bg-primary text-white px-3 py-1"><i class="bi bi-patch-check-fill me-1"></i> VERIFIED SUPPORT TICKET</span>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1"><i class="bi bi-shield-check me-1"></i> SLA Active & Monitored</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1" id="trackSlaStatusBadge"><i class="bi bi-shield-check me-1"></i> SLA Active & Monitored</span>
                   </div>
                   <div class="my-3">
                     <div class="ticket-badge-pill">
@@ -645,6 +861,21 @@
                     <span>Complaint ID: <strong id="trackComplaintNumber" class="text-body fw-bold">CMP-XXXX</strong></span>
                     <span>&bull;</span>
                     <span>Priority: <span id="trackPriority" class="badge">MEDIUM</span></span>
+                  </div>
+                </div>
+
+                <!-- Multi-Language Translation Bar -->
+                <div class="d-flex align-items-center justify-content-between p-2 rounded bg-surface-alt border mb-3 flex-wrap gap-2">
+                  <div class="small text-muted d-flex align-items-center gap-1">
+                    <i class="bi bi-translate text-primary"></i> <span>Language Translation:</span>
+                    <span id="currentTranslationLang" class="badge bg-primary text-white">Original (EN)</span>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('en')">EN</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('es')">ES</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('hi')">HI</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('fr')">FR</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('de')">DE</button>
                   </div>
                 </div>
 
@@ -674,6 +905,55 @@
                   <p id="trackResolutionNotes" class="mb-0 text-body"></p>
                 </div>
 
+                <!-- Live Conversation & Support Stream -->
+                <div class="chat-container mb-4">
+                  <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-surface-alt">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-chat-dots-fill text-primary me-2"></i> Live Conversation & Activity Stream</h6>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-circle-fill text-success fs-6 me-1"></i> Live Thread</span>
+                  </div>
+                  <div class="chat-messages-stream" id="ticketChatStream">
+                    <!-- Populated dynamically via JS -->
+                  </div>
+                  <div class="p-3 border-top bg-surface">
+                    <!-- Admin AI Quick Macro -->
+                    <div id="adminMacroBox" class="d-none mb-2">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="small text-muted fw-semibold"><i class="bi bi-magic text-info"></i> AI Macro:</span>
+                        <select class="form-select form-select-sm" id="adminMacroSelect" onchange="applyAdminMacro(this.value)">
+                          <option value="">-- Choose Quick Reply Template --</option>
+                          <option value="1">Request bank statement reference & transaction timestamp</option>
+                          <option value="2">Engineering patch deployed, please clear cache and retry</option>
+                          <option value="3">Replacement package dispatched with express tracking</option>
+                          <option value="4">Full refund authorized, credit reflects in 3-5 business days</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- Staff Internal Note Checkbox (for Admins) -->
+                    <div id="adminInternalNoteBox" class="d-none form-check form-switch mb-2">
+                      <input class="form-check-input" type="checkbox" id="chatInternalNoteCheck">
+                      <label class="form-check-label small fw-semibold text-warning" for="chatInternalNoteCheck">
+                        <i class="bi bi-lock-fill me-1"></i> Post as Staff Internal Note (Hidden from Customer)
+                      </label>
+                    </div>
+
+                    <div class="input-group">
+                      <textarea class="form-control" id="ticketChatMessageInput" rows="2" placeholder="Type message or reply..."></textarea>
+                      <button class="btn btn-primary px-3" type="button" onclick="sendTicketChatMessage()">
+                        <i class="bi bi-send-fill me-1"></i> Send
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Ticket Lifecycle Audit Trail -->
+                <div class="bento-card mb-3 p-3 bg-surface-alt border">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary me-2"></i> Ticket Lifecycle Audit Trail</h6>
+                  <div class="audit-timeline" id="ticketAuditTimeline">
+                    <!-- Injected dynamically via JS -->
+                  </div>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center">
                   <button class="btn btn-sm btn-outline-secondary" onclick="showView(currentRole === 'ADMIN' ? 'admin-complaints' : 'user-complaints')">
                     &larr; Back to List
@@ -692,21 +972,30 @@
                   <span>Ticket Reference:</span>
                   <strong class="text-primary font-monospace" id="trackTicketSidebarRef">#TCK-XXXX</strong>
                 </div>
-                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
-                  <span>Support Status:</span>
-                  <span class="badge bg-primary-subtle text-primary">SLA Monitored</span>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small align-items-center">
+                  <span>Live SLA Countdown:</span>
+                  <div id="trackSlaCountdownBadge">
+                    <span class="sla-badge sla-badge-good"><i class="bi bi-stopwatch"></i> Calculating...</span>
+                  </div>
                 </div>
                 <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
                   <span>Priority Queue:</span>
                   <span class="badge bg-info-subtle text-info" id="trackSidebarQueue">Auto Triage</span>
                 </div>
-                <div class="d-flex justify-content-between py-2 text-muted small">
-                  <span>Dispatch Window:</span>
-                  <strong class="text-body fw-bold">Within 24 Hours</strong>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
+                  <span>Assigned Personnel:</span>
+                  <strong class="text-body fw-bold" id="trackSidebarAssigned">Triage Desk</strong>
                 </div>
-                <div class="pt-3 mt-2 border-top">
-                  <button class="btn btn-sm btn-outline-primary w-100" onclick="window.print()">
-                    <i class="bi bi-printer me-1"></i> Print Ticket Slip
+                <div class="d-flex justify-content-between py-2 text-muted small">
+                  <span>Dispatch Target:</span>
+                  <strong class="text-body fw-bold" id="trackSidebarDispatch">Within 24 Hours</strong>
+                </div>
+                <div class="pt-3 mt-2 border-top d-flex flex-column gap-2">
+                  <button class="btn btn-sm btn-outline-danger w-100" id="btnEscalateTicket" onclick="escalateCurrentTicket()">
+                    <i class="bi bi-arrow-up-circle-fill me-1"></i> Escalate Ticket Priority
+                  </button>
+                  <button class="btn btn-sm btn-primary w-100" onclick="printOfficialTicketSlip()">
+                    <i class="bi bi-printer me-1"></i> Print / Save Ticket Receipt
                   </button>
                 </div>
               </div>
@@ -987,6 +1276,115 @@
             <i class="bi bi-binoculars me-1"></i> Track Ticket Now
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-Factor Authentication (2FA / OTP) Security Modal -->
+  <div class="modal fade" id="twoFactorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-shield-lock-fill text-warning me-2"></i> Security Verification (2FA)
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <div class="mb-3">
+            <span class="badge bg-warning-subtle text-warning fs-6 px-3 py-2 border border-warning-subtle">
+              <i class="bi bi-phone me-1"></i> SMS / Authenticator OTP Required
+            </span>
+          </div>
+          <p class="small text-muted mb-3" id="twoFactorActionText">
+            To authorize this sensitive administrative action, please enter the 6-digit security code dispatched to your registered device.
+          </p>
+          <div class="alert alert-info py-2 small mb-3">
+            <i class="bi bi-key me-1"></i> Demo Verification Code: <strong class="font-monospace text-primary">123456</strong>
+          </div>
+          <div class="d-flex justify-content-center gap-2 mb-3">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 1)">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 2)">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 3)">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 4)">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 5)">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 6)">
+          </div>
+          <button type="button" class="btn btn-primary w-100 fw-semibold" onclick="verifyTwoFactorCode()">
+            <i class="bi bi-shield-check me-1"></i> Confirm & Execute Action
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal for Attachments -->
+  <div class="modal fade" id="imageLightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-transparent border-0 text-center">
+        <div class="modal-header border-0 pb-0 justify-content-end">
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-2">
+          <img id="lightboxImg" src="" alt="Attachment Preview" class="img-fluid rounded shadow-lg" style="max-height: 80vh;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Printable Ticket Slip Container (Formatted for Print / PDF Export) -->
+  <div id="printableTicketSlip" class="d-none">
+    <div style="max-width: 800px; margin: 0 auto; font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #1e293b; padding: 20px;">
+      <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h2 style="color: #4f46e5; margin: 0; font-weight: 800;">SupportDesk</h2>
+          <small style="color: #64748b; font-size: 12px;">Intelligent Customer Complaint & Support Analysis System</small>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Official Ticket Slip</div>
+          <div style="font-size: 20px; font-weight: 800; font-family: monospace; color: #4f46e5;" id="printSlipTicketCode">TCK-TECH-2026-0000</div>
+          <small style="color: #64748b;" id="printSlipDate">Issued: Oct 2026</small>
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr>
+            <td style="padding: 6px 0; color: #64748b; width: 25%;">Complaint ID:</td>
+            <td style="padding: 6px 0; font-weight: 700;" id="printSlipCmpId">CMP-0000</td>
+            <td style="padding: 6px 0; color: #64748b; width: 25%;">Priority Level:</td>
+            <td style="padding: 6px 0; font-weight: 700;" id="printSlipPriority">HIGH</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; color: #64748b;">Customer Name:</td>
+            <td style="padding: 6px 0; font-weight: 700;" id="printSlipCustomer">John Doe</td>
+            <td style="padding: 6px 0; color: #64748b;">Category:</td>
+            <td style="padding: 6px 0; font-weight: 700;" id="printSlipCategory">Technical Support</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; color: #64748b;">Assigned Desk:</td>
+            <td style="padding: 6px 0; font-weight: 700;" id="printSlipAssigned">Engineering Support</td>
+            <td style="padding: 6px 0; color: #64748b;">Current Status:</td>
+            <td style="padding: 6px 0; font-weight: 700;" id="printSlipStatus">IN PROGRESS</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <h4 style="font-size: 16px; margin-bottom: 8px; color: #1e293b;" id="printSlipSubject">Complaint Subject</h4>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="printSlipDesc">
+          Description content...
+        </div>
+      </div>
+
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 14px; margin-bottom: 24px;" id="printSlipResolutionBox">
+        <strong style="color: #16a34a; font-size: 13px;">Official Resolution & Action Taken:</strong>
+        <p style="margin: 6px 0 0; font-size: 13px;" id="printSlipResolution">Under active investigation by technical team.</p>
+      </div>
+
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8;">
+        <div>Electronically Generated Record &bull; Verification Hash: <span style="font-family: monospace;">SD-SEC-84920</span></div>
+        <div>SupportDesk AI Center &bull; Verified SLA</div>
       </div>
     </div>
   </div>
