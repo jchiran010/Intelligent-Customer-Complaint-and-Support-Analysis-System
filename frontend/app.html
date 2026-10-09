@@ -915,17 +915,85 @@
                     <!-- Populated dynamically via JS -->
                   </div>
                   <div class="p-3 border-top bg-surface">
-                    <!-- Admin AI Quick Macro -->
-                    <div id="adminMacroBox" class="d-none mb-2">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="small text-muted fw-semibold"><i class="bi bi-magic text-info"></i> AI Macro:</span>
-                        <select class="form-select form-select-sm" id="adminMacroSelect" onchange="applyAdminMacro(this.value)">
-                          <option value="">-- Choose Quick Reply Template --</option>
-                          <option value="1">Request bank statement reference & transaction timestamp</option>
-                          <option value="2">Engineering patch deployed, please clear cache and retry</option>
-                          <option value="3">Replacement package dispatched with express tracking</option>
-                          <option value="4">Full refund authorized, credit reflects in 3-5 business days</option>
-                        </select>
+                    <!-- Admin AI Complaint Comprehension & Smart Responder Studio -->
+                    <div id="adminAiAssistantStudio" class="d-none mb-3">
+                      <div class="ai-assistant-studio p-3" id="aiStudioContainer">
+                        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary text-white p-1 rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                              <i class="bi bi-robot"></i>
+                            </span>
+                            <strong class="small text-primary fw-bold">AI Complaint Comprehension & Smart Response Generator</strong>
+                          </div>
+                          <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.72rem;">
+                            <i class="bi bi-stars me-1"></i> Generative NLP Assistant
+                          </span>
+                        </div>
+
+                        <!-- AI Diagnosis & Extracted Insights -->
+                        <div class="ai-insight-box mb-2 small" id="aiComplaintInsightBox">
+                          <div class="d-flex align-items-center gap-1 text-muted mb-1" style="font-size: 0.72rem;">
+                            <i class="bi bi-lightbulb-fill text-warning"></i> <strong class="text-uppercase">Issue Comprehension:</strong>
+                          </div>
+                          <div id="aiExtractedSummary" class="fw-semibold text-body mb-2">Analyzing complaint details...</div>
+                          <div class="d-flex gap-2 flex-wrap text-muted" style="font-size: 0.72rem;">
+                            <span><strong>Category:</strong> <span id="aiInsightCategory" class="text-primary fw-semibold">General</span></span>
+                            <span>&bull;</span>
+                            <span><strong>Customer Sentiment:</strong> <span id="aiInsightSentiment" class="badge">Detecting...</span></span>
+                            <span>&bull;</span>
+                            <span><strong>Recommended Strategy:</strong> <span id="aiInsightStrategy" class="text-body fw-semibold">Triage</span></span>
+                          </div>
+                        </div>
+
+                        <!-- Tone Selection & Generate Button -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                          <div class="d-flex align-items-center gap-1 flex-wrap">
+                            <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">Tone:</span>
+                            <div class="btn-group btn-group-sm" role="group">
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 active ai-tone-btn" data-tone="empathetic" onclick="setAiTone('empathetic', this)">🤝 Empathetic</button>
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 ai-tone-btn" data-tone="technical" onclick="setAiTone('technical', this)">🛠️ Technical</button>
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 ai-tone-btn" data-tone="billing" onclick="setAiTone('billing', this)">💳 Financial</button>
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 ai-tone-btn" data-tone="concise" onclick="setAiTone('concise', this)">⚡ Direct</button>
+                            </div>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-primary py-1 px-3 fw-semibold" id="btnGenerateAiDraft" onclick="triggerAiDraftGeneration()">
+                            <i class="bi bi-stars me-1"></i> Generate AI Answer
+                          </button>
+                        </div>
+
+                        <!-- AI Draft Output Container (hidden until generated) -->
+                        <div id="aiDraftResultCard" class="ai-draft-card mb-2 d-none">
+                          <div class="d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom">
+                            <small class="fw-bold text-primary d-flex align-items-center">
+                              <i class="bi bi-chat-left-quote-fill me-1"></i> AI-Generated Resolution Draft:
+                            </small>
+                            <div class="d-flex gap-1">
+                              <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.7rem;" onclick="copyAiDraft()" title="Copy draft"><i class="bi bi-clipboard"></i> Copy</button>
+                              <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.7rem;" onclick="triggerAiDraftGeneration()" title="Regenerate draft"><i class="bi bi-arrow-clockwise"></i> Redraft</button>
+                            </div>
+                          </div>
+                          <div id="aiDraftResultText" class="small text-body mb-2" style="white-space: pre-wrap; line-height: 1.5;"></div>
+                          <div class="d-flex justify-content-end gap-2 flex-wrap">
+                            <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;" onclick="insertAiDraftToInput()">
+                              <i class="bi bi-pencil-square me-1"></i> Insert into Chat Box
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success py-0 px-3 fw-semibold" style="font-size: 0.75rem;" onclick="sendAiDraftDirectly()">
+                              <i class="bi bi-send-check-fill me-1"></i> Send Directly to Customer
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- Quick Macro dropdown fallback -->
+                        <div class="d-flex align-items-center gap-2 pt-2 border-top">
+                          <span class="small text-muted" style="font-size: 0.72rem;"><i class="bi bi-bookmark text-secondary"></i> Or Quick Macro:</span>
+                          <select class="form-select form-select-sm" style="font-size: 0.75rem;" id="adminMacroSelect" onchange="applyAdminMacro(this.value)">
+                            <option value="">-- Select Template --</option>
+                            <option value="1">Request bank statement reference & transaction timestamp</option>
+                            <option value="2">Engineering patch deployed, please clear cache and retry</option>
+                            <option value="3">Replacement package dispatched with express tracking</option>
+                            <option value="4">Full refund authorized, credit reflects in 3-5 business days</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
 
@@ -1177,7 +1245,12 @@
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label small fw-semibold">Resolution / Internal Notes</label>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label small fw-semibold mb-0">Resolution / Internal Notes</label>
+              <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;" onclick="generateAiModalResolutionNotes()">
+                <i class="bi bi-robot me-1"></i> Auto-Generate with AI
+              </button>
+            </div>
             <textarea class="form-control" id="modalResolutionNotes" rows="3" placeholder="Enter resolution notes..."></textarea>
           </div>
         </div>
@@ -1275,6 +1348,94 @@
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="modalBtnTrackTicket">
             <i class="bi bi-binoculars me-1"></i> Track Ticket Now
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Complaint Analysis & Smart Responder Modal -->
+  <div class="modal fade" id="aiResponseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-robot me-2"></i> AI Complaint Comprehension & Smart Responder
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Ticket Header -->
+          <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom flex-wrap gap-2">
+            <div>
+              <span class="badge bg-primary-subtle text-primary font-monospace fw-bold fs-6" id="aiModalTicketCode">TCK-TECH-2026-XXXX</span>
+              <span class="badge bg-secondary ms-1" id="aiModalCategory">Technical</span>
+            </div>
+            <div class="small text-muted">
+              Customer: <strong id="aiModalCustomer" class="text-body">John Doe</strong>
+            </div>
+          </div>
+
+          <!-- Original Complaint Summary -->
+          <div class="p-3 rounded bg-surface-alt border mb-3">
+            <h6 class="fw-bold small text-uppercase text-muted mb-1"><i class="bi bi-chat-left-text me-1"></i> Customer's Complaint:</h6>
+            <div class="fw-bold mb-1" id="aiModalSubject">Subject...</div>
+            <p class="small text-muted mb-0" id="aiModalDescription" style="max-height: 90px; overflow-y: auto;">Description...</p>
+          </div>
+
+          <!-- AI Understanding & Diagnosis -->
+          <div class="ai-insight-box mb-3 small">
+            <div class="d-flex align-items-center gap-1 text-primary fw-bold mb-1">
+              <i class="bi bi-cpu-fill"></i> <span>AI COMPLAINT DIAGNOSIS & ROOT CAUSE:</span>
+            </div>
+            <div id="aiModalDiagnosis" class="fw-semibold text-body mb-2">Analyzing...</div>
+            <div class="d-flex gap-3 flex-wrap text-muted" style="font-size: 0.75rem;">
+              <span><strong>Sentiment:</strong> <span id="aiModalSentiment" class="badge">Analyzing</span></span>
+              <span><strong>Priority:</strong> <span id="aiModalPriority" class="badge bg-danger">HIGH</span></span>
+              <span><strong>Strategy:</strong> <span id="aiModalStrategy" class="text-dark fw-bold">Immediate Resolution</span></span>
+            </div>
+          </div>
+
+          <!-- Tone Selector -->
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="small fw-semibold text-muted">Select Tone:</span>
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary active ai-modal-tone-btn" data-tone="empathetic" onclick="setAiModalTone('empathetic', this)">🤝 Empathetic</button>
+                <button type="button" class="btn btn-outline-secondary ai-modal-tone-btn" data-tone="technical" onclick="setAiModalTone('technical', this)">🛠️ Technical</button>
+                <button type="button" class="btn btn-outline-secondary ai-modal-tone-btn" data-tone="billing" onclick="setAiModalTone('billing', this)">💳 Financial</button>
+                <button type="button" class="btn btn-outline-secondary ai-modal-tone-btn" data-tone="concise" onclick="setAiModalTone('concise', this)">⚡ Direct</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary fw-semibold" onclick="generateAiModalResponseDraft()">
+              <i class="bi bi-stars me-1"></i> Regenerate Draft
+            </button>
+          </div>
+
+          <!-- Generated Draft Box -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label small fw-semibold mb-0 text-primary">
+                <i class="bi bi-chat-quote-fill me-1"></i> AI-Generated Response Draft:
+              </label>
+              <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.72rem;" onclick="copyAiModalDraft()"><i class="bi bi-clipboard me-1"></i> Copy</button>
+            </div>
+            <textarea class="form-control" id="aiModalGeneratedAnswer" rows="5" placeholder="AI draft will appear here..."></textarea>
+          </div>
+
+          <div class="alert alert-info py-2 small mb-0">
+            <i class="bi bi-info-circle me-1"></i> Admin can review or modify this response before dispatching to the customer.
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openTrackerFromAiModal()">
+              <i class="bi bi-chat-dots me-1"></i> Open in Live Chat
+            </button>
+            <button type="button" class="btn btn-sm btn-success fw-semibold" onclick="sendAiModalResponseDirectly()">
+              <i class="bi bi-send-check-fill me-1"></i> Dispatch Response to Customer
+            </button>
+          </div>
         </div>
       </div>
     </div>

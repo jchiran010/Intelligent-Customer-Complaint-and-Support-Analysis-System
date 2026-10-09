@@ -711,6 +711,9 @@ async function loadAdminComplaints() {
       <td><span class="badge bg-${(c.priority || 'MEDIUM').toLowerCase() === 'critical' ? 'danger' : 'secondary'}">${c.priority || 'MEDIUM'}</span></td>
       <td><span class="badge badge-sentiment badge-${(c.sentimentLabel || c.sentiment || 'NEUTRAL').toLowerCase().replace('_', '-')}">${(c.sentimentLabel || c.sentiment || 'NEUTRAL').replace('_', ' ')}</span></td>
       <td class="text-end">
+        <button class="btn btn-sm btn-outline-info me-1" onclick="openAiResponseModal(${c.id})" title="AI Understand & Answer">
+          <i class="bi bi-robot"></i>
+        </button>
         <button class="btn btn-sm btn-outline-primary me-1" onclick="viewComplaintDetails(${c.id})" title="Live Conversation & Details">
           <i class="bi bi-chat-dots"></i>
         </button>
@@ -1388,9 +1391,14 @@ async function viewComplaintDetails(id) {
   const langEl = document.getElementById('currentTranslationLang');
   if (langEl) langEl.textContent = 'Original (EN)';
 
-  // Admin Tools (Macro & Internal Note switch)
-  const macroBox = document.getElementById('adminMacroBox');
-  if (macroBox) macroBox.classList.toggle('d-none', currentRole !== 'ADMIN');
+  // Admin Tools (AI Studio & Internal Note switch)
+  const aiStudio = document.getElementById('adminAiAssistantStudio');
+  if (aiStudio) {
+    aiStudio.classList.toggle('d-none', currentRole !== 'ADMIN');
+    if (currentRole === 'ADMIN') {
+      updateAiAssistantInsights(c);
+    }
+  }
   const noteBox = document.getElementById('adminInternalNoteBox');
   if (noteBox) noteBox.classList.toggle('d-none', currentRole !== 'ADMIN');
 
@@ -2366,4 +2374,451 @@ function verifyTwoFactorCode() {
     showToast('Invalid verification code. Please enter demo code 123456.', 'danger');
   }
 }
+
+// ==========================================================================
+// AI COMPLAINT COMPREHENSION & SMART RESPONSE GENERATION ENGINE
+// ==========================================================================
+let currentAiSelectedTone = 'empathetic';
+let currentAiModalSelectedTone = 'empathetic';
+
+function analyzeComplaintWithAi(c) {
+  if (!c) return {
+    rootProblem: 'Customer inquiry under review',
+    entities: {},
+    sentimentLabel: 'NEUTRAL',
+    sentimentScore: 0.0,
+    strategy: 'General Triage',
+    intent: 'GENERIC'
+  };
+
+  const text = ((c.title || '') + ' ' + (c.description || '')).toLowerCase();
+  const title = c.title || '';
+  const desc = c.description || '';
+
+  // 1. Entity Extraction via Regex
+  const invoiceMatch = (title + ' ' + desc).match(/(?:invoice|bill|sub|charge)\s*#?([A-Za-z0-9-]+)/i);
+  const orderMatch = (title + ' ' + desc).match(/(?:order|package|tracking|pkg)\s*#?([A-Za-z0-9-]+)/i);
+  const amountMatch = (title + ' ' + desc).match(/\$([0-9,.]+)/) || (title + ' ' + desc).match(/([0-9,.]+)\s*(?:usd|dollars)/i);
+  const appVersionMatch = (title + ' ' + desc).match(/(?:version|v|build)\s*([0-9.]+)/i);
+  const deviceMatch = (title + ' ' + desc).match(/(android|ios|iphone|windows|mac|chrome)/i);
+
+  const entities = {
+    invoice: invoiceMatch ? invoiceMatch[1] : null,
+    order: orderMatch ? orderMatch[1] : null,
+    amount: amountMatch ? (amountMatch[1].startsWith('$') ? amountMatch[1] : '$' + amountMatch[1]) : null,
+    appVersion: appVersionMatch ? 'v' + appVersionMatch[1] : null,
+    device: deviceMatch ? deviceMatch[1].toUpperCase() : null
+  };
+
+  // 2. Intent & Root Problem Diagnosis
+  let rootProblem = '';
+  let strategy = '';
+  let intent = 'GENERIC';
+
+  if (text.includes('duplicate') || text.includes('twice') || text.includes('double') || text.includes('charged twice') || text.includes('overcharge')) {
+    intent = 'DUPLICATE_BILLING';
+    const invText = entities.invoice ? `on Invoice #${entities.invoice}` : '';
+    const amtText = entities.amount ? `of ${entities.amount}` : '';
+    rootProblem = `Customer reports duplicate unauthorized payment deduction ${amtText} ${invText}. Requires urgent financial reversal.`;
+    strategy = 'Reconcile gateway ledger, generate refund reversal voucher, and issue automated receipt.';
+  } else if (text.includes('crash') || text.includes('freez') || text.includes('bug') || text.includes('checkout') || text.includes('error')) {
+    intent = 'APP_CRASH';
+    const devText = entities.device ? `on ${entities.device}` : 'on mobile client';
+    const verText = entities.appVersion ? `(${entities.appVersion})` : '';
+    rootProblem = `Client application crashes unexpectedly during payment/checkout ${devText} ${verText} without error diagnostics.`;
+    strategy = 'Provide cache purge instructions, check API gateway timeouts, and reference dev hotfix build.';
+  } else if (text.includes('torn') || text.includes('packag') || text.includes('damaged') || text.includes('missing') || text.includes('broken')) {
+    intent = 'DAMAGED_DELIVERY';
+    const ordText = entities.order ? `for Order #${entities.order}` : '';
+    rootProblem = `Delivered package ${ordText} arrived with damaged outer packaging and missing component/accessory.`;
+    strategy = 'Authorize zero-deduction replacement express shipment and initiate courier damage claim.';
+  } else if (text.includes('renewal') || text.includes('discount') || text.includes('contract') || text.includes('tier')) {
+    intent = 'CONTRACT_RENEWAL';
+    rootProblem = 'Customer inquiring on corporate contract renewal terms, team tier discount preservation, and account continuation.';
+    strategy = 'Verify active enterprise discount codes and confirm updated renewal terms with corporate billing.';
+  } else if (text.includes('gst') || text.includes('tax') || text.includes('entity') || text.includes('company')) {
+    intent = 'TAX_PROFILE_UPDATE';
+    rootProblem = 'Request to update corporate tax identification number (GSTIN / Tax ID) for invoicing compliance.';
+    strategy = 'Validate compliance document and update billing entity tax code on company profile.';
+  } else {
+    intent = 'GENERAL_SUPPORT';
+    rootProblem = `Inquiry regarding ${(c.categoryName || 'Support Services').toLowerCase()}: customer requires operational assistance.`;
+    strategy = 'Acknowledge inquiry promptly, assess SLA compliance window, and assign responsible specialist.';
+  }
+
+  const sentimentLabel = c.sentimentLabel || (c.sentimentScore < -0.4 ? 'VERY_NEGATIVE' : c.sentimentScore < 0 ? 'NEGATIVE' : 'NEUTRAL');
+  const sentimentScore = c.sentimentScore !== undefined ? c.sentimentScore : -0.7;
+
+  return {
+    rootProblem,
+    entities,
+    sentimentLabel,
+    sentimentScore,
+    strategy,
+    intent
+  };
+}
+
+function generateAiResponse(c, tone = 'empathetic') {
+  if (!c) return 'Thank you for reaching out. We are investigating your inquiry.';
+
+  const analysis = analyzeComplaintWithAi(c);
+  const name = c.userName || 'Customer';
+  const ent = analysis.entities;
+
+  if (tone === 'empathetic') {
+    if (analysis.intent === 'DUPLICATE_BILLING') {
+      const invRef = ent.invoice ? `Invoice #${ent.invoice}` : 'your recent subscription invoice';
+      const amtStr = ent.amount ? `of ${ent.amount}` : '';
+      return `Dear ${name},
+
+Thank you for bringing this to our attention. I sincerely apologize for the frustration caused by the duplicate debit ${amtStr} on ${invRef}. We understand how concerning unexpected charges can be.
+
+Our finance team has audited your transaction ledger and confirmed the duplicate deduction. We have authorized an immediate refund reversal back to your original payment card (Authorization Code: REV-2026-${Math.floor(1000 + Math.random() * 9000)}). The credit will reflect in your account within 3 to 5 business days.
+
+A confirmation receipt has also been recorded in your portal. Please let us know if you need any additional assistance.
+
+Warm regards,
+SupportDesk Resolution Team`;
+    } else if (analysis.intent === 'APP_CRASH') {
+      return `Dear ${name},
+
+Thank you for reporting this issue. I am truly sorry for the disruption you experienced when the application crashed during your checkout process. We know how frustrating it is when a purchase is blocked.
+
+Our mobile engineering team has isolated the crash telemetry. A server-side patch has just been deployed to stabilize the checkout gateway. In the meantime, clearing your application cache (Settings > Apps > SupportDesk > Clear Cache) will immediately refresh your session without losing cart items.
+
+Please retry your checkout and let us know right away if any issue persists. We are monitoring this ticket closely until you are fully satisfied.
+
+Best regards,
+Technical Support Specialist`;
+    } else if (analysis.intent === 'DAMAGED_DELIVERY') {
+      const ordRef = ent.order ? `Order #${ent.order}` : 'your recent order';
+      return `Dear ${name},
+
+We are so sorry to hear that ${ordRef} arrived with torn outer packaging and a missing accessory. This falls far below our delivery standards, and we completely understand your disappointment.
+
+You do not need to worry about returning the damaged box. We have immediately initiated an express replacement order with priority dispatch at no extra cost. Your new tracking reference will be updated here within 4 hours.
+
+Thank you for your patience and for being a valued customer.
+
+Sincerely,
+Logistics & Fulfillment Team`;
+    } else {
+      return `Dear ${name},
+
+Thank you for contacting SupportDesk. We sincerely appreciate your patience and apologize for any inconvenience caused regarding "${c.title}".
+
+Our team has prioritized your request under ticket reference ${c.ticketNumber || c.complaintNumber}. We have assigned a dedicated specialist to resolve this inquiry and ensure full satisfaction within our target SLA window.
+
+We will keep you updated in this conversation thread as we make progress.
+
+Warm regards,
+Customer Support Team`;
+    }
+  } else if (tone === 'technical') {
+    if (analysis.intent === 'APP_CRASH') {
+      const dev = ent.device ? ent.device : 'Mobile Device';
+      return `Hello ${name},
+
+Investigation Report for Issue #${c.ticketNumber || c.complaintNumber}:
+- Subsystem: Checkout Flow & Payment Gateway Handshake
+- Platform: ${dev} ${ent.appVersion ? ent.appVersion : ''}
+- Root Cause: Null pointer exception during checkout fragment state restoration upon network latency.
+
+Resolution Steps:
+1. Open Device Settings > Apps > SupportDesk > Storage > Tap 'Clear Cache'.
+2. Ensure device has network connectivity with TLS 1.3 support.
+3. Patch Build v4.2.2 has been deployed server-side to prevent memory leaks during payment tokens initialization.
+
+If the crash recurs, kindly share the Android logcat or timestamp so our engineering team can review stack traces immediately.
+
+Engineering Desk,
+SupportDesk Architecture Team`;
+    } else {
+      return `Hello ${name},
+
+Technical diagnostic update for ticket ${c.ticketNumber || c.complaintNumber}:
+1. Ticket telemetry validated across internal microservices.
+2. Verified ledger/database state for user ID: ${c.userEmail || 'active profile'}.
+3. The underlying service anomaly has been mitigated and queued for scheduled cache invalidation.
+
+Please verify if the resolution is operational on your side and reply to confirm closure.
+
+Best regards,
+Technical Operations`;
+    }
+  } else if (tone === 'billing') {
+    const invRef = ent.invoice ? `Invoice #${ent.invoice}` : 'your billing account';
+    const amtStr = ent.amount ? ent.amount : 'the duplicate transaction amount';
+    return `Dear ${name},
+
+Official Billing Ledger & Transaction Audit:
+- Account ID: ${c.userEmail || 'Client Account'}
+- Target Reference: ${invRef}
+- Status: REVERSAL AUTHORIZED
+
+Our Accounts & Merchant Services have audited the double debit. A full reversal of ${amtStr} has been executed via our merchant gateway (Voucher Ref: RFD-${Date.now().toString().slice(-6)}). 
+
+Depending on your issuing bank's clearing cycle, funds typically appear on your statement within 3 to 5 business days. An updated zero-balance corporate receipt is available in your SupportDesk dashboard.
+
+Finance & Treasury Team,
+SupportDesk Billing Operations`;
+  } else {
+    // Concise
+    return `Hello ${name}, we have investigated your complaint regarding "${c.title}". The necessary corrective actions have been authorized and your ticket has been prioritized with highest urgency. You will receive complete fulfillment confirmation within 2 hours. Thank you for your patience.`;
+  }
+}
+
+// ==========================================================================
+// TICKET TRACKER AI STUDIO CONTROLLER
+// ==========================================================================
+function updateAiAssistantInsights(c) {
+  if (!c) return;
+  const analysis = analyzeComplaintWithAi(c);
+
+  const sumEl = document.getElementById('aiExtractedSummary');
+  if (sumEl) sumEl.textContent = analysis.rootProblem;
+
+  const catEl = document.getElementById('aiInsightCategory');
+  if (catEl) catEl.textContent = c.categoryName || 'General';
+
+  const sentEl = document.getElementById('aiInsightSentiment');
+  if (sentEl) {
+    sentEl.textContent = analysis.sentimentLabel.replace('_', ' ');
+    sentEl.className = `badge bg-${analysis.sentimentLabel === 'VERY_NEGATIVE' ? 'danger' : analysis.sentimentLabel === 'NEGATIVE' ? 'warning text-dark' : 'success'}`;
+  }
+
+  const stratEl = document.getElementById('aiInsightStrategy');
+  if (stratEl) stratEl.textContent = analysis.strategy;
+
+  const draftCard = document.getElementById('aiDraftResultCard');
+  if (draftCard) draftCard.classList.add('d-none');
+}
+
+function setAiTone(tone, btn) {
+  currentAiSelectedTone = tone;
+  document.querySelectorAll('.ai-tone-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const draftCard = document.getElementById('aiDraftResultCard');
+  if (draftCard && !draftCard.classList.contains('d-none')) {
+    triggerAiDraftGeneration();
+  }
+}
+
+function triggerAiDraftGeneration() {
+  const c = window.currentActiveTrackedComplaint;
+  if (!c) return;
+
+  const studio = document.getElementById('aiStudioContainer');
+  const draftCard = document.getElementById('aiDraftResultCard');
+  const textEl = document.getElementById('aiDraftResultText');
+  const btn = document.getElementById('btnGenerateAiDraft');
+
+  if (studio) studio.classList.add('generating');
+  if (btn) btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Generating Answer...';
+
+  setTimeout(() => {
+    const generatedAnswer = generateAiResponse(c, currentAiSelectedTone);
+    if (textEl) textEl.textContent = generatedAnswer;
+    if (draftCard) draftCard.classList.remove('d-none');
+    if (studio) studio.classList.remove('generating');
+    if (btn) btn.innerHTML = '<i class="bi bi-stars me-1"></i> Generate AI Answer';
+    playChimeSound('success');
+    showToast(`AI generated answer with ${currentAiSelectedTone.toUpperCase()} tone!`, 'success');
+  }, 350);
+}
+
+function insertAiDraftToInput() {
+  const textEl = document.getElementById('aiDraftResultText');
+  const input = document.getElementById('ticketChatMessageInput');
+  if (textEl && input) {
+    input.value = textEl.textContent;
+    input.focus();
+    showToast('AI draft inserted into chat composer. You can edit and send.', 'info');
+  }
+}
+
+function sendAiDraftDirectly() {
+  const c = window.currentActiveTrackedComplaint;
+  const textEl = document.getElementById('aiDraftResultText');
+  if (!c || !textEl || !textEl.textContent.trim()) return;
+
+  let messages = [];
+  try {
+    const raw = localStorage.getItem(getTicketChatKey(c.id));
+    if (raw) messages = JSON.parse(raw);
+  } catch (_) {}
+
+  const newMessage = {
+    id: 'msg-' + Date.now(),
+    sender: `${currentUser?.fullName || 'Support Specialist'} (AI Smart Resolution)`,
+    role: 'AGENT',
+    text: textEl.textContent.trim(),
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  };
+
+  messages.push(newMessage);
+  localStorage.setItem(getTicketChatKey(c.id), JSON.stringify(messages));
+
+  if (c.status === 'PENDING') {
+    c.status = 'IN_PROGRESS';
+    LocalComplaintStore.updateStatus(c.id, 'IN_PROGRESS', 'AI Smart Resolution response dispatched');
+  }
+
+  playChimeSound('success');
+  renderTicketChat(c.id);
+  const draftCard = document.getElementById('aiDraftResultCard');
+  if (draftCard) draftCard.classList.add('d-none');
+
+  showToast('AI Resolution response sent directly to customer!', 'success');
+}
+
+function copyAiDraft() {
+  const textEl = document.getElementById('aiDraftResultText');
+  if (textEl) {
+    navigator.clipboard.writeText(textEl.textContent);
+    showToast('AI response draft copied to clipboard!', 'success');
+  }
+}
+
+// ==========================================================================
+// STATUS MODAL AI RESOLUTION NOTES GENERATOR
+// ==========================================================================
+function generateAiModalResolutionNotes() {
+  const complaints = LocalComplaintStore.getComplaints();
+  const c = complaints.find(x => x.id === Number(activeComplaintId)) || window.currentActiveTrackedComplaint;
+  if (!c) {
+    showToast('Unable to detect active complaint for AI generation.', 'warning');
+    return;
+  }
+
+  const analysis = analyzeComplaintWithAi(c);
+  const ent = analysis.entities;
+  let notes = '';
+
+  if (analysis.intent === 'DUPLICATE_BILLING') {
+    notes = `Verified payment gateway audit logs. Confirmed secondary duplicate charge of ${ent.amount || '$199'} on ${ent.invoice ? 'Invoice #' + ent.invoice : 'subscription billing'}. Authorized financial reversal code #RFD-${Math.floor(1000 + Math.random() * 9000)}. Zero-balance statement generated and dispatched to customer.`;
+  } else if (analysis.intent === 'APP_CRASH') {
+    notes = `Isolated checkout crash telemetry on ${ent.device || 'Android'} client. Deployed server-side patch for payment gateway handshake timeout. Instructed user to clear local cache. Verified transaction flow test successful.`;
+  } else if (analysis.intent === 'DAMAGED_DELIVERY') {
+    notes = `Confirmed damaged outer freight delivery for ${ent.order ? 'Order #' + ent.order : 'customer parcel'}. Authorized complimentary express replacement dispatch (Tracking #EXP-${Date.now().toString().slice(-6)}). Filed freight insurance claim with courier partner.`;
+  } else {
+    notes = `Conducted investigation into ${c.title}. Successfully resolved customer inquiry in compliance with SLA target ${c.slaHours || 24} hours. Client notified via portal communications.`;
+  }
+
+  const textarea = document.getElementById('modalResolutionNotes');
+  if (textarea) {
+    textarea.value = notes;
+    textarea.focus();
+    playChimeSound('success');
+    showToast('AI formulated audit-ready resolution notes!', 'success');
+  }
+}
+
+// ==========================================================================
+// DEDICATED AI RESPONDER MODAL CONTROLLER
+// ==========================================================================
+function openAiResponseModal(complaintId) {
+  const complaints = LocalComplaintStore.getComplaints();
+  const c = complaints.find(x => x.id === Number(complaintId));
+  if (!c) {
+    showToast('Complaint not found.', 'danger');
+    return;
+  }
+
+  window.activeAiModalComplaint = c;
+  const analysis = analyzeComplaintWithAi(c);
+
+  document.getElementById('aiModalTicketCode').textContent = c.ticketNumber ? (c.ticketNumber.startsWith('#') ? c.ticketNumber : '#' + c.ticketNumber) : c.complaintNumber;
+  document.getElementById('aiModalCategory').textContent = c.categoryName || 'General';
+  document.getElementById('aiModalCustomer').textContent = `${c.userName || 'Customer'} (${c.userEmail || ''})`;
+  document.getElementById('aiModalSubject').textContent = c.title;
+  document.getElementById('aiModalDescription').textContent = c.description;
+
+  document.getElementById('aiModalDiagnosis').textContent = analysis.rootProblem;
+  const sentEl = document.getElementById('aiModalSentiment');
+  if (sentEl) {
+    sentEl.textContent = analysis.sentimentLabel.replace('_', ' ');
+    sentEl.className = `badge bg-${analysis.sentimentLabel === 'VERY_NEGATIVE' ? 'danger' : analysis.sentimentLabel === 'NEGATIVE' ? 'warning text-dark' : 'success'}`;
+  }
+  document.getElementById('aiModalPriority').textContent = c.priority || 'MEDIUM';
+  document.getElementById('aiModalStrategy').textContent = analysis.strategy;
+
+  // Generate default draft
+  currentAiModalSelectedTone = 'empathetic';
+  document.querySelectorAll('.ai-modal-tone-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tone') === 'empathetic'));
+  document.getElementById('aiModalGeneratedAnswer').value = generateAiResponse(c, 'empathetic');
+
+  const modal = new bootstrap.Modal(document.getElementById('aiResponseModal'));
+  modal.show();
+}
+
+function setAiModalTone(tone, btn) {
+  currentAiModalSelectedTone = tone;
+  document.querySelectorAll('.ai-modal-tone-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  generateAiModalResponseDraft();
+}
+
+function generateAiModalResponseDraft() {
+  const c = window.activeAiModalComplaint;
+  if (!c) return;
+
+  const answer = generateAiResponse(c, currentAiModalSelectedTone);
+  const textarea = document.getElementById('aiModalGeneratedAnswer');
+  if (textarea) textarea.value = answer;
+  playChimeSound('chime');
+  showToast(`Draft updated with ${currentAiModalSelectedTone.toUpperCase()} tone`, 'info');
+}
+
+function copyAiModalDraft() {
+  const textarea = document.getElementById('aiModalGeneratedAnswer');
+  if (textarea) {
+    navigator.clipboard.writeText(textarea.value);
+    showToast('AI response draft copied to clipboard!', 'success');
+  }
+}
+
+function sendAiModalResponseDirectly() {
+  const c = window.activeAiModalComplaint;
+  const textarea = document.getElementById('aiModalGeneratedAnswer');
+  if (!c || !textarea || !textarea.value.trim()) return;
+
+  const text = textarea.value.trim();
+
+  let messages = [];
+  try {
+    const raw = localStorage.getItem(getTicketChatKey(c.id));
+    if (raw) messages = JSON.parse(raw);
+  } catch (_) {}
+
+  messages.push({
+    id: 'msg-' + Date.now(),
+    sender: `${currentUser?.fullName || 'Support Specialist'} (AI Smart Resolution)`,
+    role: 'AGENT',
+    text: text,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  });
+  localStorage.setItem(getTicketChatKey(c.id), JSON.stringify(messages));
+
+  // Update status to IN_PROGRESS
+  LocalComplaintStore.updateStatus(c.id, 'IN_PROGRESS', 'AI Response dispatched to customer');
+
+  bootstrap.Modal.getInstance(document.getElementById('aiResponseModal')).hide();
+  playChimeSound('success');
+  showToast(`AI Response dispatched to ${c.userName || 'customer'}!`, 'success');
+
+  loadAdminComplaints();
+  loadAdminKanban();
+}
+
+function openTrackerFromAiModal() {
+  const c = window.activeAiModalComplaint;
+  if (c) {
+    bootstrap.Modal.getInstance(document.getElementById('aiResponseModal')).hide();
+    viewComplaintDetails(c.id);
+  }
+}
+
 
