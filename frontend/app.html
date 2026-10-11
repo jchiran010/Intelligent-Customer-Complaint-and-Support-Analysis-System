@@ -526,8 +526,11 @@
                   <button class="btn btn-primary px-4 py-2 fw-semibold" onclick="exportCsvReport()">
                     <i class="bi bi-filetype-csv me-2"></i> Export Complaints CSV
                   </button>
-                  <button class="btn btn-outline-primary px-4 py-2 fw-semibold" onclick="printExecutiveReport()">
-                    <i class="bi bi-printer me-2"></i> Executive Summary Slip
+                  <button class="btn btn-danger px-4 py-2 fw-semibold" onclick="exportPdfReport()">
+                    <i class="bi bi-filetype-pdf me-2"></i> Export Complaints PDF
+                  </button>
+                  <button class="btn btn-outline-primary px-4 py-2 fw-semibold" onclick="openExecutiveSummaryModal()">
+                    <i class="bi bi-file-earmark-text me-2"></i> Executive Summary Slip
                   </button>
                   <button class="btn btn-outline-warning px-4 py-2 fw-semibold" onclick="promptTwoFactorAction('EXPORT_ALL')">
                     <i class="bi bi-shield-lock me-2"></i> Secure Audit Dump (2FA)
@@ -1768,6 +1771,40 @@
     </div>
   </div>
 
+  <!-- Executive Summary Slip Modal (Interactive Preview & PDF / Print Dialog) -->
+  <div class="modal fade" id="executiveSummaryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white py-3">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary text-white"><i class="bi bi-file-earmark-bar-graph me-1"></i> EXECUTIVE BRIEFING</span>
+            <h5 class="modal-title fw-bold mb-0">Executive Operational & SLA Performance Summary</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-3 p-md-4 bg-light">
+          <!-- Printable / Exportable Slip Container -->
+          <div id="executiveSummarySlipCard" class="bg-white p-4 rounded-3 border shadow-sm mx-auto" style="max-width: 900px;">
+            <!-- Rendered dynamically by populateExecutiveSummaryModal() -->
+          </div>
+        </div>
+        <div class="modal-footer bg-white border-top d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Close
+          </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary px-3 fw-semibold" onclick="printExecutiveSummaryDirect()">
+              <i class="bi bi-printer me-1"></i> Print Slip
+            </button>
+            <button type="button" class="btn btn-danger px-3 fw-semibold" onclick="downloadExecutiveSummaryPdf()">
+              <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Image Lightbox Modal for Attachments -->
   <div class="modal fade" id="imageLightboxModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1849,6 +1886,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/html2pdf.bundle.min.js"></script>
   <script src="/js/unified-app.js"></script>
   <script>
     async function submitAppFeedback() {

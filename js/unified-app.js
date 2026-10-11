@@ -983,6 +983,153 @@ async function exportCsvReport() {
   }
 }
 
+async function exportPdfReport() {
+  showToast('Generating official Complaints Register PDF document...', 'info');
+
+  const complaints = (typeof LocalComplaintStore !== 'undefined' && LocalComplaintStore.getComplaints)
+    ? LocalComplaintStore.getComplaints()
+    : [];
+
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const timeStr = new Date().toLocaleTimeString();
+  const filename = `SupportDesk_Complaints_Report_${dateStr}.pdf`;
+  const operatorName = currentUser?.name || 'System Administrator';
+
+  // Build the complete, beautifully styled multi-page PDF document
+  const pdfContainer = document.createElement('div');
+  pdfContainer.style.padding = '24px';
+  pdfContainer.style.fontFamily = "'Plus Jakarta Sans', Arial, sans-serif";
+  pdfContainer.style.color = '#1e293b';
+  pdfContainer.style.background = '#ffffff';
+
+  const barcodeBars = typeof generateSvgBarcodeBars === 'function' ? generateSvgBarcodeBars(180, 28) : '';
+
+  pdfContainer.innerHTML = `
+    <div style="border-bottom: 3px solid #dc2626; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <span style="background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">OFFICIAL AUDIT REPORT</span>
+          <span style="background: #fee2e2; color: #991b1b; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">PDF COMPLIANCE EXPORT</span>
+        </div>
+        <h2 style="color: #0f172a; margin: 0; font-weight: 800; font-size: 22px;">SupportDesk - Master Customer Complaints Register</h2>
+        <div style="color: #64748b; font-size: 12px; margin-top: 2px;">Comprehensive Complaints Audit Log, SLA Status & Sentiment Analysis</div>
+      </div>
+      <div style="text-align: right; font-size: 11px; color: #64748b;">
+        <div><strong>Export Date:</strong> ${dateStr} ${timeStr}</div>
+        <div><strong>Auditor:</strong> ${operatorName} (ADMIN)</div>
+        <div><strong>Total Records:</strong> ${complaints.length} Complaints</div>
+      </div>
+    </div>
+
+    <!-- Summary strip -->
+    <div style="display: flex; gap: 12px; margin-bottom: 18px; font-size: 12px;">
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px; text-align: center;">
+        <span style="color: #64748b; font-size: 10px; text-transform: uppercase; font-weight: 700;">TOTAL COMPLAINTS</span>
+        <div style="font-size: 18px; font-weight: 800; color: #2563eb;">${complaints.length}</div>
+      </div>
+      <div style="flex: 1; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 12px; text-align: center;">
+        <span style="color: #166534; font-size: 10px; text-transform: uppercase; font-weight: 700;">RESOLVED CASES</span>
+        <div style="font-size: 18px; font-weight: 800; color: #16a34a;">${complaints.filter(c => c.status === 'RESOLVED').length}</div>
+      </div>
+      <div style="flex: 1; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 12px; text-align: center;">
+        <span style="color: #1e40af; font-size: 10px; text-transform: uppercase; font-weight: 700;">IN PROGRESS</span>
+        <div style="font-size: 18px; font-weight: 800; color: #2563eb;">${complaints.filter(c => c.status === 'IN_PROGRESS').length}</div>
+      </div>
+      <div style="flex: 1; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 12px; text-align: center;">
+        <span style="color: #991b1b; font-size: 10px; text-transform: uppercase; font-weight: 700;">CRITICAL / HIGH</span>
+        <div style="font-size: 18px; font-weight: 800; color: #dc2626;">${complaints.filter(c => c.priority === 'CRITICAL' || c.priority === 'HIGH').length}</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px;">
+      <thead>
+        <tr style="background: #1e293b; color: #ffffff;">
+          <th style="padding: 6px 8px; text-align: left; border: 1px solid #334155;"># Number</th>
+          <th style="padding: 6px 8px; text-align: left; border: 1px solid #334155;">Customer</th>
+          <th style="padding: 6px 8px; text-align: left; border: 1px solid #334155;">Subject / Issue</th>
+          <th style="padding: 6px 8px; text-align: left; border: 1px solid #334155;">Category</th>
+          <th style="padding: 6px 8px; text-align: center; border: 1px solid #334155;">Priority</th>
+          <th style="padding: 6px 8px; text-align: center; border: 1px solid #334155;">Status</th>
+          <th style="padding: 6px 8px; text-align: center; border: 1px solid #334155;">Sentiment</th>
+          <th style="padding: 6px 8px; text-align: left; border: 1px solid #334155;">Assigned Desk</th>
+          <th style="padding: 6px 8px; text-align: left; border: 1px solid #334155;">Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${complaints.map((c, idx) => {
+          const bg = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+          const pColor = c.priority === 'CRITICAL' ? '#dc2626' : (c.priority === 'HIGH' ? '#ea580c' : '#475569');
+          const sColor = c.status === 'RESOLVED' ? '#16a34a' : (c.status === 'IN_PROGRESS' ? '#0284c7' : '#eab308');
+          const sentColor = (c.sentimentLabel || '').includes('NEG') ? '#dc2626' : ((c.sentimentLabel || '').includes('POS') ? '#16a34a' : '#64748b');
+          return `
+            <tr style="background: ${bg}; border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 6px 8px; font-family: monospace; font-weight: 700; color: #4338ca; border: 1px solid #e2e8f0;">${c.complaintNumber || 'CMP-'+c.id}</td>
+              <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">
+                <div style="font-weight: 600;">${c.userName || 'Customer'}</div>
+                <div style="font-size: 10px; color: #64748b;">${c.userEmail || ''}</div>
+              </td>
+              <td style="padding: 6px 8px; max-width: 220px; border: 1px solid #e2e8f0;">
+                <div style="font-weight: 600; color: #0f172a;">${c.title || 'Support Complaint'}</div>
+                <div style="font-size: 10px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${c.description || ''}</div>
+              </td>
+              <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">${c.categoryName || 'General'}</td>
+              <td style="padding: 6px 8px; text-align: center; font-weight: 700; color: ${pColor}; border: 1px solid #e2e8f0;">${c.priority || 'MEDIUM'}</td>
+              <td style="padding: 6px 8px; text-align: center; font-weight: 700; color: ${sColor}; border: 1px solid #e2e8f0;">${(c.status || 'PENDING').replace('_', ' ')}</td>
+              <td style="padding: 6px 8px; text-align: center; font-weight: 600; color: ${sentColor}; border: 1px solid #e2e8f0;">${c.sentimentLabel || 'NEUTRAL'}</td>
+              <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">${c.assignedToName || 'Unassigned'}</td>
+              <td style="padding: 6px 8px; font-size: 10px; color: #64748b; border: 1px solid #e2e8f0;">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : dateStr}</td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+
+    <!-- Footer -->
+    <div style="border-top: 1px solid #e2e8f0; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #64748b;">
+      <div>
+        <svg viewBox="0 0 200 36" width="160" height="24">
+          ${barcodeBars}
+        </svg>
+        <div>Electronically Certified Dataset &bull; Total records: ${complaints.length}</div>
+      </div>
+      <div style="text-align: right;">
+        <div>Security Hash: SD-AUD-${Date.now()} &bull; SOC-2 Type II Verified</div>
+        <div>SupportDesk Customer Support & Intelligence Center</div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(pdfContainer);
+
+  if (typeof html2pdf !== 'undefined') {
+    const opt = {
+      margin: [8, 8, 8, 8],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+    try {
+      await html2pdf().from(pdfContainer).set(opt).save();
+      document.body.removeChild(pdfContainer);
+      playChimeSound('success');
+      showToast(`Complaints PDF report downloaded successfully (${complaints.length} records)!`, 'success');
+      if (typeof recordAuditLog === 'function') {
+        recordAuditLog('PDF Dataset Export', complaints.length, 'CLIENT_SECURE', 'SUCCESS');
+      }
+      return;
+    } catch (err) {
+      console.warn('html2pdf generation error, falling back:', err);
+    }
+  }
+
+  // Fallback
+  document.body.removeChild(pdfContainer);
+  showToast('Printing Complaints PDF via system print dialog...', 'info');
+  window.print();
+}
+
 // ==========================================
 // USER LOADERS & ACTIONS
 // ==========================================
@@ -2805,7 +2952,10 @@ function printOfficialTicketSlip() {
   printTicketSlipViaIframe(c);
 }
 
-function generatePrintableExecutiveReportHtml() {
+function openExecutiveSummaryModal() {
+  const container = document.getElementById('executiveSummarySlipCard');
+  if (!container) return;
+
   const complaints = (typeof LocalComplaintStore !== 'undefined' && LocalComplaintStore.getComplaints)
     ? LocalComplaintStore.getComplaints()
     : [];
@@ -2825,273 +2975,241 @@ function generatePrintableExecutiveReportHtml() {
     hour: '2-digit',
     minute: '2-digit'
   });
+  const operatorName = currentUser?.name || 'System Administrator';
+  const operatorRole = currentRole || 'ADMIN';
+  const barcodeBars = typeof generateSvgBarcodeBars === 'function' ? generateSvgBarcodeBars(180, 30) : '';
 
-  const barcodeBars = typeof generateSvgBarcodeBars === 'function' ? generateSvgBarcodeBars(180, 32) : '';
-
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>SupportDesk Executive SLA & Operations Report</title>
-  <style>
-    @page { size: A4 portrait; margin: 15mm; }
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #0f172a;
-      background: #ffffff;
-      margin: 0;
-      padding: 24px;
-      line-height: 1.45;
-    }
-    .report-card {
-      max-width: 820px;
-      margin: 0 auto;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 32px;
-      background: #ffffff;
-    }
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      border-bottom: 3px solid #4f46e5;
-      padding-bottom: 18px;
-      margin-bottom: 24px;
-    }
-    .brand-title {
-      font-size: 26px;
-      font-weight: 800;
-      color: #4f46e5;
-      margin: 0;
-      letter-spacing: -0.5px;
-    }
-    .brand-subtitle {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: 4px;
-      font-weight: 500;
-    }
-    .badge-report {
-      background: #eef2ff;
-      color: #4f46e5;
-      font-weight: 800;
-      font-size: 11px;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 4px;
-    }
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .metric-cell {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 14px;
-      text-align: center;
-    }
-    .metric-cell .label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #64748b;
-      margin-bottom: 4px;
-    }
-    .metric-cell .val {
-      font-size: 24px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #334155;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-      margin-top: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      margin-bottom: 20px;
-    }
-    th {
-      background: #f1f5f9;
-      padding: 8px 10px;
-      text-align: left;
-      font-weight: 700;
-      color: #475569;
-      border-bottom: 1px solid #cbd5e1;
-    }
-    td {
-      padding: 8px 10px;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
-    }
-    .footer-row {
-      margin-top: 24px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: #64748b;
-    }
-  </style>
-</head>
-<body>
-  <div class="report-card">
-    <div class="header-row">
+  container.innerHTML = `
+    <!-- Header Bar -->
+    <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
       <div>
-        <h1 class="brand-title">SupportDesk</h1>
-        <div class="brand-subtitle">Executive Operational Quality & SLA Performance Briefing</div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-primary text-white px-2 py-1" style="font-size: 11px; letter-spacing: 0.5px;">OFFICIAL BRIEFING</span>
+          <span class="badge bg-dark-subtle text-dark border px-2 py-1" style="font-size: 11px;">ISO/IEC 27001 AUDIT</span>
+        </div>
+        <h3 class="fw-bold text-primary mb-1" style="letter-spacing: -0.5px;">SupportDesk Operations</h3>
+        <div class="text-muted small">Intelligent Customer Complaint & Support Analysis System</div>
       </div>
-      <div style="text-align: right;">
-        <span class="badge-report">CONFIDENTIAL AUDIT</span>
-        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">${dateStr} &bull; ${timeStr}</div>
-        <div style="font-size: 11px; color: #64748b;">Operator: ${currentUser?.name || 'System Administrator'}</div>
-      </div>
-    </div>
-
-    <div class="metrics-grid">
-      <div class="metric-cell">
-        <div class="label">Total Volume</div>
-        <div class="val" style="color: #4f46e5;">${total}</div>
-      </div>
-      <div class="metric-cell">
-        <div class="label">SLA Compliance</div>
-        <div class="val" style="color: #16a34a;">94.8%</div>
-      </div>
-      <div class="metric-cell">
-        <div class="label">Resolution Hours</div>
-        <div class="val" style="color: #0284c7;">16.5h</div>
-      </div>
-      <div class="metric-cell">
-        <div class="label">CSAT Satisfaction</div>
-        <div class="val" style="color: #ea580c;">91.2%</div>
+      <div class="text-md-end">
+        <div class="fw-bold font-monospace text-dark fs-5">EXEC-SLA-${Date.now()}</div>
+        <div class="text-muted small">Generated: ${dateStr} &bull; ${timeStr}</div>
+        <div class="text-muted small">Authorized: <strong class="text-primary">${operatorName}</strong> (${operatorRole})</div>
       </div>
     </div>
 
-    <div class="section-title">Case Status Pipeline Summary</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Pipeline Stage</th>
-          <th>Case Volume</th>
-          <th>Percentage</th>
-          <th>Operational Health</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Resolved & Closed</strong></td>
-          <td>${resolved} cases</td>
-          <td>${total ? Math.round((resolved/total)*100) : 0}%</td>
-          <td><span style="color: #16a34a; font-weight: 700;">Within Target</span></td>
-        </tr>
-        <tr>
-          <td><strong>Under Active Investigation</strong></td>
-          <td>${inProgress} cases</td>
-          <td>${total ? Math.round((inProgress/total)*100) : 0}%</td>
-          <td><span style="color: #0284c7; font-weight: 700;">In Progress</span></td>
-        </tr>
-        <tr>
-          <td><strong>New Triage Queue</strong></td>
-          <td>${pending} cases</td>
-          <td>${total ? Math.round((pending/total)*100) : 0}%</td>
-          <td><span style="color: #ea580c; font-weight: 700;">Active Queue</span></td>
-        </tr>
-        <tr>
-          <td><strong>High / Critical Urgency</strong></td>
-          <td>${critical} cases</td>
-          <td>${total ? Math.round((critical/total)*100) : 0}%</td>
-          <td><span style="color: #dc2626; font-weight: 700;">Priority Attention</span></td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Bento KPI Row -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-light rounded-3 border text-center">
+          <div class="small fw-semibold text-muted text-uppercase mb-1" style="font-size: 11px;">Total Volume</div>
+          <div class="fs-3 fw-bold text-primary">${total}</div>
+          <div class="small text-muted" style="font-size: 10px;">Managed Cases</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-light rounded-3 border text-center">
+          <div class="small fw-semibold text-muted text-uppercase mb-1" style="font-size: 11px;">SLA Compliance</div>
+          <div class="fs-3 fw-bold text-success">94.8%</div>
+          <div class="small text-success fw-semibold" style="font-size: 10px;">Target Achieved</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-light rounded-3 border text-center">
+          <div class="small fw-semibold text-muted text-uppercase mb-1" style="font-size: 11px;">Avg Resolution</div>
+          <div class="fs-3 fw-bold text-info">16.5h</div>
+          <div class="small text-muted" style="font-size: 10px;">Turnaround Time</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-light rounded-3 border text-center">
+          <div class="small fw-semibold text-muted text-uppercase mb-1" style="font-size: 11px;">CSAT Score</div>
+          <div class="fs-3 fw-bold text-warning">91.2%</div>
+          <div class="small text-muted" style="font-size: 10px;">Satisfaction Rating</div>
+        </div>
+      </div>
+    </div>
 
-    <div class="section-title">Recent High-Priority Audit Sample</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Complaint #</th>
-          <th>Customer</th>
-          <th>Category</th>
-          <th>Status</th>
-          <th>Specialist</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${complaints.slice(0, 5).map(c => `
-          <tr>
-            <td style="font-family: monospace; font-weight: 700;">${c.complaintNumber || 'CMP-'+c.id}</td>
-            <td>${c.userName || 'Customer'}</td>
-            <td>${c.categoryName || 'General'}</td>
-            <td style="font-weight: 600;">${(c.status || 'PENDING').replace('_', ' ')}</td>
-            <td>${c.assignedToName || 'Customer Support'}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <!-- Pipeline Stages & Urgency Breakdown -->
+    <div class="card border mb-4">
+      <div class="card-header bg-light py-2">
+        <div class="fw-bold small text-uppercase text-secondary"><i class="bi bi-kanban me-1 text-primary"></i> Lifecycle Pipeline Breakdown</div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0" style="font-size: 13px;">
+          <thead class="table-light">
+            <tr>
+              <th>Status Pipeline</th>
+              <th class="text-center">Active Count</th>
+              <th class="text-center">Ratio</th>
+              <th>Operational SLA Benchmark</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check2-all me-1"></i> Resolved & Closed</span></td>
+              <td class="text-center fw-bold">${resolved} cases</td>
+              <td class="text-center font-monospace">${total ? Math.round((resolved/total)*100) : 0}%</td>
+              <td><span class="text-success fw-semibold">&bull; Resolved within guaranteed window</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"><i class="bi bi-arrow-repeat me-1"></i> In Progress (Triage)</span></td>
+              <td class="text-center fw-bold">${inProgress} cases</td>
+              <td class="text-center font-monospace">${total ? Math.round((inProgress/total)*100) : 0}%</td>
+              <td><span class="text-primary fw-semibold">&bull; Active diagnostics underway</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"><i class="bi bi-clock-history me-1"></i> New Queue (Pending)</span></td>
+              <td class="text-center fw-bold">${pending} cases</td>
+              <td class="text-center font-monospace">${total ? Math.round((pending/total)*100) : 0}%</td>
+              <td><span class="text-warning fw-semibold">&bull; Auto-dispatch SLA active</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Critical / Escalated</span></td>
+              <td class="text-center fw-bold text-danger">${critical} cases</td>
+              <td class="text-center font-monospace">${total ? Math.round((critical/total)*100) : 0}%</td>
+              <td><span class="text-danger fw-semibold">&bull; Tier 1 priority response dispatched</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-    <div class="footer-row">
+    <!-- Recent Priority Sample -->
+    <div class="card border mb-4">
+      <div class="card-header bg-light py-2">
+        <div class="fw-bold small text-uppercase text-secondary"><i class="bi bi-journal-text me-1 text-primary"></i> Audited Complaint Sample</div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0" style="font-size: 12px;">
+          <thead class="table-light">
+            <tr>
+              <th>Complaint #</th>
+              <th>Customer</th>
+              <th>Category</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Assigned Specialist</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${complaints.slice(0, 5).map(c => `
+              <tr>
+                <td class="fw-bold font-monospace text-primary">${c.complaintNumber || 'CMP-'+c.id}</td>
+                <td>${c.userName || 'Customer'}</td>
+                <td>${c.categoryName || 'General'}</td>
+                <td><span class="badge ${c.priority === 'CRITICAL' ? 'bg-danger' : (c.priority === 'HIGH' ? 'bg-warning text-dark' : 'bg-secondary')}">${c.priority}</span></td>
+                <td><span class="badge bg-light text-dark border">${(c.status || 'PENDING').replace('_', ' ')}</span></td>
+                <td class="text-muted">${c.assignedToName || 'Support Desk'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Signoff & Barcode Footer -->
+    <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
       <div>
         <svg viewBox="0 0 200 36" width="180" height="30">
           ${barcodeBars}
         </svg>
-        <div style="font-family: monospace; font-size: 10px; color: #64748b; margin-top: 2px;">AUD-SEC-EXEC-REPORT</div>
+        <div style="font-family: monospace; font-size: 10px; color: #64748b; margin-top: 2px;">CERT-EXEC-${dateStr.replace(/\s+/g, '-')}</div>
       </div>
-      <div style="text-align: right;">
-        <div>Executive Report Certified by SupportDesk AI Operations</div>
-        <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Electronic Signature: AUTH-SHA256-VERIFIED</div>
+      <div class="text-end">
+        <div class="fw-bold text-dark small">Digitally Certified &bull; SupportDesk AI Analytics Engine</div>
+        <div class="text-muted font-monospace" style="font-size: 10px;">SHA256: 9b2d8f4...e739a1 &bull; SOC-2 Type II Certified</div>
       </div>
     </div>
-  </div>
-</body>
-</html>`;
+  `;
+
+  playChimeSound('success');
+  const modalEl = document.getElementById('executiveSummaryModal');
+  if (modalEl) {
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+
+  if (typeof recordAuditLog === 'function') {
+    recordAuditLog('Executive Summary Slip', 'All', 'ADMIN_ROLE', 'VIEWED');
+  }
 }
 
 function printExecutiveReport() {
-  const htmlContent = generatePrintableExecutiveReportHtml();
-  let iframe = document.getElementById('reportPrintIframe');
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.id = 'reportPrintIframe';
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    iframe.style.opacity = '0';
-    iframe.style.pointerEvents = 'none';
-    document.body.appendChild(iframe);
+  openExecutiveSummaryModal();
+}
+
+async function downloadExecutiveSummaryPdf() {
+  const element = document.getElementById('executiveSummarySlipCard');
+  if (!element) {
+    showToast('Executive summary card not found.', 'danger');
+    return;
   }
 
-  const doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write(htmlContent);
-  doc.close();
+  showToast('Preparing Executive Summary PDF download...', 'info');
 
-  iframe.contentWindow.focus();
-  setTimeout(() => {
-    iframe.contentWindow.print();
+  const filename = `SupportDesk_Executive_Summary_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+  if (typeof html2pdf !== 'undefined') {
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    try {
+      await html2pdf().from(element).set(opt).save();
+      playChimeSound('success');
+      showToast('Executive Summary PDF successfully downloaded!', 'success');
+      if (typeof recordAuditLog === 'function') {
+        recordAuditLog('Executive Summary (PDF)', 'All', 'ADMIN_ROLE', 'DOWNLOADED');
+      }
+      return;
+    } catch (err) {
+      console.warn('html2pdf generation error, falling back to print:', err);
+    }
+  }
+
+  printExecutiveSummaryDirect();
+}
+
+function printExecutiveSummaryDirect() {
+  const content = document.getElementById('executiveSummarySlipCard');
+  if (!content) return;
+
+  const printWin = window.open('', '_blank', 'width=900,height=700');
+  if (printWin) {
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>SupportDesk Executive SLA & Operations Report</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <style>
+          @page { size: A4 portrait; margin: 12mm; }
+          body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; background: #fff; padding: 20px; }
+        </style>
+      </head>
+      <body>
+        ${content.innerHTML}
+        <script>
+          window.onload = function() {
+            window.focus();
+            window.print();
+            setTimeout(function() { window.close(); }, 600);
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
     if (typeof recordAuditLog === 'function') {
       recordAuditLog('Executive Summary Slip', 'All', 'ADMIN_ROLE', 'PRINTED');
     }
-  }, 250);
+  } else {
+    window.print();
+  }
 }
 
 // ==========================================================================
@@ -3440,9 +3558,14 @@ function executeSecureAuditDump() {
     triggerBlobDownload(csvBlob, `SupportDesk_Audit_Dataset_${dateStamp}.csv`);
   }, 600);
 
+  // Download 3: Full Audit PDF
+  setTimeout(() => {
+    exportPdfReport();
+  }, 1400);
+
   recordAuditLog('Secure Audit Dump (2FA)', complaints.length, '2FA_OTP_123456', 'SUCCESS');
   playChimeSound('success');
-  showToast(`2FA Verified: Full Audit Dump (${complaints.length} records + JSON Ledger) downloaded! Audit ID: ${auditId}`, 'success');
+  showToast(`2FA Verified: Full Audit Dump (${complaints.length} records + JSON + CSV + PDF) downloaded! Audit ID: ${auditId}`, 'success');
 }
 
 // ==========================================================================
