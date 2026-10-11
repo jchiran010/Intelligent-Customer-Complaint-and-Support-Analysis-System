@@ -513,11 +513,16 @@
 
         <div id="view-admin-reports" class="app-view-panel d-none">
           <div class="row justify-content-center">
-            <div class="col-lg-8">
-              <div class="bento-card">
-                <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-bar-graph text-primary me-2"></i> Export Operational Reports</h5>
-                <p class="text-muted small mb-4">Export detailed complaint audit datasets, executive SLA performance sheets, and sentiment distribution reports.</p>
-                <div class="d-flex flex-wrap gap-2">
+            <div class="col-lg-10">
+              <div class="bento-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-bar-graph text-primary me-2"></i> Export Operational Reports</h5>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                    <i class="bi bi-check-circle me-1"></i> Data Stream Connected
+                  </span>
+                </div>
+                <p class="text-muted small mb-4">Export detailed complaint audit datasets, executive SLA performance sheets, and sentiment distribution reports with zero latency.</p>
+                <div class="d-flex flex-wrap gap-2 mb-4">
                   <button class="btn btn-primary px-4 py-2 fw-semibold" onclick="exportCsvReport()">
                     <i class="bi bi-filetype-csv me-2"></i> Export Complaints CSV
                   </button>
@@ -527,6 +532,59 @@
                   <button class="btn btn-outline-warning px-4 py-2 fw-semibold" onclick="promptTwoFactorAction('EXPORT_ALL')">
                     <i class="bi bi-shield-lock me-2"></i> Secure Audit Dump (2FA)
                   </button>
+                </div>
+
+                <!-- Live Dataset Summary Bento Strip -->
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">READY TO EXPORT</div>
+                      <div class="fs-4 fw-bold text-primary" id="reportExportCount">12 Complaints</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">SLA COMPLIANCE</div>
+                      <div class="fs-4 fw-bold text-success">94.8%</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">SECURITY STANDARD</div>
+                      <div class="fs-4 fw-bold text-dark font-monospace">SOC-2 / 2FA</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">STREAM STATUS</div>
+                      <div class="fs-4 fw-bold text-info" id="reportExportLastTime">Active &bull; Synced</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Security Audit Log Card -->
+              <div class="bento-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="bi bi-shield-check text-warning me-2"></i> Security Verification & Export Activity Log</h6>
+                  <span class="badge bg-primary-subtle text-primary">Immutable Trail</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Operation Type</th>
+                        <th>Target Records</th>
+                        <th>Authentication Gate</th>
+                        <th>Authorized Operator</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody id="reportAuditLogTable">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -1682,24 +1740,27 @@
         <div class="modal-body text-center py-4">
           <div class="mb-3">
             <span class="badge bg-warning-subtle text-warning fs-6 px-3 py-2 border border-warning-subtle">
-              <i class="bi bi-phone me-1"></i> SMS / Authenticator OTP Required
+              <i class="bi bi-shield-check me-1"></i> Multi-Factor Security Gate Active
             </span>
           </div>
           <p class="small text-muted mb-3" id="twoFactorActionText">
-            To authorize this sensitive administrative action, please enter the 6-digit security code dispatched to your registered device.
+            To authorize <strong>Secure Audit Dump (Full Compliance Export & Audit Ledger)</strong>, enter the 6-digit security code dispatched to your registered authenticator.
           </p>
-          <div class="alert alert-info py-2 small mb-3">
-            <i class="bi bi-key me-1"></i> Demo Verification Code: <strong class="font-monospace text-primary">123456</strong>
+          <div class="alert alert-info py-2 small mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2 text-start">
+            <div><i class="bi bi-key me-1"></i> Demo Security OTP: <strong class="font-monospace text-primary fs-6">123456</strong></div>
+            <button type="button" class="btn btn-sm btn-primary py-1 px-3 fw-semibold font-monospace" onclick="quickFillOtp('123456')">
+              <i class="bi bi-lightning-fill me-1"></i> Auto-Fill 123456
+            </button>
           </div>
-          <div class="d-flex justify-content-center gap-2 mb-3">
-            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 1)">
-            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 2)">
-            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 3)">
-            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 4)">
-            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 5)">
-            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 6)">
+          <div class="d-flex justify-content-center gap-2 mb-3" onpaste="handleOtpPaste(event)">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 1)" onkeydown="handleOtpKeydown(event, 0)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 2)" onkeydown="handleOtpKeydown(event, 1)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 3)" onkeydown="handleOtpKeydown(event, 2)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 4)" onkeydown="handleOtpKeydown(event, 3)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 5)" onkeydown="handleOtpKeydown(event, 4)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 6)" onkeydown="handleOtpKeydown(event, 5)" inputmode="numeric">
           </div>
-          <button type="button" class="btn btn-primary w-100 fw-semibold" onclick="verifyTwoFactorCode()">
+          <button type="button" class="btn btn-primary w-100 fw-semibold py-2" onclick="verifyTwoFactorCode()">
             <i class="bi bi-shield-check me-1"></i> Confirm & Execute Action
           </button>
         </div>

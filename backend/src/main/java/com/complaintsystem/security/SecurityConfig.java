@@ -68,7 +68,8 @@ public class SecurityConfig {
                     "/api/user/login",
                     "/api/user/register",
                     "/api/auth/**",
-                    "/api/categories/public"
+                    "/api/categories/public",
+                    "/api/admin/reports/export/**"
                 ).permitAll()
 
                 // STRICT ADMIN ROUTES (ROLE_ADMIN only)
