@@ -3270,4 +3270,302 @@ function openTrackerFromAiModal() {
   }
 }
 
+// ==========================================================================
+// INTERACTIVE ANALYTICS "HOW IT WORKS" EXPLAINER CONTROLLER
+// ==========================================================================
+function explainAnalyticsMetric(type) {
+  const modalEl = document.getElementById('analyticsExplainerModal');
+  if (!modalEl) return;
+
+  const iconEl = document.getElementById('explainerIcon');
+  const titleEl = document.getElementById('explainerTitle');
+  const subEl = document.getElementById('explainerSubtitle');
+  const howEl = document.getElementById('explainerHowItWorks');
+  const formBox = document.getElementById('explainerFormulaBox');
+  const formEl = document.getElementById('explainerFormula');
+  const gridEl = document.getElementById('explainerMetricsGrid');
+  const actTextEl = document.getElementById('explainerActionText');
+  const actBtnsEl = document.getElementById('explainerActionButtons');
+
+  formBox.classList.remove('d-none');
+
+  if (type === 'SLA') {
+    if (iconEl) iconEl.innerHTML = '<i class="bi bi-shield-check fs-4 text-success"></i>';
+    if (titleEl) titleEl.textContent = 'SLA Compliance Rate Engine (94.8%)';
+    if (subEl) subEl.textContent = 'Automated Service Level Agreement Fulfillment Protocol';
+    if (howEl) howEl.innerHTML = 'The <strong>SLA Compliance Rate</strong> measures the percentage of customer complaints resolved within their contractual SLA time window (6h for Security, 12h for Technical, 24h for Billing, 48h for Logistics). As complaints are submitted, our intelligent triage engine allocates an automated target deadline. When marked as <em>RESOLVED</em>, the system verifies elapsed resolution time against the allocated window.';
+    if (formEl) formEl.textContent = 'SLA Compliance Rate (%) = (Tickets Resolved Within SLA / Total Resolved Tickets) × 100';
+
+    if (gridEl) gridEl.innerHTML = `
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Target Threshold</span>
+          <h4 class="fw-bold text-success mb-0">≥ 90.0%</h4>
+          <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right me-1"></i> Passing SLA</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Current Rate</span>
+          <h4 class="fw-bold text-success mb-0">94.8%</h4>
+          <small class="text-muted">+4.8% margin</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Compliant Tickets</span>
+          <h4 class="fw-bold text-primary mb-0">228</h4>
+          <small class="text-muted">On-time resolutions</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Breached SLA</span>
+          <h4 class="fw-bold text-danger mb-0">12</h4>
+          <small class="text-danger">Escalated to Mgmt</small>
+        </div>
+      </div>
+    `;
+
+    if (actTextEl) actTextEl.textContent = 'Explore complaints categorized under SLA compliance tracking to review bottlenecks or celebrate fulfilled tickets:';
+    if (actBtnsEl) actBtnsEl.innerHTML = `
+      <button class="btn btn-sm btn-primary" onclick="bootstrap.Modal.getInstance(document.getElementById('analyticsExplainerModal')).hide(); showView('admin-complaints');">
+        <i class="bi bi-list-check me-1"></i> View All Complaints in SLA Queue
+      </button>
+      <button class="btn btn-sm btn-outline-danger" onclick="bootstrap.Modal.getInstance(document.getElementById('analyticsExplainerModal')).hide(); filterComplaintsBySearch('CRITICAL');">
+        <i class="bi bi-exclamation-triangle me-1"></i> Inspect Critical Priority Items
+      </button>
+    `;
+  } else if (type === 'RESOLUTION_TIME') {
+    if (iconEl) iconEl.innerHTML = '<i class="bi bi-stopwatch fs-4 text-primary"></i>';
+    if (titleEl) titleEl.textContent = 'Average Resolution Time Engine (18.5h)';
+    if (subEl) subEl.textContent = 'End-to-End Mean Grievance Turnaround Time Calculation';
+    if (howEl) howEl.innerHTML = 'Calculates the arithmetic mean duration between the precise instant a customer lodges a complaint (<code>createdAt</code>) and the final resolution confirmation timestamp (<code>resolvedAt</code>). This metric is weighted across all six departmental support desks to detect systemic delays and evaluate staff efficiency.';
+    if (formEl) formEl.textContent = 'Avg Resolution Time = Σ (Resolved Timestamp - Lodged Timestamp) / Total Resolved Tickets';
+
+    if (gridEl) gridEl.innerHTML = `
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Global Mean</span>
+          <h4 class="fw-bold text-primary mb-0">18.5 hrs</h4>
+          <small class="text-success"><i class="bi bi-lightning-charge me-1"></i> 5.5h under max SLA</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Fastest Desk</span>
+          <h4 class="fw-bold text-success mb-0">8.4 hrs</h4>
+          <small class="text-muted">Accounts & Security</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Billing Desk</span>
+          <h4 class="fw-bold text-info mb-0">9.2 hrs</h4>
+          <small class="text-muted">Target: 24 hrs</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Engineering</span>
+          <h4 class="fw-bold text-warning mb-0">14.5 hrs</h4>
+          <small class="text-muted">Target: 12 hrs</small>
+        </div>
+      </div>
+    `;
+
+    if (actTextEl) actTextEl.textContent = 'Inspect work items in progress to identify resolution roadblocks:';
+    if (actBtnsEl) actBtnsEl.innerHTML = `
+      <button class="btn btn-sm btn-primary" onclick="bootstrap.Modal.getInstance(document.getElementById('analyticsExplainerModal')).hide(); showView('admin-kanban');">
+        <i class="bi bi-kanban me-1"></i> Open Live Kanban Pipeline
+      </button>
+      <button class="btn btn-sm btn-outline-primary" onclick="bootstrap.Modal.getInstance(document.getElementById('analyticsExplainerModal')).hide(); showView('admin-categories');">
+        <i class="bi bi-clock-history me-1"></i> Review Category SLA Settings
+      </button>
+    `;
+  } else if (type === 'CSAT') {
+    if (iconEl) iconEl.innerHTML = '<i class="bi bi-star-fill fs-4 text-warning"></i>';
+    if (titleEl) titleEl.textContent = 'Customer Satisfaction (CSAT) Engine (88% - 91.2%)';
+    if (subEl) subEl.textContent = 'Verified Post-Resolution Star Rating Aggregator';
+    if (howEl) howEl.innerHTML = 'The <strong>CSAT Score</strong> is computed from verified customer star ratings collected after a complaint ticket is marked as resolved. When customers rate their experience from 1 to 5 stars, the system normalizes 4-star and 5-star ratings as positive responses over the total feedback corpus.';
+    if (formEl) formEl.textContent = 'CSAT (%) = (Count of 4★ & 5★ Ratings / Total Ratings Collected) × 100';
+
+    if (gridEl) gridEl.innerHTML = `
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Mean Rating</span>
+          <h4 class="fw-bold text-warning mb-0">4.8 / 5.0</h4>
+          <small class="text-warning">★★★★★</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">5-Star Ratings</span>
+          <h4 class="fw-bold text-success mb-0">74%</h4>
+          <small class="text-muted">Highest satisfaction</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">4-Star Ratings</span>
+          <h4 class="fw-bold text-primary mb-0">17%</h4>
+          <small class="text-muted">Satisfied resolution</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded border bg-surface text-center h-100">
+          <span class="small text-muted d-block text-uppercase">Neutral/Low (≤3★)</span>
+          <h4 class="fw-bold text-danger mb-0">9%</h4>
+          <small class="text-danger">Escalation follow-up</small>
+        </div>
+      </div>
+    `;
+
+    if (actTextEl) actTextEl.textContent = 'Review direct customer star ratings and feedback commentary:';
+    if (actBtnsEl) actBtnsEl.innerHTML = `
+      <button class="btn btn-sm btn-primary" onclick="bootstrap.Modal.getInstance(document.getElementById('analyticsExplainerModal')).hide(); showView('admin-reports');">
+        <i class="bi bi-file-earmark-bar-graph me-1"></i> Export CSAT Feedback Report
+      </button>
+    `;
+  }
+
+  bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+function explainSentimentKeyword(keyword, count, sentiment, explanation) {
+  const modalEl = document.getElementById('analyticsExplainerModal');
+  if (!modalEl) return;
+
+  const iconEl = document.getElementById('explainerIcon');
+  const titleEl = document.getElementById('explainerTitle');
+  const subEl = document.getElementById('explainerSubtitle');
+  const howEl = document.getElementById('explainerHowItWorks');
+  const formBox = document.getElementById('explainerFormulaBox');
+  const formEl = document.getElementById('explainerFormula');
+  const gridEl = document.getElementById('explainerMetricsGrid');
+  const actTextEl = document.getElementById('explainerActionText');
+  const actBtnsEl = document.getElementById('explainerActionButtons');
+
+  formBox.classList.remove('d-none');
+
+  const isNeg = sentiment === 'NEGATIVE';
+  const colorClass = isNeg ? 'danger' : 'success';
+
+  if (iconEl) iconEl.innerHTML = `<i class="bi bi-tag-fill fs-4 text-${colorClass}"></i>`;
+  if (titleEl) titleEl.textContent = `NLP Keyword Trigger: "${keyword}"`;
+  if (subEl) subEl.textContent = `Natural Language Semantic Extraction • ${sentiment} Driver`;
+  if (howEl) howEl.innerHTML = `<strong>Root Cause & Trigger Impact:</strong> ${explanation}<br><br>Our machine-learning and heuristic NLP pipeline parses customer complaint subjects and descriptions. When phrases matching <code>"${keyword}"</code> are detected, the system automatically correlates the frequency with emotional urgency and adapts prioritization weights accordingly.`;
+  if (formEl) formEl.textContent = `Sentiment Weight = Keyword Score (${isNeg ? '-0.75 to -0.95' : '+0.60 to +0.85'}) × Recency Factor`;
+
+  if (gridEl) gridEl.innerHTML = `
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Detected Count</span>
+        <h4 class="fw-bold text-${colorClass} mb-0">${count} Instances</h4>
+        <small class="text-muted">High frequency cluster</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Sentiment Polarity</span>
+        <h4 class="fw-bold text-${colorClass} mb-0">${sentiment}</h4>
+        <small class="text-muted">${isNeg ? 'Grievance Driver' : 'Satisfaction Driver'}</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Auto-Routing</span>
+        <h4 class="fw-bold text-primary mb-0">${isNeg ? 'Escalated' : 'Standard'}</h4>
+        <small class="text-muted">AI Triage protocol</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Recommended Action</span>
+        <h4 class="fw-bold text-info mb-0">${isNeg ? 'Immediate Audit' : 'Quality Log'}</h4>
+        <small class="text-muted">Department SLA</small>
+      </div>
+    </div>
+  `;
+
+  if (actTextEl) actTextEl.textContent = `Filter all existing customer complaints that match the keyword "${keyword}":`;
+  if (actBtnsEl) actBtnsEl.innerHTML = `
+    <button class="btn btn-sm btn-primary" onclick="bootstrap.Modal.getInstance(document.getElementById('analyticsExplainerModal')).hide(); filterComplaintsBySearch('${keyword}');">
+      <i class="bi bi-search me-1"></i> Filter Complaints with "${keyword}"
+    </button>
+  `;
+
+  bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+function explainSpecialist(name, desk, resolved, turnaround, csat, bio) {
+  const modalEl = document.getElementById('analyticsExplainerModal');
+  if (!modalEl) return;
+
+  const iconEl = document.getElementById('explainerIcon');
+  const titleEl = document.getElementById('explainerTitle');
+  const subEl = document.getElementById('explainerSubtitle');
+  const howEl = document.getElementById('explainerHowItWorks');
+  const formBox = document.getElementById('explainerFormulaBox');
+  const gridEl = document.getElementById('explainerMetricsGrid');
+  const actTextEl = document.getElementById('explainerActionText');
+  const actBtnsEl = document.getElementById('explainerActionButtons');
+
+  formBox.classList.add('d-none');
+
+  if (iconEl) iconEl.innerHTML = '<i class="bi bi-person-badge fs-4 text-primary"></i>';
+  if (titleEl) titleEl.textContent = `Specialist Profile: ${name}`;
+  if (subEl) subEl.textContent = `Assigned Support Desk: ${desk} • Top Performer`;
+  if (howEl) howEl.innerHTML = `<strong>Role & Operational Bio:</strong> ${bio}<br><br>Performance metrics are calculated automatically by tracking the turnaround speed, resolution accuracy, and customer rating scores associated with complaints assigned to this specialist.`;
+
+  if (gridEl) gridEl.innerHTML = `
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Resolved Cases</span>
+        <h4 class="fw-bold text-primary mb-0">${resolved}</h4>
+        <small class="text-muted">Closed with SLA compliance</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Avg Turnaround</span>
+        <h4 class="fw-bold text-success mb-0">${turnaround}</h4>
+        <small class="text-success"><i class="bi bi-lightning-charge me-1"></i> Above SLA target</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Customer CSAT</span>
+        <h4 class="fw-bold text-warning mb-0">${csat} ★</h4>
+        <small class="text-muted">Outstanding feedback</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 rounded border bg-surface text-center h-100">
+        <span class="small text-muted d-block text-uppercase">Assigned Desk</span>
+        <h4 class="fw-bold text-info mb-0">${desk}</h4>
+        <small class="text-muted">Lead Representative</small>
+      </div>
+    </div>
+  `;
+
+  if (actTextEl) actTextEl.textContent = `Inspect complaints assigned to ${name} in the Complaints Queue:`;
+  if (actBtnsEl) actBtnsEl.innerHTML = `
+    <button class="btn btn-sm btn-primary" onclick="bootstrap.Modal.getInstance(document.getElementById('analyticsExplainerModal')).hide(); filterComplaintsBySearch('${name}');">
+      <i class="bi bi-person-lines-fill me-1"></i> View Complaints Handled by ${name}
+    </button>
+  `;
+
+  bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+function filterComplaintsBySearch(query) {
+  showView('admin-complaints');
+  const searchInput = document.getElementById('admFilterSearch');
+  if (searchInput) {
+    searchInput.value = query;
+    loadAdminComplaints();
+  }
+}
+
 

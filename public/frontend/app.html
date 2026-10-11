@@ -399,24 +399,33 @@
         <div id="view-admin-analytics" class="app-view-panel d-none">
           <div class="row g-3 mb-4">
             <div class="col-md-4">
-              <div class="bento-card text-center">
+              <div class="bento-card text-center card-hover-lift cursor-pointer position-relative" onclick="explainAnalyticsMetric('SLA')" title="Click to inspect how SLA Compliance is calculated">
                 <span class="text-muted small fw-semibold text-uppercase">SLA Compliance Rate</span>
                 <div class="metric-number text-success my-2" id="admSlaRate">94.8%</div>
-                <small class="text-muted">Target: &ge; 90% compliance</small>
+                <small class="text-muted d-block">Target: &ge; 90% compliance</small>
+                <span class="badge bg-success-subtle text-success border border-success-subtle mt-2 py-1 px-2">
+                  <i class="bi bi-info-circle me-1"></i> Tap to see how it works &rarr;
+                </span>
               </div>
             </div>
             <div class="col-md-4">
-              <div class="bento-card text-center">
+              <div class="bento-card text-center card-hover-lift cursor-pointer position-relative" onclick="explainAnalyticsMetric('RESOLUTION_TIME')" title="Click to inspect how Average Resolution Time is calculated">
                 <span class="text-muted small fw-semibold text-uppercase">Average Resolution Time</span>
                 <div class="metric-number text-primary my-2" id="admAvgHours">18.5h</div>
-                <small class="text-muted">Across all complaint categories</small>
+                <small class="text-muted d-block">Across all complaint categories</small>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-2 py-1 px-2">
+                  <i class="bi bi-info-circle me-1"></i> Tap to see how it works &rarr;
+                </span>
               </div>
             </div>
             <div class="col-md-4">
-              <div class="bento-card text-center">
+              <div class="bento-card text-center card-hover-lift cursor-pointer position-relative" onclick="explainAnalyticsMetric('CSAT')" title="Click to inspect how CSAT Score is calculated">
                 <span class="text-muted small fw-semibold text-uppercase">Customer Satisfaction (CSAT)</span>
                 <div class="metric-number text-warning my-2" id="admCsatScore">88%</div>
-                <small class="text-muted">Based on customer feedback</small>
+                <small class="text-muted d-block">Based on customer feedback</small>
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle mt-2 py-1 px-2">
+                  <i class="bi bi-info-circle me-1"></i> Tap to see how it works &rarr;
+                </span>
               </div>
             </div>
           </div>
@@ -425,23 +434,23 @@
             <!-- Sentiment Trigger Keyword Cloud / Heatmap -->
             <div class="col-lg-6">
               <div class="bento-card h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
                   <h6 class="fw-bold mb-0"><i class="bi bi-fire text-danger me-2"></i> Sentiment Keyword Trigger Heatmap</h6>
                   <span class="badge bg-danger-subtle text-danger border border-danger-subtle">NLP Extracted</span>
                 </div>
-                <p class="text-muted small mb-3">High-frequency keywords mapped from positive resolution drivers and negative grievance escalations.</p>
+                <p class="text-muted small mb-3">High-frequency keywords mapped from positive resolution drivers and negative grievance escalations. <span class="badge bg-primary-subtle text-primary ms-1"><i class="bi bi-hand-index-thumb me-1"></i> Tap any box to see how it works</span></p>
                 <div class="keyword-cloud">
-                  <span class="keyword-pill keyword-pill-danger" title="14 occurrences"><i class="bi bi-arrow-up-right"></i> Duplicate Charge (14)</span>
-                  <span class="keyword-pill keyword-pill-danger" title="9 occurrences"><i class="bi bi-exclamation-circle"></i> App Crash (9)</span>
-                  <span class="keyword-pill keyword-pill-danger" title="8 occurrences"><i class="bi bi-credit-card"></i> Payment Timeout (8)</span>
-                  <span class="keyword-pill keyword-pill-danger" title="7 occurrences"><i class="bi bi-box-seam"></i> Torn Packaging (7)</span>
-                  <span class="keyword-pill keyword-pill-danger" title="6 occurrences"><i class="bi bi-question-circle"></i> Missing Adapter (6)</span>
-                  <span class="keyword-pill keyword-pill-danger" title="5 occurrences"><i class="bi bi-clock-history"></i> Delivery Delay (5)</span>
-                  <span class="keyword-pill keyword-pill-success" title="18 occurrences"><i class="bi bi-check2-circle"></i> Fast Support (18)</span>
-                  <span class="keyword-pill keyword-pill-success" title="15 occurrences"><i class="bi bi-patch-check"></i> Solved on Call (15)</span>
-                  <span class="keyword-pill keyword-pill-success" title="12 occurrences"><i class="bi bi-arrow-counterclockwise"></i> Refund Processed (12)</span>
-                  <span class="keyword-pill keyword-pill-info" title="10 occurrences"><i class="bi bi-person-check"></i> Helpful Staff (10)</span>
-                  <span class="keyword-pill keyword-pill-info" title="7 occurrences"><i class="bi bi-shield-check"></i> Polite Triage (7)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Duplicate Charge', 14, 'NEGATIVE', 'Frequent duplicate transaction deductions detected in monthly invoice grievances. Triggers emergency priority escalation and automated routing to the Finance & Billing Desk.')" title="14 occurrences - Click to explore"><i class="bi bi-arrow-up-right"></i> Duplicate Charge (14)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('App Crash', 9, 'NEGATIVE', 'Software stability exceptions, unhandled runtime crashes, and system stalls. Automatically classified under Engineering Support with 12-hour SLA.')" title="9 occurrences - Click to explore"><i class="bi bi-exclamation-circle"></i> App Crash (9)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Payment Timeout', 8, 'NEGATIVE', 'Payment gateway checkout handshake timeouts and card debits without order confirmations. Auto-assigned to Payment Operations for ledger rollback.')" title="8 occurrences - Click to explore"><i class="bi bi-credit-card"></i> Payment Timeout (8)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Torn Packaging', 7, 'NEGATIVE', 'Physical courier damage and torn external parcel seals upon customer arrival. Routed to Logistics Desk with 7-day no-questions-asked replacement protocol.')" title="7 occurrences - Click to explore"><i class="bi bi-box-seam"></i> Torn Packaging (7)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Missing Adapter', 6, 'NEGATIVE', 'Package contents discrepancy and missing peripheral parts. Triggers warehouse fulfillment check and expedited accessory parcel dispatch.')" title="6 occurrences - Click to explore"><i class="bi bi-question-circle"></i> Missing Adapter (6)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Delivery Delay', 5, 'NEGATIVE', 'Transit delay past estimated delivery window. Triggers courier API tracking check and proactive customer delivery guarantee.')" title="5 occurrences - Click to explore"><i class="bi bi-clock-history"></i> Delivery Delay (5)</span>
+                  <span class="keyword-pill keyword-pill-success" onclick="explainSentimentKeyword('Fast Support', 18, 'POSITIVE', 'Positive driver indicating swift first response within initial 15-minute triage window. Boosts overall customer retention and CSAT score.')" title="18 occurrences - Click to explore"><i class="bi bi-check2-circle"></i> Fast Support (18)</span>
+                  <span class="keyword-pill keyword-pill-success" onclick="explainSentimentKeyword('Solved on Call', 15, 'POSITIVE', 'First Contact Resolution (FCR) achievement driver where support specialist resolved the customer issue in a single interaction session.')" title="15 occurrences - Click to explore"><i class="bi bi-patch-check"></i> Solved on Call (15)</span>
+                  <span class="keyword-pill keyword-pill-success" onclick="explainSentimentKeyword('Refund Processed', 12, 'POSITIVE', 'Successful resolution closure confirmation where merchant reversal and ledger credit was completed within 2 business days.')" title="12 occurrences - Click to explore"><i class="bi bi-arrow-counterclockwise"></i> Refund Processed (12)</span>
+                  <span class="keyword-pill keyword-pill-info" onclick="explainSentimentKeyword('Helpful Staff', 10, 'POSITIVE', 'Positive customer sentiment feedback highlighting polite, proactive, and knowledgeable support agent behavior during inquiry handling.')" title="10 occurrences - Click to explore"><i class="bi bi-person-check"></i> Helpful Staff (10)</span>
+                  <span class="keyword-pill keyword-pill-info" onclick="explainSentimentKeyword('Polite Triage', 7, 'POSITIVE', 'Customer appreciation for automated intake, clear SLA timelines, and empathetic communication tone.')" title="7 occurrences - Click to explore"><i class="bi bi-shield-check"></i> Polite Triage (7)</span>
                 </div>
               </div>
             </div>
@@ -449,12 +458,13 @@
             <!-- Agent Performance Leaderboard -->
             <div class="col-lg-6">
               <div class="bento-card h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
                   <h6 class="fw-bold mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i> Support Specialist Leaderboard</h6>
                   <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Top Performers</span>
                 </div>
+                <small class="text-muted d-block mb-3"><i class="bi bi-hand-index-thumb me-1"></i> Tap any specialist row to view how their performance & assigned queue works</small>
                 <div class="table-responsive">
-                  <table class="table table-sm align-middle mb-0">
+                  <table class="table table-hover table-sm align-middle mb-0">
                     <thead class="text-muted small">
                       <tr>
                         <th>Specialist</th>
@@ -465,29 +475,29 @@
                       </tr>
                     </thead>
                     <tbody class="small">
-                      <tr>
-                        <td><strong>Sarah Connor</strong></td>
+                      <tr class="cursor-pointer" onclick="explainSpecialist('Sarah Connor', 'Finance', 38, '9.2 hrs', 4.9, 'Senior financial analyst specializing in duplicate billing reconciliation, payment gateway refund rollbacks, and merchant chargebacks.')">
+                        <td><strong>Sarah Connor</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
                         <td><span class="badge bg-light text-dark">Finance</span></td>
                         <td>38</td>
                         <td>9.2 hrs</td>
                         <td><span class="text-warning">4.9 &#9733;</span></td>
                       </tr>
-                      <tr>
-                        <td><strong>David Miller</strong></td>
+                      <tr class="cursor-pointer" onclick="explainSpecialist('David Miller', 'Engineering', 32, '14.5 hrs', 4.8, 'Senior engineer handling application crashes, database bottlenecks, API timeouts, and critical system downtime.')">
+                        <td><strong>David Miller</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
                         <td><span class="badge bg-light text-dark">Engineering</span></td>
                         <td>32</td>
                         <td>14.5 hrs</td>
                         <td><span class="text-warning">4.8 &#9733;</span></td>
                       </tr>
-                      <tr>
-                        <td><strong>Emily Watson</strong></td>
+                      <tr class="cursor-pointer" onclick="explainSpecialist('Emily Watson', 'Logistics', 29, '11.0 hrs', 4.7, 'Fulfillment coordinator specializing in shipment tracking, transit damage RMA claims, and expedited part replacements.')">
+                        <td><strong>Emily Watson</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
                         <td><span class="badge bg-light text-dark">Logistics</span></td>
                         <td>29</td>
                         <td>11.0 hrs</td>
                         <td><span class="text-warning">4.7 &#9733;</span></td>
                       </tr>
-                      <tr>
-                        <td><strong>Alex Chen</strong></td>
+                      <tr class="cursor-pointer" onclick="explainSpecialist('Alex Chen', 'Accounts', 26, '8.4 hrs', 4.9, 'Identity and account security specialist handling MFA recovery, role access provisioning, and credential resets.')">
+                        <td><strong>Alex Chen</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
                         <td><span class="badge bg-light text-dark">Accounts</span></td>
                         <td>26</td>
                         <td>8.4 hrs</td>
@@ -1505,6 +1515,67 @@
               <i class="bi bi-printer-fill me-1"></i> Print / Save as PDF
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Analytics Explainer Modal ("How It Works") -->
+  <div class="modal fade" id="analyticsExplainerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white py-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="p-2 rounded bg-white text-primary" id="explainerIcon">
+              <i class="bi bi-lightbulb-fill fs-5"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold mb-0 text-white" id="explainerTitle">How This Metric Works</h5>
+              <small class="text-white-50" id="explainerSubtitle">Intelligent Customer Complaint & Support Analysis System</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 bg-surface">
+          <!-- Overview Card -->
+          <div class="p-3 rounded border bg-surface-alt mb-3">
+            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Operational Principle & Methodology</span>
+            <p class="mb-0 text-body" id="explainerHowItWorks" style="line-height: 1.6;">
+              Explanation text goes here...
+            </p>
+          </div>
+
+          <!-- Formula & Calculation Box -->
+          <div class="p-3 rounded border border-primary-subtle bg-primary-subtle mb-3" id="explainerFormulaBox">
+            <span class="small fw-bold text-primary text-uppercase d-block mb-1">
+              <i class="bi bi-calculator me-1"></i> Calculation Formula & Logic
+            </span>
+            <div class="font-monospace fw-bold text-primary fs-6" id="explainerFormula">
+              Formula string...
+            </div>
+          </div>
+
+          <!-- Metrics Breakdown Grid -->
+          <div class="row g-3 mb-3" id="explainerMetricsGrid">
+            <!-- Dynamically populated 3-4 metric cards -->
+          </div>
+
+          <!-- Live Related Data & Actions Box -->
+          <div class="p-3 rounded border bg-surface" id="explainerActionBox">
+            <span class="small fw-bold text-muted text-uppercase d-block mb-2">Live Application Insights & Drilldown</span>
+            <div class="small text-muted mb-3" id="explainerActionText">
+              Actions description...
+            </div>
+            <div class="d-flex gap-2 flex-wrap" id="explainerActionButtons">
+              <!-- Action buttons populated dynamically -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-surface-alt d-flex justify-content-between">
+          <small class="text-muted"><i class="bi bi-shield-check text-success me-1"></i> Verified by System Analytics Engine</small>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+            <i class="bi bi-check2 me-1"></i> Close Explainer
+          </button>
         </div>
       </div>
     </div>
