@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Comprehensive Project Documentation - Intelligent Customer Complaint & Support Analysis System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  @page {
+    size: A4 portrait;
+    margin: 16mm 14mm 16mm 14mm;
+    @bottom-right {
+      content: counter(page);
+      font-size: 8pt;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #64748b;
+    }
+    @bottom-left {
+      content: "Intelligent Customer Complaint & Support Analysis System — Capstone Project";
+      font-size: 8pt;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #64748b;
+    }
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.6;
+    font-size: 9.5pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cover-page {
+    page-break-after: always;
+    height: 96vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2.5rem 1.5rem;
+    box-sizing: border-box;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+  }
+
+  .cover-header {
+    border-bottom: 3px solid #4f46e5;
+    padding-bottom: 1.5rem;
+  }
+
+  .badge-tag {
+    display: inline-block;
+    background: #4f46e5;
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+
+  .cover-title {
+    font-size: 24pt;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .cover-subtitle {
+    font-size: 13pt;
+    font-weight: 500;
+    color: #4338ca;
+    margin: 0;
+  }
+
+  .cover-abstract {
+    background: #ffffff;
+    border-left: 4px solid #4f46e5;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 1.5rem 0;
+  }
+
+  .cover-abstract h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 10.5pt;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .cover-abstract p {
+    margin: 0;
+    color: #475569;
+    font-size: 9pt;
+    line-height: 1.5;
+  }
+
+  .cover-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    background: #f1f5f9;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 8.5pt;
+  }
+
+  .cover-meta-item strong {
+    color: #0f172a;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  h1, h2, h3, h4, h5 {
+    color: #0f172a;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+
+  h1 {
+    font-size: 16pt;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #3730a3;
+  }
+
+  h2 {
+    font-size: 12.5pt;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #1e1b4b;
+  }
+
+  h3 {
+    font-size: 10.5pt;
+    margin-top: 1rem;
+    margin-bottom: 0.35rem;
+    color: #312e81;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+  }
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+
+  .callout-box {
+    background: #f8fafc;
+    border-left: 4px solid #6366f1;
+    border-radius: 6px;
+    padding: 0.85rem 1.15rem;
+    margin: 1rem 0;
+    font-size: 9pt;
+  }
+
+  .callout-box.info {
+    border-left-color: #0284c7;
+    background: #f0f9ff;
+  }
+
+  .callout-box.success {
+    border-left-color: #10b981;
+    background: #ecfdf5;
+  }
+
+  .callout-box.warning {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+
+  pre, code {
+    font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+    font-size: 8pt;
+  }
+
+  code {
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 4px;
+    color: #4338ca;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.45;
+    margin: 0.75rem 0;
+    page-break-inside: avoid;
+    border: 1px solid #1e293b;
+  }
+
+  pre code {
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 0;
+  }
+
+  .diagram-container {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+
+  .diagram-box {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 8.5pt;
+    margin: 4px;
+  }
+
+  .box-client { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+  .box-gateway { background: #ccfbf1; color: #115e59; border: 1px solid #99f6e4; }
+  .box-service { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+  .box-db { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+  .toc-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px dotted #cbd5e1;
+    font-size: 9pt;
+  }
+
+  .toc-title {
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .toc-dots {
+    flex-grow: 1;
+    border-bottom: 1px dotted #94a3b8;
+    margin: 0 8px;
+    height: 12px;
+  }
+
+  .formula-box {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    color: #312e81;
+    text-align: center;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 0.75rem 0;
+    page-break-inside: avoid;
+  }
+
+  .kpi-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .kpi-val {
+    font-size: 13pt;
+    font-weight: 800;
+    color: #4f46e5;
+  }
+
+  .kpi-lbl {
+    font-size: 7.5pt;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover-page">
+  <div class="cover-header">
+    <span class="badge-tag">Academic Capstone Engineering Documentation</span>
+    <h1 class="cover-title">Intelligent Customer Complaint & Support Analysis System</h1>
+    <p class="cover-subtitle">Complete Architectural, Algorithmic & Implementation Reference Manual</p>
+  </div>
+
+  <div class="cover-abstract">
+    <h4>Project Abstract & Executive Overview</h4>
+    <p>
+      The <strong>Intelligent Customer Complaint and Support Analysis System</strong> is a modern, enterprise-grade, full-stack software application engineered to revolutionize customer service operations. By marrying a resilient Java 21 Spring Boot 3 backend with an adaptive, accessible, glassmorphic Single Page Application (SPA), the system automates complaint ingestion, performs algorithmic Natural Language Processing (NLP) sentiment scoring, dynamically computes resolution SLAs, enforces role-based security isolation (Customer vs. Administrator), and supports zero-friction dual deployment across localhost and cloud edge networks (Vercel).
+    </p>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-val">Java 21</div>
+      <div class="kpi-lbl">Core Backend Runtime</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">Spring Boot 3.2.5</div>
+      <div class="kpi-lbl">Enterprise Framework</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">NLP Engine</div>
+      <div class="kpi-lbl">Rule-Based Sentiment Analyzer</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val">Dual-Mode DB</div>
+      <div class="kpi-lbl">MySQL + Embedded H2 Auto-Switch</div>
+    </div>
+  </div>
+
+  <div class="cover-meta-grid">
+    <div class="cover-meta-item">
+      <strong>Author / Student Developer:</strong>
+      CHIRANJEEVI (GitHub: <code>jchiran010</code>)
+    </div>
+    <div class="cover-meta-item">
+      <strong>Project Repository:</strong>
+      <code>github.com/jchiran010/Intelligent-Customer-Complaint-and-Support-Analysis-System</code>
+    </div>
+    <div class="cover-meta-item">
+      <strong>Production Deployment Target:</strong>
+      Vercel Edge Cloud (Automated Static & Serverless Pipeline)
+    </div>
+    <div class="cover-meta-item">
+      <strong>Documentation Version & Date:</strong>
+      Version 1.0.0 — Generated October 2026
+    </div>
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="page-break"></div>
+<h1>Table of Contents</h1>
+<p style="color: #64748b; font-size: 8.5pt;">A structured instructional guide to all software components, architecture layers, algorithms, and deployment workflows.</p>
+
+<ul class="toc-list">
+  <li class="toc-item"><span class="toc-title">1. Introduction, Problem Statement & Core Objectives</span><span class="toc-dots"></span><span>Chapter 1</span></li>
+  <li class="toc-item"><span class="toc-title">2. End-to-End System Architecture & Layered Design</span><span class="toc-dots"></span><span>Chapter 2</span></li>
+  <li class="toc-item"><span class="toc-title">3. Backend Engineering & Spring Boot Ecosystem</span><span class="toc-dots"></span><span>Chapter 3</span></li>
+  <li class="toc-item"><span class="toc-title">4. Database Architecture, Relational Schema & ORM Entities</span><span class="toc-dots"></span><span>Chapter 4</span></li>
+  <li class="toc-item"><span class="toc-title">5. AI & Natural Language Processing Sentiment Analysis Engine</span><span class="toc-dots"></span><span>Chapter 5</span></li>
+  <li class="toc-item"><span class="toc-title">6. RESTful API Specification & Endpoint Directory</span><span class="toc-dots"></span><span>Chapter 6</span></li>
+  <li class="toc-item"><span class="toc-title">7. Frontend Engineering, UI/UX Design System & Animations</span><span class="toc-dots"></span><span>Chapter 7</span></li>
+  <li class="toc-item"><span class="toc-title">8. Dual-Mode Client Fallback & Local Data Store Architecture</span><span class="toc-dots"></span><span>Chapter 8</span></li>
+  <li class="toc-item"><span class="toc-title">9. DevOps, Build Automation & Cloud Deployment (Vercel & Docker)</span><span class="toc-dots"></span><span>Chapter 9</span></li>
+  <li class="toc-item"><span class="toc-title">10. Step-by-Step Execution, Verification & Testing Guide</span><span class="toc-dots"></span><span>Chapter 10</span></li>
+  <li class="toc-item"><span class="toc-title">11. Security Audit, Pedagogical Takeaways & Future Roadmap</span><span class="toc-dots"></span><span>Chapter 11</span></li>
+</ul>
+
+<!-- CHAPTER 1 -->
+<div class="page-break"></div>
+<h1>Chapter 1: Introduction, Problem Statement & Core Objectives</h1>
+
+<h2>1.1 Background & Context</h2>
+<p>
+  In modern corporate and enterprise software ecosystems, customer experience (CX) and support responsiveness directly dictate user retention, brand reputation, and operational solvency. Traditional helpdesk ticketing systems frequently suffer from substantial friction points:
+</p>
+<ul>
+  <li><strong>Manual Triage Bottlenecks:</strong> Human agents must read through thousands of unstructured tickets to identify critical outages, leading to severe delay in emergency scenarios.</li>
+  <li><strong>Emotional Disconnect:</strong> Inability to quantitatively gauge customer frustration or churn risk at the exact moment a complaint is lodged.</li>
+  <li><strong>Fragmented Role Portals:</strong> Lack of strict, authenticated boundary enforcement between regular customers submitting issues and administrative operators triaging tickets.</li>
+  <li><strong>Rigid Deployment Overhead:</strong> Complex server setups requiring extensive database dependencies make demonstrating or deploying projects across varied testing environments notoriously difficult.</li>
+</ul>
+
+<h2>1.2 The Problem Statement</h2>
+<p>
+  Organizations require an <em>intelligent, automated, and resilient support platform</em> capable of ingesting customer complaints, instantly extracting emotional sentiment, auto-assigning priority levels based on semantic severity indicators, generating trackable support tickets with realistic Service Level Agreements (SLAs), and providing dual-mode operational continuity whether hosted locally or deployed to modern edge hosting networks.
+</p>
+
+<h2>1.3 System Goals & Pedagogical Objectives</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">Objective Dimension</th>
+      <th style="width: 40%;">Technical Implementation</th>
+      <th style="width: 35%;">Pedagogical Value (What We Learn)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Automated NLP Triage</strong></td>
+      <td>Built-in lexical sentiment engine computing polarity scores and assigning recommended priority tags (<code>CRITICAL</code>, <code>HIGH</code>, <code>MEDIUM</code>, <code>LOW</code>).</td>
+      <td>Natural Language Processing, text tokenization, weighted lexicon scoring, and threshold optimization.</td>
+    </tr>
+    <tr>
+      <td><strong>Enterprise Security</strong></td>
+      <td>Spring Security 6 with BCrypt hashing, role separation (<code>ROLE_ADMIN</code> vs <code>ROLE_USER</code>), session management, and HTTP security headers.</td>
+      <td>Authentication filter chains, RBAC authorization, CSRF/XSS defense, and credential salting.</td>
+    </tr>
+    <tr>
+      <td><strong>Resilient Persistence</strong></td>
+      <td>Auto-sensing <code>DataSourceConfig</code> connecting to MySQL on port 3306 or seamlessly falling back to in-memory H2 database.</td>
+      <td>Dynamic bean creation, socket connection testing, and fault-tolerant system design.</td>
+    </tr>
+    <tr>
+      <td><strong>Unified Modern UI/UX</strong></td>
+      <td>Glassmorphic design system, CSS custom property theming (Dark/Light mode), Chart.js data visualizations, and interactive simulators.</td>
+      <td>Component modularity, accessible design, CSS animation performance, and client-side reactive rendering.</td>
+    </tr>
+    <tr>
+      <td><strong>Hybrid Cloud Deployment</strong></td>
+      <td>Zero-configuration Vercel deployment with automated Node build script (<code>build.js</code>) and local client data fallback (<code>LocalComplaintStore</code>).</td>
+      <td>CI/CD pipelines, static site generation, serverless edge rewrites, and hybrid offline/online architectures.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- CHAPTER 2 -->
+<div class="page-break"></div>
+<h1>Chapter 2: End-to-End System Architecture & Layered Design</h1>
+
+<h2>2.1 High-Level Architecture Overview</h2>
+<p>
+  The system follows an industry-standard <strong>N-Tier Layered Architecture</strong> with clean boundary separation between the Presentation Layer, Application/Security Controller Layer, Business Logic & NLP Service Layer, and Data Access / Persistence Layer.
+</p>
+
+<div class="diagram-container">
+  <div style="font-weight: 700; margin-bottom: 8px; color: #1e1b4b;">SYSTEM COMPONENT INTERACTION MODEL</div>
+  <div>
+    <span class="diagram-box box-client">Client Browser (SPA)</span>
+    <span style="font-size: 14pt;">&harr;</span>
+    <span class="diagram-box box-gateway">Spring Security Filter Chain</span>
+    <span style="font-size: 14pt;">&harr;</span>
+    <span class="diagram-box box-service">REST Controllers & Services</span>
+    <span style="font-size: 14pt;">&harr;</span>
+    <span class="diagram-box box-db">Dual-Mode Persistence (MySQL / H2)</span>
+  </div>
+  <div style="margin-top: 10px; font-size: 8pt; color: #64748b;">
+    [Optional Cloud Mode]: Browser &harr; Vercel Edge Serverless &harr; LocalComplaintStore (Client-side Data Fallback)
+  </div>
+</div>
+
+<h2>2.2 Detailed Layered Breakdown</h2>
+
+<h3>1. Client Presentation Layer (Frontend)</h3>
+<ul>
+  <li><strong>Landing Page (<code>index.html</code>):</strong> Educational portal showcasing system architecture, live interactive sentiment analyzer simulator, department categories, and quick portal navigators.</li>
+  <li><strong>Unified Auth Page (<code>login.html</code>):</strong> Segmented role switcher for Customer and Administrator authentication, demo credential autofill, and password recovery.</li>
+  <li><strong>Unified Dashboard Application (<code>app.html</code>):</strong> Role-reactive Single Page Application that dynamically alters the navigation sidebar, data tables, metrics, and modal dialogs depending on the authenticated role.</li>
+  <li><strong>Asset Pipelines:</strong> Modular CSS (<code>unified.css</code>, <code>unified-responsive.css</code>) and ES6 JavaScript (<code>unified-app.js</code>, <code>unified-auth.js</code>).</li>
+</ul>
+
+<h3>2. API Controller & Security Gateway Layer</h3>
+<ul>
+  <li><strong>Security Configuration (<code>SecurityConfig.java</code>):</strong> Intercepts all incoming HTTP requests, enforces route guards (e.g. <code>/api/admin/**</code> restricted to <code>ROLE_ADMIN</code>), and protects session integrity.</li>
+  <li><strong>REST Controllers:</strong> Expose standardized JSON endpoints for authentication, complaint filing, ticket management, user directories, and analytical rollups.</li>
+</ul>
+
+<h3>3. Business Logic & AI Processing Layer</h3>
+<ul>
+  <li><strong>Sentiment Analyzer (<code>SentimentAnalyzerUtil.java</code>):</strong> Tokenizes raw text, executes multi-word critical phrase matching, computes weighted polarity scores, and classifies priority.</li>
+  <li><strong>Domain Services:</strong> Orchestrates complaint lifecycle transitions, creates linked support tickets with dynamic SLA calculations, and triggers user notification events.</li>
+</ul>
+
+<h3>4. Data Access & Persistence Layer</h3>
+<ul>
+  <li><strong>Spring Data JPA Repositories:</strong> Type-safe interfaces providing CRUD operations, custom JPQL queries, and database transaction boundaries.</li>
+  <li><strong>Resilient Data Source (<code>DataSourceConfig.java</code>):</strong> Automatic network probe detecting MySQL availability with transparent in-memory H2 fallback.</li>
+</ul>
+
+<!-- CHAPTER 3 -->
+<div class="page-break"></div>
+<h1>Chapter 3: Backend Engineering & Spring Boot Ecosystem</h1>
+
+<h2>3.1 Technology Stack & Runtime Specifications</h2>
+<ul>
+  <li><strong>Java Runtime Environment:</strong> OpenJDK 21 (LTS) leveraging modern language enhancements.</li>
+  <li><strong>Application Framework:</strong> Spring Boot 3.2.5 utilizing Spring Framework 6.1.</li>
+  <li><strong>Build Tool:</strong> Apache Maven 3.9.x with multi-phase compilation and packaging.</li>
+  <li><strong>Security Suite:</strong> Spring Security 6 with BCrypt cryptographic password hashing.</li>
+  <li><strong>Object-Relational Mapping:</strong> Jakarta Persistence API (JPA) powered by Hibernate ORM 6.4.</li>
+</ul>
+
+<h2>3.2 Maven Dependency Architecture (pom.xml)</h2>
+<p>
+  The project dependencies are strictly curated to provide enterprise stability while avoiding bloated classpaths:
+</p>
+<pre><code>&lt;!-- Core Web &amp; REST Starter --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Enterprise Role-Based Security --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Spring Data JPA with Hibernate --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Dual Database Drivers: MySQL (Production) &amp; H2 (Resilient Dev) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.mysql&lt;/groupId&gt;
+    &lt;artifactId&gt;mysql-connector-j&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+    &lt;artifactId&gt;h2&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+
+<h2>3.3 Resilient Dual-Mode Database Architecture (DataSourceConfig.java)</h2>
+<p>
+  A classic engineering flaw in academic projects is hardcoded database connectivity. If MySQL is not running or the password differs, the entire application crashes during startup. Our system overcomes this with a custom <code>@Primary DataSource</code> bean:
+</p>
+<pre><code>@Bean
+@Primary
+public DataSource dataSource() {
+    boolean mysqlAvailable = isPortAvailable("localhost", 3306, 1500);
+
+    if (mysqlAvailable) {
+        log.info("&gt;&gt;&gt; MySQL instance detected on localhost:3306. Connecting to MySQL...");
+        return DataSourceBuilder.create()
+                .driverClassName("com.mysql.cj.jdbc.Driver")
+                .url(mysqlUrl).username(mysqlUser).password(mysqlPass).build();
+    } else {
+        log.warn("&gt;&gt;&gt; MySQL service was not detected on localhost:3306.");
+        log.info("&gt;&gt;&gt; Initializing resilient embedded MySQL-compatible H2 database.");
+        return DataSourceBuilder.create()
+                .driverClassName("org.h2.Driver")
+                .url("jdbc:h2:mem:complaint_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1")
+                .username("sa").password("").build();
+    }
+}</code></pre>
+
+<div class="callout-box success">
+  <div class="callout-title">Teacher's Pedagogical Note: Resilience Engineering</div>
+  By opening a raw socket to <code>localhost:3306</code> with a 1500ms timeout, the application dynamically tests infrastructure health before Hibernate attempts initialization. If MySQL is unavailable, it spins up an in-memory instance operating in <code>MODE=MySQL</code>, ensuring zero downtime and immediate demonstration capability.
+</div>
+
+<!-- CHAPTER 4 -->
+<div class="page-break"></div>
+<h1>Chapter 4: Database Design, Schema & Relational Modeling</h1>
+
+<h2>4.1 Entity-Relationship (ER) Architecture</h2>
+<p>
+  The data model represents an enterprise complaint management lifecycle. It enforces referential integrity through foreign key constraints, cascading deletions, and indexed lookups.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Table Name</th>
+      <th>Primary Key</th>
+      <th>Foreign Keys & Relationships</th>
+      <th>Business Function & Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>users</code></td>
+      <td><code>id</code> (BIGINT)</td>
+      <td>None (Root parent entity)</td>
+      <td>Stores identity, hashed passwords, contact details, and role classifications (<code>ROLE_ADMIN</code>, <code>ROLE_USER</code>).</td>
+    </tr>
+    <tr>
+      <td><code>categories</code></td>
+      <td><code>id</code> (BIGINT)</td>
+      <td>None</td>
+      <td>Support departments (Billing, Tech, Logistics, etc.) with explicit SLA resolution windows.</td>
+    </tr>
+    <tr>
+      <td><code>complaints</code></td>
+      <td><code>id</code> (BIGINT)</td>
+      <td><code>user_id</code> &rarr; <code>users.id</code><br><code>category_id</code> &rarr; <code>categories.id</code><br><code>assigned_admin_id</code> &rarr; <code>users.id</code></td>
+      <td>Core complaint record including title, description, priority, lifecycle status, and AI sentiment score.</td>
+    </tr>
+    <tr>
+      <td><code>tickets</code></td>
+      <td><code>id</code> (BIGINT)</td>
+      <td><code>complaint_id</code> &rarr; <code>complaints.id</code> (1-to-1)</td>
+      <td>Actionable operational work item tracking assignee and estimated resolution deadline.</td>
+    </tr>
+    <tr>
+      <td><code>feedbacks</code></td>
+      <td><code>id</code> (BIGINT)</td>
+      <td><code>complaint_id</code> &rarr; <code>complaints.id</code><br><code>user_id</code> &rarr; <code>users.id</code></td>
+      <td>Post-resolution customer feedback with 1–5 star rating and comments.</td>
+    </tr>
+    <tr>
+      <td><code>notifications</code></td>
+      <td><code>id</code> (BIGINT)</td>
+      <td><code>user_id</code> &rarr; <code>users.id</code></td>
+      <td>Real-time alert messages for status updates, ticket dispatches, or critical escalations.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4.2 Relational Schema DDL Excerpt (schema.sql)</h2>
+<pre><code>CREATE TABLE complaints (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    complaint_number VARCHAR(30) NOT NULL UNIQUE,
+    title VARCHAR(200) NOT NULL,
+    description TEXT NOT NULL,
+    user_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    assigned_admin_id BIGINT NULL,
+    priority ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL') NOT NULL DEFAULT 'MEDIUM',
+    status ENUM('PENDING', 'IN_PROGRESS', 'RESOLVED', 'CLOSED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+    sentiment ENUM('POSITIVE', 'NEUTRAL', 'NEGATIVE', 'VERY_NEGATIVE') NOT NULL DEFAULT 'NEUTRAL',
+    sentiment_score DOUBLE DEFAULT 0.0,
+    resolution_notes TEXT,
+    resolved_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_complaints_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_complaints_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_complaints_assigned FOREIGN KEY (assigned_admin_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_complaints_user (user_id),
+    INDEX idx_complaints_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</code></pre>
+
+<!-- CHAPTER 5 -->
+<div class="page-break"></div>
+<h1>Chapter 5: AI & Natural Language Processing Sentiment Engine</h1>
+
+<h2>5.1 Algorithmic Philosophy</h2>
+<p>
+  Rather than relying on brittle external cloud APIs that introduce network latency, cost, and rate limits, our system features an embedded, high-performance, deterministic Lexicon-Based Sentiment Analysis Engine (<code>SentimentAnalyzerUtil.java</code>).
+</p>
+
+<h2>5.2 Lexical Dictionaries & Semantic Categories</h2>
+<ul>
+  <li><strong>Very Negative Lexicon (W_VN = -2.0):</strong> Words indicating severe breach or legal jeopardy (e.g., <em>fraud, stolen, scam, illegal, lawyer, sue, unauthorized, disaster, breach</em>).</li>
+  <li><strong>Negative Lexicon (W_N = -1.0):</strong> Words indicating operational defects (e.g., <em>broken, damaged, fail, bug, crash, delayed, missing, poor, overcharged</em>).</li>
+  <li><strong>Positive Lexicon (W_P = +1.0):</strong> Expressions of satisfaction (e.g., <em>thanks, good, great, appreciate, helpful, resolved, excellent</em>).</li>
+  <li><strong>Critical Indicators:</strong> Urgency multipliers (e.g., <em>immediately, urgent, emergency, asap, security, locked out, production down</em>).</li>
+</ul>
+
+<h2>5.3 Mathematical Formulation of the Polarity Score</h2>
+<p>
+  The engine tokenizes input text, calculates the raw emotional delta, and normalizes it over the square root of the token length to prevent document-length distortion:
+</p>
+
+<div class="formula-box">
+  RawDelta = (N_positive * 1.0) - (N_negative * 1.0) - (N_very_negative * 2.0)<br>
+  NormalizedScore = max(-1.0, min(1.0, RawDelta / sqrt(TotalTokens + 1)))
+</div>
+
+<h2>5.4 Threshold Classification & Priority Determination Logic</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Computed Metric Condition</th>
+      <th>Assigned Sentiment Tag</th>
+      <th>Recommended Priority Tag</th>
+      <th>Target SLA Window</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>N_very_negative &gt; 0 OR Score &le; -0.5</td>
+      <td><span style="color: #b91c1c; font-weight: 700;">VERY_NEGATIVE</span></td>
+      <td><strong>CRITICAL</strong></td>
+      <td>Within 4 to 8 Hours</td>
+    </tr>
+    <tr>
+      <td>Score &lt; -0.1</td>
+      <td><span style="color: #ea580c; font-weight: 700;">NEGATIVE</span></td>
+      <td><strong>HIGH</strong></td>
+      <td>Within 12 to 24 Hours</td>
+    </tr>
+    <tr>
+      <td>-0.1 &le; Score &le; 0.2</td>
+      <td><span style="color: #4b5563; font-weight: 700;">NEUTRAL</span></td>
+      <td><strong>MEDIUM</strong></td>
+      <td>Within 36 to 48 Hours</td>
+    </tr>
+    <tr>
+      <td>Score &gt; 0.2</td>
+      <td><span style="color: #15803d; font-weight: 700;">POSITIVE</span></td>
+      <td><strong>LOW</strong></td>
+      <td>Within 72 Hours</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout-box info">
+  <div class="callout-title">Teacher's Pedagogical Note: Multi-Word Phrase Matching</div>
+  Single-word tokenization often misses context. The engine incorporates a multi-word scanning pass over key phrases such as <em>"production down"</em>, <em>"loss of business"</em>, and <em>"locked out"</em>, injecting priority boosts regardless of surrounding neutral words.
+</div>
+
+<!-- CHAPTER 6 -->
+<div class="page-break"></div>
+<h1>Chapter 6: RESTful API Specification & Endpoint Directory</h1>
+
+<h2>6.1 API Design Principles</h2>
+<p>
+  All backend services communicate through stateless REST APIs with consistent JSON request/response envelopes, standard HTTP status codes, and Spring Security authorization guards.
+</p>
+
+<h2>6.2 Comprehensive Endpoint Matrix</h2>
+<table>
+  <thead>
+    <tr>
+      <th>HTTP Method</th>
+      <th>URI Path</th>
+      <th>Access Level</th>
+      <th>Description & Functionality</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>POST</code></td>
+      <td><code>/api/auth/login</code></td>
+      <td>Public</td>
+      <td>Authenticates credentials, initializes session cookie, returns user role and redirect target.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/auth/me</code></td>
+      <td>Authenticated</td>
+      <td>Returns active user session profile, role, email, and department metadata.</td>
+    </tr>
+    <tr>
+      <td><code>POST</code></td>
+      <td><code>/api/auth/logout</code></td>
+      <td>Public</td>
+      <td>Invalidates HTTP session and cleans client cookies.</td>
+    </tr>
+    <tr>
+      <td><code>POST</code></td>
+      <td><code>/api/user/register</code></td>
+      <td>Public</td>
+      <td>Registers a new customer account, validates email uniqueness, and encrypts password with BCrypt.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/categories/public</code></td>
+      <td>Public</td>
+      <td>Returns active support categories with SLA hours and iconography.</td>
+    </tr>
+    <tr>
+      <td><code>POST</code></td>
+      <td><code>/api/complaints</code></td>
+      <td><code>ROLE_USER</code></td>
+      <td>Submits new complaint, executes NLP sentiment scoring, sets priority, and creates linked ticket.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/complaints/my</code></td>
+      <td><code>ROLE_USER</code></td>
+      <td>Retrieves complaints filed by the currently logged-in customer.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/admin/complaints</code></td>
+      <td><code>ROLE_ADMIN</code></td>
+      <td>Retrieves complete cross-department complaint registry with search and status filtering.</td>
+    </tr>
+    <tr>
+      <td><code>PUT</code></td>
+      <td><code>/api/admin/complaints/{id}/status</code></td>
+      <td><code>ROLE_ADMIN</code></td>
+      <td>Updates lifecycle status (e.g. to <code>RESOLVED</code>), appends resolution notes, and dispatches notification.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/admin/analytics/overview</code></td>
+      <td><code>ROLE_ADMIN</code></td>
+      <td>Aggregates KPI counts (Total, Pending, Resolved), resolution rate, and sentiment distribution.</td>
+    </tr>
+    <tr>
+      <td><code>POST</code></td>
+      <td><code>/api/feedback</code></td>
+      <td><code>ROLE_USER</code></td>
+      <td>Submits star rating and qualitative feedback for resolved complaints.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- CHAPTER 7 -->
+<div class="page-break"></div>
+<h1>Chapter 7: Frontend Engineering, UI/UX Design System & Animations</h1>
+
+<h2>7.1 Design Tokens & CSS Variable Architecture</h2>
+<p>
+  The frontend does not rely on heavy, bloated third-party frameworks. It leverages pure vanilla CSS with CSS Custom Properties (Variables), ensuring lightweight footprint, instantaneous load times, and dynamic theming.
+</p>
+
+<pre><code>:root {
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #eef2ff;
+  --admin-accent: #7c3aed;
+  --bg-body: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --radius-lg: 16px;
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+  --bg-body: #070b14;
+  --bg-surface: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #1e293b;
+}</code></pre>
+
+<h2>7.2 Glassmorphism & Micro-Interactions</h2>
+<ul>
+  <li><strong>Glassmorphic Cards:</strong> Translucent surface backgrounds utilizing <code>backdrop-filter: blur(12px)</code> and subtle border gradients for a futuristic, polished aesthetic.</li>
+  <li><strong>Hover Lift Physics:</strong> Cards feature smooth transformations (<code>transform: translateY(-6px)</code>) driven by cubic-bezier physics curves.</li>
+  <li><strong>Theme Persistence:</strong> The user's theme selection (Light vs Dark) is saved in <code>localStorage</code> and synchronously applied before DOM rendering to prevent flashing.</li>
+  <li><strong>Page Transition Overlay:</strong> A sleek progress bar and pulsating spinner (<code>pageTransitionBar</code>) ensure visually pleasant route switches.</li>
+</ul>
+
+<!-- CHAPTER 8 -->
+<div class="page-break"></div>
+<h1>Chapter 8: Dual-Mode Client Fallback & Local Data Store Architecture</h1>
+
+<h2>8.1 The Cloud Serverless Challenge</h2>
+<p>
+  When hosting a Java Spring Boot project on serverless static edge networks like <strong>Vercel</strong>, traditional REST APIs that require an active Java virtual machine will return <code>404 Not Found</code>. Typical projects fail completely in this scenario.
+</p>
+
+<h2>8.2 The Dual-Mode Resilient Solution: LocalComplaintStore</h2>
+<p>
+  Our frontend engineers designed an intelligent <strong>hybrid data layer</strong> in <code>unified-app.js</code> and <code>unified-auth.js</code>. The application automatically tests for backend presence:
+</p>
+<ol>
+  <li><strong>When running on Localhost (with Spring Boot):</strong> All calls connect to live Java endpoints on port 8080 and interact with MySQL/H2.</li>
+  <li><strong>When deployed to Vercel (static edge):</strong> If an API call fails or encounters 404, the system seamlessly activates the client-side <code>LocalComplaintStore</code> stored in <code>sessionStorage</code> and <code>localStorage</code>.</li>
+</ol>
+
+<div class="callout-box success">
+  <div class="callout-title">Teacher's Pedagogical Note: High Availability Patterns</div>
+  This architectural innovation means the user can demonstrate the fully functional application on Vercel—complete with live complaint filing, priority calculations, status updates, admin analytics, and role switching—with 100% functionality and zero server dependencies!
+</div>
+
+<!-- CHAPTER 9 -->
+<div class="page-break"></div>
+<h1>Chapter 9: DevOps, Build Automation & Cloud Deployment</h1>
+
+<h2>9.1 Vercel Edge Cloud Deployment Architecture</h2>
+<p>
+  To eliminate Vercel build errors, we engineered a dedicated automation pipeline:
+</p>
+
+<h3>1. Automated Build Pipeline (build.js)</h3>
+<pre><code>const fs = require('fs');
+const path = require('path');
+const targetDir = path.join(__dirname, 'public');
+
+if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+
+['index.html', 'login.html', 'app.html', 'manifest.json', 'css', 'js', 'frontend']
+  .forEach(item => {
+    const src = path.join(__dirname, item);
+    const dest = path.join(targetDir, item);
+    if (fs.existsSync(src)) fs.cpSync(src, dest, { recursive: true, force: true });
+  });</code></pre>
+
+<h3>2. Edge Routing Rules (vercel.json)</h3>
+<pre><code>{
+  "version": 2,
+  "outputDirectory": "public",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/register", "destination": "/frontend/user/register.html" },
+    { "source": "/forgot-password", "destination": "/frontend/user/forgot-password.html" }
+  ]
+}</code></pre>
+
+<h2>9.2 Containerization with Multi-Stage Dockerfile</h2>
+<p>
+  For traditional cloud environments (AWS ECS, Google Cloud Run, Azure App Service), a multi-stage Docker build guarantees a lightweight, hardened production container:
+</p>
+<pre><code># Stage 1: Build Java Application
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
+WORKDIR /build
+COPY backend/pom.xml .
+RUN mvn dependency:go-offline
+COPY backend/src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Minimal Distroless JRE Runtime
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=builder /build/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre>
+
+<!-- CHAPTER 10 -->
+<div class="page-break"></div>
+<h1>Chapter 10: Step-by-Step Execution, Verification & Testing Guide</h1>
+
+<h2>10.1 Running on Localhost (Development Mode)</h2>
+<p>Execute the following commands in PowerShell from the project root:</p>
+<pre><code># 1. Configure Java 21 &amp; Maven Environment
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
+$env:Path = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot\bin;C:\Users\CHIRANJEEVI\maven\apache-maven-3.9.6\bin;" + $env:Path
+
+# 2. Launch Spring Boot Service
+mvn -f backend/pom.xml spring-boot:run</code></pre>
+
+<p>The application initializes on <code>http://localhost:8080/</code> within ~10 seconds.</p>
+
+<h2>10.2 Mandatory Pre-Seeded Credentials</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Role Classification</th>
+      <th>Login Email ID</th>
+      <th>Password</th>
+      <th>Assigned Capabilities</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>System Administrator</strong></td>
+      <td><code>admin@complaintsystem.com</code></td>
+      <td><code>Admin@123</code></td>
+      <td>Global triage, status modification, resolution notes, analytics charts, user directory.</td>
+    </tr>
+    <tr>
+      <td><strong>Support Lead</strong></td>
+      <td><code>sarah.support@complaintsystem.com</code></td>
+      <td><code>Admin@123</code></td>
+      <td>Departmental queue management and ticket assignment.</td>
+    </tr>
+    <tr>
+      <td><strong>Registered Customer</strong></td>
+      <td><code>john.doe@example.com</code></td>
+      <td><code>User@123</code></td>
+      <td>Filing complaints, live sentiment analysis preview, ticket status tracking.</td>
+    </tr>
+    <tr>
+      <td><strong>Registered Customer</strong></td>
+      <td><code>jane.smith@example.com</code></td>
+      <td><code>User@123</code></td>
+      <td>Viewing complaint history, rating support service.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- CHAPTER 11 -->
+<div class="page-break"></div>
+<h1>Chapter 11: Security Audit, Pedagogical Takeaways & Future Roadmap</h1>
+
+<h2>11.1 Security Implementation Audit</h2>
+<ul>
+  <li><strong>Cryptographic Salting:</strong> Passwords are never stored in plaintext. They utilize BCrypt adaptive hashing with a default work factor of 10.</li>
+  <li><strong>Session Fixation Protection:</strong> Spring Security regenerates session IDs upon authentication to thwart fixation attacks.</li>
+  <li><strong>HTTP Protection Headers:</strong> Injected <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: SAMEORIGIN</code>, and <code>X-XSS-Protection</code>.</li>
+  <li><strong>SQL Injection Immunity:</strong> All JPA Repositories utilize parameterized queries and Hibernate prepared statements.</li>
+</ul>
+
+<h2>11.2 Key Pedagogical Lessons Learned</h2>
+<ol>
+  <li><strong>Defense in Depth:</strong> Combining backend role validation with reactive frontend DOM manipulation produces robust, tamper-resistant web applications.</li>
+  <li><strong>Graceful Degradation:</strong> Building fallback layers (MySQL &rarr; H2 in backend; REST API &rarr; LocalStore in frontend) ensures the software remains operational regardless of environment constraints.</li>
+  <li><strong>Modern Tooling Synergy:</strong> Using Java 21 LTS alongside standards-compliant ES6 JavaScript provides maximum performance without framework overhead.</li>
+</ol>
+
+<h2>11.3 Future Enhancement Roadmap</h2>
+<ul>
+  <li><strong>Deep Learning LLM Integration:</strong> Expanding the lexicon analyzer with transformer models (e.g. HuggingFace / Gemini API) for multilingual customer complaints.</li>
+  <li><strong>Automated Email & SMS Dispatch:</strong> Connecting Spring Mail and Twilio SDKs to send SMS alerts upon ticket resolution.</li>
+  <li><strong>Live WebSockets Agent Chat:</strong> Integrating STOMP over WebSockets for instant real-time messaging between customers and active administrators.</li>
+</ul>
+
+<div style="margin-top: 2rem; padding: 1.5rem; border-top: 2px solid #e2e8f0; text-align: center; color: #64748b; font-size: 8.5pt;">
+  <strong>End of Comprehensive Project Documentation</strong><br>
+  Intelligent Customer Complaint & Support Analysis System &bull; Capstone Project 2026
+</div>
+
+</body>
+</html>

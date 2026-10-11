@@ -1,0 +1,108 @@
+/* ==========================================================================
+   ADMIN PORTAL - DASHBOARD & ANALYTICS SPECIFIC STYLES
+   ========================================================================== */
+
+.metric-number {
+  font-size: 2.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-main);
+}
+
+.metric-trend {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  gap: 0.25rem;
+}
+
+.metric-trend.up { color: #10b981; }
+.metric-trend.down { color: #ef4444; }
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+
+.chart-wrapper-sm {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+
+.priority-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: var(--border-color);
+  overflow: hidden;
+  display: flex;
+}
+
+.priority-bar-seg {
+  height: 100%;
+  transition: width 0.6s ease;
+}
+
+.priority-bar-critical { background-color: #ef4444; }
+.priority-bar-high { background-color: #f97316; }
+.priority-bar-medium { background-color: #3b82f6; }
+.priority-bar-low { background-color: #10b981; }
+
+.activity-timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.activity-timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--border-color);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -1.5rem;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  border: 3px solid var(--bg-surface);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+/* Resolution gauge card */
+.resolution-gauge {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: conic-gradient(var(--primary-color) calc(var(--gauge-value, 80) * 1%), var(--border-color) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+}
+
+.resolution-gauge-inner {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background-color: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

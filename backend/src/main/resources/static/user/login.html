@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Login - Customer Support Portal</title>
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/user/css/user.css">
+  <link rel="stylesheet" href="/user/css/user-responsive.css">
+  <style>
+    .user-login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 90% 10%, rgba(13, 148, 136, 0.08) 0%, rgba(2, 132, 199, 0.03) 90%);
+      padding: 1.5rem;
+    }
+    .user-login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      padding: 2.5rem 2.25rem;
+      position: relative;
+    }
+    .user-header-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(13, 148, 136, 0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(13, 148, 136, 0.2);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="user-login-wrapper">
+    <div class="user-login-card">
+      <!-- Theme Switcher Top Right -->
+      <div class="position-absolute top-0 end-0 p-3">
+        <button class="btn btn-sm btn-outline-secondary border-0" id="themeToggleBtn" title="Toggle Theme">
+          <i class="bi bi-moon-stars theme-toggle-icon fs-5"></i>
+        </button>
+      </div>
+
+      <div class="text-center mb-4">
+        <div class="user-header-pill">
+          <i class="bi bi-person-check-fill"></i> CUSTOMER PORTAL
+        </div>
+        <h3 class="fw-bold mb-1">Customer Sign In</h3>
+        <p class="text-muted small">Intelligent Customer Complaint & Support Analysis System</p>
+      </div>
+
+      <!-- Alert Message Box -->
+      <div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
+
+      <!-- User Login Form -->
+      <form id="userLoginForm">
+        <div class="mb-3">
+          <label for="userEmail" class="form-label fw-semibold small">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+            <input type="email" class="form-control border-start-0" id="userEmail" value="john.doe@example.com" placeholder="name@domain.com" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <label for="userPassword" class="form-label fw-semibold small">Password</label>
+            <a href="/user/forgot-password.html" class="small text-decoration-none text-primary fw-medium">Forgot?</a>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text bg-surface-alt border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+            <input type="password" class="form-control border-start-0" id="userPassword" value="User@123" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <div class="mb-4 form-check">
+          <input type="checkbox" class="form-check-input" id="userRememberMe">
+          <label class="form-check-label small text-muted" for="userRememberMe">Remember this browser</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="loginSubmitBtn">
+          <span id="btnSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+          <span id="btnText">Sign In to Customer Portal</span>
+        </button>
+      </form>
+
+      <div class="mt-4 pt-3 border-top text-center">
+        <span class="text-muted small">Don't have an account?</span>
+        <a href="/user/register.html" class="small fw-semibold text-decoration-none ms-1">Create Account &rarr;</a>
+      </div>
+
+      <!-- Demo Info Card -->
+      <div class="mt-3 p-2 rounded bg-light border text-center small text-muted" style="font-size: 0.76rem;">
+        <i class="bi bi-info-circle me-1"></i> Demo Customer: <code>john.doe@example.com</code> | <code>User@123</code>
+      </div>
+
+      <div class="mt-2 text-center">
+        <a href="/admin/login.html" class="text-muted small text-decoration-none"><i class="bi bi-shield-lock me-1"></i>Admin Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/user/js/user-common.js"></script>
+  <script src="/user/js/user-login.js"></script>
+</body>
+</html>
