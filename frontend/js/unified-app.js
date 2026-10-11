@@ -651,9 +651,12 @@ function renderAdminRecentTable(complaints) {
       <td><span class="badge badge-status badge-${c.status.toLowerCase().replace('_', '-')}">${c.status.replace('_', ' ')}</span></td>
       <td><span class="badge bg-${c.priority.toLowerCase() === 'critical' ? 'danger' : 'secondary'}">${c.priority}</span></td>
       <td><span class="badge badge-sentiment badge-${c.sentiment.toLowerCase().replace('_', '-')}">${c.sentiment.replace('_', ' ')}</span></td>
-      <td class="text-end">
-        <button class="btn btn-sm btn-outline-primary" onclick="openStatusUpdateModal(${c.id}, '${c.status}')">
+      <td class="text-end text-nowrap">
+        <button class="btn btn-sm btn-outline-primary" onclick="openStatusUpdateModal(${c.id}, '${c.status}')" title="Update Status">
           Update
+        </button>
+        <button class="btn btn-sm btn-outline-secondary ms-1" onclick="openOfficialTicketSlipModal(${c.id})" title="View Official Ticket Receipt">
+          <i class="bi bi-receipt-cutoff"></i>
         </button>
       </td>
     </tr>
@@ -910,16 +913,19 @@ async function loadUserDashboard() {
 
   tbody.innerHTML = data.recentComplaints.map(c => `
     <tr>
-      <td class="fw-bold text-primary">${c.complaintNumber}</td>
+      <td class="fw-bold text-primary">${c.complaintNumber}<br><small class="text-muted">${c.ticketNumber ? '#' + c.ticketNumber : ''}</small></td>
       <td>
         <div class="fw-semibold text-truncate" style="max-width: 220px;">${c.title}</div>
         <small class="text-muted">${c.categoryName || 'General'}</small>
       </td>
       <td><span class="badge badge-status badge-${(c.status || 'PENDING').toLowerCase().replace('_', '-')}">${(c.status || 'PENDING').replace('_', ' ')}</span></td>
       <td><span class="badge bg-${(c.priority || 'MEDIUM').toLowerCase() === 'critical' ? 'danger' : 'secondary'}">${c.priority || 'MEDIUM'}</span></td>
-      <td class="text-end">
+      <td class="text-end text-nowrap">
         <button class="btn btn-sm btn-outline-primary" onclick="viewComplaintDetails(${c.id})">
-          Track Ticket
+          Track
+        </button>
+        <button class="btn btn-sm btn-outline-secondary ms-1" onclick="openOfficialTicketSlipModal(${c.id})" title="View Official Ticket Receipt">
+          <i class="bi bi-receipt-cutoff"></i> Receipt
         </button>
       </td>
     </tr>
@@ -966,6 +972,8 @@ function renderUserTicketGenerationBox(latest) {
   const subjEl = document.getElementById('dashTicketSubject');
   const dateEl = document.getElementById('dashTicketDate');
   const slaEl = document.getElementById('dashTicketSla');
+  const barcodeTextEl = document.getElementById('dashBarcodeCodeText');
+  const barcodeSvgEl = document.getElementById('dashTicketBarcodeSvg');
 
   if (!latest) {
     const all = LocalComplaintStore.getComplaints();
@@ -991,15 +999,21 @@ function renderUserTicketGenerationBox(latest) {
       dateEl.textContent = d.toLocaleDateString() + ' • ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
     if (slaEl) slaEl.textContent = getSlaForCategory(latest.categoryId || latest.categoryName);
+    if (barcodeTextEl) barcodeTextEl.textContent = tCode.replace('#', '');
+    if (barcodeSvgEl) barcodeSvgEl.innerHTML = generateSvgBarcodeBars(tCode);
 
     window.latestDashComplaintId = latest.id;
     window.latestDashTicketCode = tCode;
+    window.currentActiveTrackedComplaint = latest;
   } else {
-    if (codeEl) codeEl.textContent = 'TCK-TECH-2026-AUTO';
+    const defaultCode = 'TCK-TECH-2026-AUTO';
+    if (codeEl) codeEl.textContent = defaultCode;
     if (catEl) catEl.textContent = 'Select Category Below';
     if (subjEl) subjEl.textContent = 'No complaints filed yet. Select complaint type below to auto-generate tracking ticket!';
     if (dateEl) dateEl.textContent = 'Auto-ready';
     if (slaEl) slaEl.textContent = 'Standard SLA';
+    if (barcodeTextEl) barcodeTextEl.textContent = defaultCode;
+    if (barcodeSvgEl) barcodeSvgEl.innerHTML = generateSvgBarcodeBars(defaultCode);
   }
 
   const catSelect = document.getElementById('dashCategorySelect');
@@ -1046,6 +1060,50 @@ function trackDashTicket() {
     viewComplaintDetails(window.latestDashComplaintId);
   } else {
     showView('user-complaints');
+  }
+}
+
+function viewDashTicketSlip() {
+  if (window.latestDashComplaintId) {
+    openOfficialTicketSlipModal(window.latestDashComplaintId);
+  } else {
+    openOfficialTicketSlipModal();
+  }
+}
+
+function instantPreviewGeneratedSlip() {
+  const catSelect = document.getElementById('dashCategorySelect');
+  const catVal = catSelect ? catSelect.value : '2';
+  const catName = catSelect ? catSelect.options[catSelect.selectedIndex].getAttribute('data-name') : 'Technical & Bug Reports';
+  const slaText = catSelect ? catSelect.options[catSelect.selectedIndex].getAttribute('data-sla') : '12 Hours';
+  const prefix = getTicketPrefixForCategory(catVal);
+  const code = window.lastGeneratedDashTicket || `TCK-${prefix}-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const previewComplaint = {
+    id: 99999,
+    complaintNumber: 'CMP-' + new Date().getFullYear() + '-PASS',
+    ticketNumber: code,
+    title: `Pre-Generated Service Pass: ${catName}`,
+    description: `Instant pre-allocated ticket reference generated directly from the Dashboard. Link this pass to your complaint using "File Complaint with this Ticket Type" to lock in automated SLA routing.`,
+    categoryName: catName,
+    categoryId: Number(catVal),
+    status: 'ACTIVE_PASS',
+    priority: catVal === '5' ? 'CRITICAL' : (catVal === '2' ? 'HIGH' : 'MEDIUM'),
+    slaHours: parseInt(slaText) || 24,
+    userName: currentUser ? currentUser.name : 'Customer',
+    userEmail: currentUser ? currentUser.email : 'customer@supportdesk.com',
+    assignedToName: catVal === '1' ? 'Finance Desk' : (catVal === '2' ? 'Engineering Support' : 'Customer Support Desk'),
+    resolutionNotes: `Auto-triage SLA dispatch active. Turnaround target committed: ${slaText}.`,
+    createdAt: new Date().toISOString()
+  };
+
+  window.currentActiveTrackedComplaint = previewComplaint;
+  populateTicketSlipModal(previewComplaint);
+  populatePrintableTicketSlip(previewComplaint);
+
+  const modalEl = document.getElementById('officialTicketSlipModal');
+  if (modalEl) {
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
   }
 }
 
