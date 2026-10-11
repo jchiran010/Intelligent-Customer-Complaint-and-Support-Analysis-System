@@ -1062,8 +1062,8 @@
                   <button class="btn btn-sm btn-outline-danger w-100" id="btnEscalateTicket" onclick="escalateCurrentTicket()">
                     <i class="bi bi-arrow-up-circle-fill me-1"></i> Escalate Ticket Priority
                   </button>
-                  <button class="btn btn-sm btn-primary w-100" onclick="printOfficialTicketSlip()">
-                    <i class="bi bi-printer me-1"></i> Print / Save Ticket Receipt
+                  <button class="btn btn-sm btn-primary w-100" onclick="openOfficialTicketSlipModal()">
+                    <i class="bi bi-receipt-cutoff me-1"></i> View & Print Ticket Receipt
                   </button>
                 </div>
               </div>
@@ -1341,13 +1341,144 @@
             This ticket code has been added to your <strong>Dashboard Ticket Box</strong>. You can track resolution status anytime.
           </div>
         </div>
-        <div class="modal-footer d-flex justify-content-between">
+        <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="showView('user-dashboard')">
             <i class="bi bi-grid-1x2 me-1"></i> Back to Dashboard
           </button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="modalBtnTrackTicket">
-            <i class="bi bi-binoculars me-1"></i> Track Ticket Now
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" onclick="openOfficialTicketSlipModal(window.lastCreatedComplaintId)">
+              <i class="bi bi-receipt-cutoff me-1"></i> View Ticket Receipt
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="modalBtnTrackTicket">
+              <i class="bi bi-binoculars me-1"></i> Track Ticket Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Printable & Interactive Ticket Receipt Modal -->
+  <div class="modal fade" id="officialTicketSlipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white py-3">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-receipt-cutoff fs-4 text-primary"></i>
+            <div>
+              <h5 class="modal-title fw-bold mb-0 text-white">Official Support Ticket Receipt</h5>
+              <small class="text-white-50">Verified SLA Registration & Service Guarantee Record</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 bg-surface">
+          <!-- Ticket Pass Container -->
+          <div class="ticket-receipt-card shadow-sm mb-3" id="modalTicketSlipCard">
+            <!-- Header Bar -->
+            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3 flex-wrap gap-2">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <div class="p-1 rounded bg-primary text-white d-inline-flex">
+                    <i class="bi bi-shield-check fs-5"></i>
+                  </div>
+                  <h4 class="fw-bold mb-0 text-primary">SupportDesk</h4>
+                </div>
+                <small class="text-muted fw-semibold">Intelligent Customer Complaint & Support Analysis System</small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 text-uppercase fw-bold mb-1 d-inline-block">OFFICIAL SERVICE PASS</span>
+                <div class="fs-4 font-monospace fw-bold text-primary" id="slipModalTicketCode">#TCK-2026-0000</div>
+                <small class="text-muted" id="slipModalDate">Issued: Oct 10, 2026</small>
+              </div>
+            </div>
+
+            <!-- Metadata Grid -->
+            <div class="p-3 rounded bg-surface-alt border mb-3">
+              <div class="row g-3 small">
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Complaint ID</span>
+                  <strong class="text-body font-monospace fw-bold" id="slipModalCmpId">CMP-2026-0000</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Customer Name</span>
+                  <strong class="text-body fw-bold text-truncate d-block" id="slipModalCustomer">John Doe</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Complaint Category</span>
+                  <span class="badge bg-primary-subtle text-primary fw-semibold" id="slipModalCategory">Technical Support</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Priority Urgency</span>
+                  <span class="badge bg-danger" id="slipModalPriority">HIGH</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Current Status</span>
+                  <span class="badge bg-warning-subtle text-warning-emphasis" id="slipModalStatus">IN PROGRESS</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Assigned Support Desk</span>
+                  <strong class="text-body fw-bold" id="slipModalAssigned">Engineering Support</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">SLA Turnaround</span>
+                  <span class="text-success fw-bold" id="slipModalSla"><i class="bi bi-clock-history me-1"></i> 12 Hours SLA</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Customer Contact</span>
+                  <small class="text-muted text-truncate d-block" id="slipModalEmail">user@example.com</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subject & Description -->
+            <div class="mb-3">
+              <span class="small fw-bold text-muted text-uppercase d-block mb-1">Complaint Subject:</span>
+              <h6 class="fw-bold text-body mb-2" id="slipModalSubject">Issue Title</h6>
+              <div class="p-3 rounded bg-surface border small text-body" style="white-space: pre-wrap; max-height: 140px; overflow-y: auto;" id="slipModalDesc">
+                Description goes here...
+              </div>
+            </div>
+
+            <!-- Resolution / Action Guarantee Box -->
+            <div class="p-3 rounded border border-success-subtle bg-success-subtle text-success-emphasis mb-3" id="slipModalResolutionBox">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-patch-check-fill text-success"></i>
+                <strong class="small text-uppercase">Official Support Resolution / Action Plan:</strong>
+              </div>
+              <p class="small mb-0" id="slipModalResolution">Under active investigation by our engineering team within the target SLA window.</p>
+            </div>
+
+            <!-- Barcode & Official Verification Seal -->
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-3">
+              <div class="ticket-barcode-wrap" id="slipModalBarcodeWrap">
+                <div class="font-monospace text-muted small mb-1" id="slipModalBarcodeText">TCK-TECH-2026-0000</div>
+                <svg id="slipModalBarcodeSvg" viewBox="0 0 200 40" width="200" height="36">
+                  <!-- Dynamic SVG barcode bars generated by JS -->
+                </svg>
+              </div>
+              <div class="text-end small text-muted">
+                <div class="fw-semibold text-body"><i class="bi bi-shield-lock-fill text-primary me-1"></i> SLA Security Hash: <span class="font-monospace" id="slipModalHash">SD-SEC-84920</span></div>
+                <div>SupportDesk AI Center &bull; Verified Electronic Record</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between flex-wrap gap-2 bg-surface-alt">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Close
           </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" onclick="copySlipModalTicketCode()">
+              <i class="bi bi-clipboard me-1"></i> Copy Ticket Code
+            </button>
+            <button type="button" class="btn btn-outline-success" onclick="downloadTicketReceiptHtml()">
+              <i class="bi bi-download me-1"></i> Download Receipt
+            </button>
+            <button type="button" class="btn btn-primary" onclick="printOfficialTicketSlip()">
+              <i class="bi bi-printer-fill me-1"></i> Print / Save as PDF
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1494,58 +1625,67 @@
   </div>
 
   <!-- Hidden Printable Ticket Slip Container (Formatted for Print / PDF Export) -->
-  <div id="printableTicketSlip" class="d-none">
-    <div style="max-width: 800px; margin: 0 auto; font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #1e293b; padding: 20px;">
-      <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
+  <div id="printableTicketSlip" class="d-none d-print-block">
+    <div style="max-width: 800px; margin: 0 auto; font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #1e293b; padding: 20px; background: #ffffff;">
+      <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
-          <h2 style="color: #4f46e5; margin: 0; font-weight: 800;">SupportDesk</h2>
-          <small style="color: #64748b; font-size: 12px;">Intelligent Customer Complaint & Support Analysis System</small>
+          <h2 style="color: #4f46e5; margin: 0; font-weight: 800; font-size: 24px;">SupportDesk</h2>
+          <small style="color: #64748b; font-size: 12px; font-weight: 600;">Intelligent Customer Complaint & Support Analysis System</small>
         </div>
         <div style="text-align: right;">
-          <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Official Ticket Slip</div>
+          <div style="font-size: 10px; text-transform: uppercase; color: #4f46e5; font-weight: 800; letter-spacing: 0.5px;">OFFICIAL SERVICE PASS</div>
           <div style="font-size: 20px; font-weight: 800; font-family: monospace; color: #4f46e5;" id="printSlipTicketCode">TCK-TECH-2026-0000</div>
-          <small style="color: #64748b;" id="printSlipDate">Issued: Oct 2026</small>
+          <small style="color: #64748b; font-size: 11px;" id="printSlipDate">Issued: Oct 2026</small>
         </div>
       </div>
 
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 18px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
           <tr>
-            <td style="padding: 6px 0; color: #64748b; width: 25%;">Complaint ID:</td>
-            <td style="padding: 6px 0; font-weight: 700;" id="printSlipCmpId">CMP-0000</td>
-            <td style="padding: 6px 0; color: #64748b; width: 25%;">Priority Level:</td>
-            <td style="padding: 6px 0; font-weight: 700;" id="printSlipPriority">HIGH</td>
+            <td style="padding: 5px 0; color: #64748b; width: 22%;">Complaint ID:</td>
+            <td style="padding: 5px 0; font-weight: 700; font-family: monospace;" id="printSlipCmpId">CMP-0000</td>
+            <td style="padding: 5px 0; color: #64748b; width: 22%;">Priority Level:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipPriority">HIGH</td>
           </tr>
           <tr>
-            <td style="padding: 6px 0; color: #64748b;">Customer Name:</td>
-            <td style="padding: 6px 0; font-weight: 700;" id="printSlipCustomer">John Doe</td>
-            <td style="padding: 6px 0; color: #64748b;">Category:</td>
-            <td style="padding: 6px 0; font-weight: 700;" id="printSlipCategory">Technical Support</td>
+            <td style="padding: 5px 0; color: #64748b;">Customer Name:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipCustomer">John Doe</td>
+            <td style="padding: 5px 0; color: #64748b;">Complaint Type:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipCategory">Technical Support</td>
           </tr>
           <tr>
-            <td style="padding: 6px 0; color: #64748b;">Assigned Desk:</td>
-            <td style="padding: 6px 0; font-weight: 700;" id="printSlipAssigned">Engineering Support</td>
-            <td style="padding: 6px 0; color: #64748b;">Current Status:</td>
-            <td style="padding: 6px 0; font-weight: 700;" id="printSlipStatus">IN PROGRESS</td>
+            <td style="padding: 5px 0; color: #64748b;">Assigned Desk:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipAssigned">Engineering Support</td>
+            <td style="padding: 5px 0; color: #64748b;">Current Status:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipStatus">IN PROGRESS</td>
           </tr>
         </table>
       </div>
 
-      <div style="margin-bottom: 20px;">
-        <h4 style="font-size: 16px; margin-bottom: 8px; color: #1e293b;" id="printSlipSubject">Complaint Subject</h4>
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="printSlipDesc">
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 4px;">Complaint Subject</div>
+        <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 8px;" id="printSlipSubject">Issue Title</div>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 13px; line-height: 1.5; color: #334155; white-space: pre-wrap;" id="printSlipDesc">
           Description content...
         </div>
       </div>
 
-      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 14px; margin-bottom: 24px;" id="printSlipResolutionBox">
-        <strong style="color: #16a34a; font-size: 13px;">Official Resolution & Action Taken:</strong>
-        <p style="margin: 6px 0 0; font-size: 13px;" id="printSlipResolution">Under active investigation by technical team.</p>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; margin-bottom: 20px;" id="printSlipResolutionBox">
+        <strong style="color: #16a34a; font-size: 12px; text-transform: uppercase;">Official Resolution & Action Taken:</strong>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #166534;" id="printSlipResolution">Under active investigation by technical team within guaranteed SLA window.</p>
       </div>
 
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8;">
-        <div>Electronically Generated Record &bull; Verification Hash: <span style="font-family: monospace;">SD-SEC-84920</span></div>
-        <div>SupportDesk AI Center &bull; Verified SLA</div>
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b;">
+        <div>
+          <div style="font-family: monospace; font-size: 12px; font-weight: 700; color: #0f172a;" id="printSlipBarcodeText">TCK-TECH-2026-0000</div>
+          <svg id="printSlipBarcodeSvg" viewBox="0 0 200 36" width="180" height="32" style="margin-top: 2px;">
+            <!-- Rendered by JS -->
+          </svg>
+        </div>
+        <div style="text-align: right;">
+          <div>Electronically Verified &bull; Security Hash: <strong style="font-family: monospace; color: #4f46e5;">SD-SEC-84920</strong></div>
+          <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">SupportDesk AI Center &bull; Verified SLA Record</div>
+        </div>
       </div>
     </div>
   </div>

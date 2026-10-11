@@ -1102,6 +1102,9 @@ function loadUserTicketsHub() {
           <button class="btn btn-sm btn-outline-primary" onclick="viewComplaintDetails(${c.id})">
             <i class="bi bi-binoculars"></i> Track
           </button>
+          <button class="btn btn-sm btn-outline-secondary ms-1" onclick="openOfficialTicketSlipModal(${c.id})" title="View Official Ticket Receipt">
+            <i class="bi bi-receipt-cutoff"></i> Receipt
+          </button>
         </td>
       </tr>
     `;
@@ -1319,6 +1322,9 @@ async function handleUserSubmitComplaint(e) {
   document.getElementById('usrSentimentPreview')?.classList.add('d-none');
 
   showToast(`Complaint lodged! Auto-generated ticket #${createdObj.ticketNumber || assignedTicketNumber}`, 'success');
+
+  window.lastCreatedComplaintId = createdObj.id;
+  window.currentActiveTrackedComplaint = createdObj;
 
   // Trigger high-visibility modal
   const modalEl = document.getElementById('ticketGeneratedModal');
@@ -2228,25 +2234,410 @@ function escalateCurrentTicket() {
 }
 
 // ==========================================================================
-// PRINT OFFICIAL TICKET SLIP & EXECUTIVE REPORT
+// OFFICIAL TICKET SLIP, BARCODE & HIGH-FIDELITY PRINT CONTROLLER
 // ==========================================================================
-function printOfficialTicketSlip() {
+function generateSvgBarcodeBars(code) {
+  const str = (code || 'TCK-2026-0001').toUpperCase();
+  let x = 6;
+  let rects = '';
+  for (let i = 0; i < str.length; i++) {
+    const charCode = str.charCodeAt(i);
+    const w1 = (charCode % 3) + 1.2;
+    const w2 = ((charCode * 3) % 2) + 1;
+    rects += `<rect x="${x}" y="2" width="${w1}" height="32" fill="#0f172a" />`;
+    x += w1 + 1.5;
+    rects += `<rect x="${x}" y="2" width="${w2}" height="32" fill="#0f172a" />`;
+    x += w2 + 2;
+  }
+  return rects;
+}
+
+function formatTicketReferenceCode(c) {
+  if (!c) return '#TCK-2026-0001';
+  if (c.ticketNumber) {
+    return c.ticketNumber.startsWith('#') || c.ticketNumber.startsWith('TCK') ? (c.ticketNumber.startsWith('#') ? c.ticketNumber : '#' + c.ticketNumber) : '#' + c.ticketNumber;
+  }
+  return '#' + (c.complaintNumber || 'TCK-2026-0001');
+}
+
+function populateTicketSlipModal(c) {
+  if (!c) return;
+  const ticketRef = formatTicketReferenceCode(c);
+  const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  setEl('slipModalTicketCode', ticketRef);
+  setEl('slipModalDate', 'Issued: ' + dateStr);
+  setEl('slipModalCmpId', c.complaintNumber || 'CMP-0000');
+  setEl('slipModalCustomer', c.userName || (currentUser ? currentUser.name : 'Customer'));
+  setEl('slipModalEmail', c.userEmail || (currentUser ? currentUser.email : 'customer@supportdesk.com'));
+  setEl('slipModalCategory', c.categoryName || 'Technical Support');
+  setEl('slipModalAssigned', c.assignedToName || 'Engineering Support');
+  setEl('slipModalSubject', c.title || 'Support Complaint');
+  setEl('slipModalDesc', c.description || 'Details recorded under official ticket reference.');
+
+  const prioEl = document.getElementById('slipModalPriority');
+  if (prioEl) {
+    prioEl.textContent = c.priority || 'MEDIUM';
+    prioEl.className = `badge bg-${(c.priority || 'MEDIUM').toLowerCase() === 'critical' || (c.priority || 'MEDIUM').toLowerCase() === 'high' ? 'danger' : 'secondary'}`;
+  }
+
+  const statusEl = document.getElementById('slipModalStatus');
+  if (statusEl) {
+    const stat = (c.status || 'PENDING').replace('_', ' ');
+    statusEl.textContent = stat;
+    statusEl.className = `badge badge-status badge-${(c.status || 'PENDING').toLowerCase().replace('_', '-')}`;
+  }
+
+  const slaEl = document.getElementById('slipModalSla');
+  if (slaEl) {
+    slaEl.innerHTML = `<i class="bi bi-clock-history me-1"></i> ${c.slaHours || 24} Hours SLA Target`;
+  }
+
+  const resBox = document.getElementById('slipModalResolutionBox');
+  const resText = document.getElementById('slipModalResolution');
+  if (resBox && resText) {
+    if (c.resolutionNotes) {
+      resText.textContent = c.resolutionNotes;
+    } else {
+      resText.textContent = 'Active case currently under automated triage and assigned to our technical department within target SLA window.';
+    }
+  }
+
+  setEl('slipModalBarcodeText', ticketRef.replace('#', ''));
+  const svgEl = document.getElementById('slipModalBarcodeSvg');
+  if (svgEl) {
+    svgEl.innerHTML = generateSvgBarcodeBars(ticketRef);
+  }
+
+  const hashVal = 'SD-SEC-' + Math.abs((ticketRef + (c.complaintNumber || '')).split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0)).toString(16).toUpperCase().padStart(6, '0');
+  setEl('slipModalHash', hashVal);
+}
+
+function populatePrintableTicketSlip(c) {
+  if (!c) return;
+  const ticketRef = formatTicketReferenceCode(c);
+  const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  setEl('printSlipTicketCode', ticketRef);
+  setEl('printSlipDate', 'Issued: ' + dateStr);
+  setEl('printSlipCmpId', c.complaintNumber || 'CMP-0000');
+  setEl('printSlipPriority', c.priority || 'MEDIUM');
+  setEl('printSlipCustomer', c.userName || (currentUser ? currentUser.name : 'Customer'));
+  setEl('printSlipCategory', c.categoryName || 'Technical Support');
+  setEl('printSlipAssigned', c.assignedToName || 'Engineering Support');
+  setEl('printSlipStatus', (c.status || 'PENDING').replace('_', ' '));
+  setEl('printSlipSubject', c.title || 'Support Complaint');
+  setEl('printSlipDesc', c.description || 'Details recorded.');
+  setEl('printSlipResolution', c.resolutionNotes || 'Active case currently under automated triage and assigned to our technical department within target SLA window.');
+  setEl('printSlipBarcodeText', ticketRef.replace('#', ''));
+
+  const svgEl = document.getElementById('printSlipBarcodeSvg');
+  if (svgEl) {
+    svgEl.innerHTML = generateSvgBarcodeBars(ticketRef);
+  }
+}
+
+function openOfficialTicketSlipModal(complaintId) {
+  let c = null;
+  if (complaintId) {
+    c = LocalComplaintStore.getComplaints().find(x => x.id === Number(complaintId) || x.id == complaintId);
+  }
+  if (!c) {
+    c = window.currentActiveTrackedComplaint;
+  }
+  if (!c) {
+    const list = LocalComplaintStore.getComplaints();
+    if (list && list.length) c = list[0];
+  }
+
+  if (!c) {
+    showToast('No complaint selected to generate ticket receipt.', 'warning');
+    return;
+  }
+
+  window.currentActiveTrackedComplaint = c;
+  populateTicketSlipModal(c);
+  populatePrintableTicketSlip(c);
+
+  const modalEl = document.getElementById('officialTicketSlipModal');
+  if (modalEl) {
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+}
+
+function copySlipModalTicketCode() {
+  const c = window.currentActiveTrackedComplaint;
+  const ticketRef = c ? formatTicketReferenceCode(c) : document.getElementById('slipModalTicketCode')?.textContent;
+  if (ticketRef) {
+    navigator.clipboard.writeText(ticketRef);
+    showToast(`Ticket reference ${ticketRef} copied to clipboard!`, 'success');
+  }
+}
+
+function downloadTicketReceiptHtml() {
   const c = window.currentActiveTrackedComplaint;
   if (!c) return;
+  const ticketRef = formatTicketReferenceCode(c);
+  const htmlContent = generatePrintableTicketHtml(c);
+  const blob = new Blob([htmlContent], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `SupportDesk_Ticket_${ticketRef.replace('#', '')}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Ticket receipt downloaded successfully!`, 'success');
+}
 
-  document.getElementById('printSlipTicketCode').textContent = c.ticketNumber ? (c.ticketNumber.startsWith('#') ? c.ticketNumber : '#' + c.ticketNumber) : c.complaintNumber;
-  document.getElementById('printSlipDate').textContent = 'Issued: ' + new Date().toLocaleDateString();
-  document.getElementById('printSlipCmpId').textContent = c.complaintNumber;
-  document.getElementById('printSlipPriority').textContent = c.priority || 'MEDIUM';
-  document.getElementById('printSlipCustomer').textContent = c.userName || 'Customer';
-  document.getElementById('printSlipCategory').textContent = c.categoryName || 'General';
-  document.getElementById('printSlipAssigned').textContent = c.assignedToName || 'Triage Desk';
-  document.getElementById('printSlipStatus').textContent = (c.status || 'PENDING').replace('_', ' ');
-  document.getElementById('printSlipSubject').textContent = c.title;
-  document.getElementById('printSlipDesc').textContent = c.description;
-  document.getElementById('printSlipResolution').textContent = c.resolutionNotes || 'Currently active and monitored within SLA turnaround target.';
+function generatePrintableTicketHtml(c) {
+  const ticketRef = formatTicketReferenceCode(c);
+  const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  const hashVal = 'SD-SEC-' + Math.abs((ticketRef + (c.complaintNumber || '')).split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0)).toString(16).toUpperCase().padStart(6, '0');
+  const barcodeBars = generateSvgBarcodeBars(ticketRef);
 
-  window.print();
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Official Support Ticket - ${ticketRef}</title>
+  <style>
+    @page { size: A4 portrait; margin: 15mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 24px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .ticket-box {
+      max-width: 800px;
+      margin: 0 auto;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 28px;
+      background: #ffffff;
+    }
+    .header-bar {
+      border-bottom: 3px solid #4f46e5;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #4f46e5;
+      margin: 0;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .ticket-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #4f46e5;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ticket-code {
+      font-size: 24px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #4f46e5;
+      margin: 4px 0;
+    }
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    .info-table td {
+      padding: 8px 12px;
+    }
+    .info-label {
+      color: #64748b;
+      font-weight: 600;
+      width: 25%;
+    }
+    .info-val {
+      color: #0f172a;
+      font-weight: 700;
+      width: 25%;
+    }
+    .subject-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 8px 0;
+    }
+    .desc-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #334155;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
+    .resolution-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #166534;
+    }
+    .footer-bar {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket-box">
+    <div class="header-bar">
+      <div>
+        <h1 class="brand-title">SupportDesk</h1>
+        <div class="brand-sub">Intelligent Customer Complaint & Support Analysis System</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="ticket-badge">OFFICIAL SERVICE PASS</div>
+        <div class="ticket-code">${ticketRef}</div>
+        <div style="font-size: 12px; color: #64748b;">Issued: ${dateStr}</div>
+      </div>
+    </div>
+
+    <table class="info-table">
+      <tr>
+        <td class="info-label">Complaint ID:</td>
+        <td class="info-val" style="font-family: monospace;">${c.complaintNumber || 'CMP-0000'}</td>
+        <td class="info-label">Priority Level:</td>
+        <td class="info-val" style="color: #dc2626;">${c.priority || 'MEDIUM'}</td>
+      </tr>
+      <tr>
+        <td class="info-label">Customer Name:</td>
+        <td class="info-val">${c.userName || (currentUser ? currentUser.name : 'Customer')}</td>
+        <td class="info-label">Category:</td>
+        <td class="info-val">${c.categoryName || 'Technical Support'}</td>
+      </tr>
+      <tr>
+        <td class="info-label">Assigned Desk:</td>
+        <td class="info-val">${c.assignedToName || 'Engineering Support'}</td>
+        <td class="info-label">Current Status:</td>
+        <td class="info-val" style="color: #4f46e5;">${(c.status || 'PENDING').replace('_', ' ')}</td>
+      </tr>
+      <tr>
+        <td class="info-label">SLA Turnaround:</td>
+        <td class="info-val" style="color: #16a34a;">${c.slaHours || 24} Hours Target</td>
+        <td class="info-label">Customer Email:</td>
+        <td class="info-val" style="font-size: 12px; font-weight: normal;">${c.userEmail || (currentUser ? currentUser.email : 'user@example.com')}</td>
+      </tr>
+    </table>
+
+    <div style="margin-bottom: 20px;">
+      <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 4px;">Complaint Subject</div>
+      <div class="subject-title">${c.title || 'Support Complaint'}</div>
+      <div class="desc-box">${c.description || 'No detailed description provided.'}</div>
+    </div>
+
+    <div class="resolution-box">
+      <strong style="text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 4px;">Official Support Resolution & SLA Guarantee:</strong>
+      <div>${c.resolutionNotes || 'Active case currently under automated triage and assigned to our technical department within target SLA window.'}</div>
+    </div>
+
+    <div class="footer-bar">
+      <div>
+        <div style="font-family: monospace; font-size: 12px; font-weight: 700; color: #0f172a;">${ticketRef.replace('#', '')}</div>
+        <svg viewBox="0 0 200 36" width="180" height="32" style="margin-top: 4px;">
+          ${barcodeBars}
+        </svg>
+      </div>
+      <div style="text-align: right;">
+        <div>Electronically Generated Record &bull; Verification Hash: <strong style="font-family: monospace; color: #4f46e5;">${hashVal}</strong></div>
+        <div style="color: #94a3b8; font-size: 11px; margin-top: 3px;">SupportDesk AI Center &bull; Verified SLA</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function printTicketSlipViaIframe(c) {
+  const htmlContent = generatePrintableTicketHtml(c);
+
+  let iframe = document.getElementById('ticketPrintIframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'ticketPrintIframe';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.opacity = '0';
+    iframe.style.pointerEvents = 'none';
+    document.body.appendChild(iframe);
+  }
+
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(htmlContent);
+  doc.close();
+
+  setTimeout(() => {
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch (e) {
+      console.warn('Iframe printing encountered an issue, falling back to window.print():', e);
+      window.print();
+    }
+  }, 350);
+}
+
+function printOfficialTicketSlip() {
+  const c = window.currentActiveTrackedComplaint;
+  if (!c) {
+    showToast('No active complaint selected to print ticket.', 'warning');
+    return;
+  }
+
+  populatePrintableTicketSlip(c);
+  printTicketSlipViaIframe(c);
 }
 
 function printExecutiveReport() {

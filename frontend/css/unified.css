@@ -1491,22 +1491,91 @@ body.sidebar-collapsed .unified-main {
    PRINTABLE TICKET SLIP STYLES
    ========================================================================== */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4 portrait;
+    margin: 12mm 15mm;
   }
-  #printableTicketSlip, #printableTicketSlip * {
-    visibility: visible;
-  }
-  #printableTicketSlip {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 2rem;
+
+  html, body {
     background: #ffffff !important;
-    color: #000000 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
   }
+
+  /* Completely remove the application shell from the print layout flow */
+  body > *:not(#printableTicketSlip) {
+    display: none !important;
+  }
+
+  /* Format the ticket slip prominently on a single clean page */
+  #printableTicketSlip {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  #printableTicketSlip * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Prevent page breaks across critical sections */
+  #printableTicketSlip table,
+  #printableTicketSlip .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
+/* On-screen Ticket Receipt Card */
+.ticket-receipt-card {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  color: var(--text-main);
+}
+
+.ticket-receipt-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4f46e5, #06b6d4, #10b981);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.ticket-barcode-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius-sm);
+}
+
+.ticket-barcode-wrap svg {
+  max-width: 260px;
+  height: 48px;
 }
 
 /* ==========================================================================
