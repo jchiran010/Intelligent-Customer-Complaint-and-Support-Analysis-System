@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: intelligent-complaint-system
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /api/categories/public
+    envVars:
+      - key: PORT
+        value: 10000
