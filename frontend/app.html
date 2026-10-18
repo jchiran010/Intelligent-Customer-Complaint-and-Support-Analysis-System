@@ -1457,14 +1457,16 @@
 
   <!-- Official Printable & Interactive Ticket Receipt Modal -->
   <div class="modal fade" id="officialTicketSlipModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
       <div class="modal-content border-0 shadow-lg">
-        <div class="modal-header bg-dark text-white py-3">
+        <div class="modal-header text-white py-3" style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-bottom: 1px solid rgba(255,255,255,0.12);">
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-receipt-cutoff fs-4 text-primary"></i>
+            <div class="p-2 rounded bg-primary text-white d-inline-flex shadow-sm">
+              <i class="bi bi-receipt-cutoff fs-5"></i>
+            </div>
             <div>
               <h5 class="modal-title fw-bold mb-0 text-white">Official Support Ticket Receipt</h5>
-              <small class="text-white-50">Verified SLA Registration & Service Guarantee Record</small>
+              <small class="text-white-50">Verified SLA Registration &bull; Service Guarantee Record</small>
             </div>
           </div>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1491,38 +1493,38 @@
             </div>
 
             <!-- Metadata Grid -->
-            <div class="p-3 rounded bg-surface-alt border mb-3">
+            <div class="p-3 rounded bg-surface-alt border mb-3 ticket-slip-meta-box">
               <div class="row g-3 small">
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Complaint ID</span>
+                  <span class="slip-meta-label d-block text-uppercase">Complaint ID</span>
                   <strong class="text-body font-monospace fw-bold" id="slipModalCmpId">CMP-2026-0000</strong>
                 </div>
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Customer Name</span>
+                  <span class="slip-meta-label d-block text-uppercase">Customer Name</span>
                   <strong class="text-body fw-bold text-truncate d-block" id="slipModalCustomer">John Doe</strong>
                 </div>
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Complaint Category</span>
+                  <span class="slip-meta-label d-block text-uppercase">Complaint Category</span>
                   <span class="badge bg-primary-subtle text-primary fw-semibold" id="slipModalCategory">Technical Support</span>
                 </div>
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Priority Urgency</span>
+                  <span class="slip-meta-label d-block text-uppercase">Priority Urgency</span>
                   <span class="badge bg-danger" id="slipModalPriority">HIGH</span>
                 </div>
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Current Status</span>
+                  <span class="slip-meta-label d-block text-uppercase">Current Status</span>
                   <span class="badge bg-warning-subtle text-warning-emphasis" id="slipModalStatus">IN PROGRESS</span>
                 </div>
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Assigned Support Desk</span>
+                  <span class="slip-meta-label d-block text-uppercase">Assigned Support Desk</span>
                   <strong class="text-body fw-bold" id="slipModalAssigned">Engineering Support</strong>
                 </div>
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">SLA Turnaround</span>
+                  <span class="slip-meta-label d-block text-uppercase">SLA Turnaround</span>
                   <span class="text-success fw-bold" id="slipModalSla"><i class="bi bi-clock-history me-1"></i> 12 Hours SLA</span>
                 </div>
                 <div class="col-6 col-md-3">
-                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Customer Contact</span>
+                  <span class="slip-meta-label d-block text-uppercase">Customer Contact</span>
                   <small class="text-muted text-truncate d-block" id="slipModalEmail">user@example.com</small>
                 </div>
               </div>
@@ -1530,7 +1532,7 @@
 
             <!-- Subject & Description -->
             <div class="mb-3">
-              <span class="small fw-bold text-muted text-uppercase d-block mb-1">Complaint Subject:</span>
+              <span class="slip-meta-label d-block text-uppercase mb-1">Complaint Subject:</span>
               <h6 class="fw-bold text-body mb-2" id="slipModalSubject">Issue Title</h6>
               <div class="p-3 rounded bg-surface border small text-body" style="white-space: pre-wrap; max-height: 140px; overflow-y: auto;" id="slipModalDesc">
                 Description goes here...
@@ -1549,7 +1551,7 @@
             <!-- Barcode & Official Verification Seal -->
             <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-3">
               <div class="ticket-barcode-wrap" id="slipModalBarcodeWrap">
-                <div class="font-monospace text-muted small mb-1" id="slipModalBarcodeText">TCK-TECH-2026-0000</div>
+                <div class="font-monospace fw-bold slip-barcode-text mb-1" id="slipModalBarcodeText">TCK-TECH-2026-0000</div>
                 <svg id="slipModalBarcodeSvg" viewBox="0 0 200 40" width="200" height="36">
                   <!-- Dynamic SVG barcode bars generated by JS -->
                 </svg>
@@ -1561,18 +1563,18 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer d-flex justify-content-between flex-wrap gap-2 bg-surface-alt">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+        <div class="modal-footer d-flex justify-content-between flex-wrap gap-2 slip-modal-footer">
+          <button type="button" class="btn btn-outline-secondary slip-btn-close px-3 py-2 fw-semibold" data-bs-dismiss="modal">
             <i class="bi bi-x-lg me-1"></i> Close
           </button>
-          <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-primary" onclick="copySlipModalTicketCode()">
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-outline-primary slip-btn-copy px-3 py-2 fw-semibold" onclick="copySlipModalTicketCode()">
               <i class="bi bi-clipboard me-1"></i> Copy Ticket Code
             </button>
-            <button type="button" class="btn btn-outline-success" onclick="downloadTicketReceiptHtml()">
+            <button type="button" class="btn btn-outline-success slip-btn-download px-3 py-2 fw-semibold" onclick="downloadTicketReceiptHtml()">
               <i class="bi bi-download me-1"></i> Download Receipt
             </button>
-            <button type="button" class="btn btn-primary" onclick="printOfficialTicketSlip()">
+            <button type="button" class="btn btn-primary slip-btn-print px-3 py-2 fw-bold" onclick="printOfficialTicketSlip()">
               <i class="bi bi-printer-fill me-1"></i> Print / Save as PDF
             </button>
           </div>
@@ -1583,7 +1585,7 @@
 
   <!-- Interactive Analytics Explainer Modal ("How It Works") -->
   <div class="modal fade" id="analyticsExplainerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
       <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-primary text-white py-3">
           <div class="d-flex align-items-center gap-2">
