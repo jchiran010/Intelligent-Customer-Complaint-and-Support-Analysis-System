@@ -41,6 +41,10 @@ const ROUTE_REWRITES = {
   '/register': '/frontend/user/register.html',
   '/forgot-password': '/frontend/user/forgot-password.html',
   '/docs': '/documentation.html',
+  '/admin/login': '/frontend/admin/login.html',
+  '/user/login': '/frontend/user/login.html',
+  '/user/register': '/frontend/user/register.html',
+  '/user/forgot-password': '/frontend/user/forgot-password.html',
   '/admin': '/frontend/admin/dashboard.html',
   '/admin/': '/frontend/admin/dashboard.html',
   '/admin/dashboard': '/frontend/admin/dashboard.html',
@@ -127,6 +131,16 @@ const server = http.createServer((req, res) => {
   if (!fs.existsSync(filePath) && !path.extname(filePath)) {
     if (fs.existsSync(filePath + '.html')) {
       filePath = filePath + '.html';
+    } else if (fs.existsSync(path.join(PUBLIC_DIR, 'frontend', pathname + '.html'))) {
+      filePath = path.join(PUBLIC_DIR, 'frontend', pathname + '.html');
+    }
+  }
+
+  // Fallback check in frontend/ directory
+  if (!fs.existsSync(filePath) && (pathname.startsWith('/admin') || pathname.startsWith('/user'))) {
+    const frontendTarget = path.join(PUBLIC_DIR, 'frontend', pathname);
+    if (fs.existsSync(frontendTarget)) {
+      filePath = frontendTarget;
     }
   }
 

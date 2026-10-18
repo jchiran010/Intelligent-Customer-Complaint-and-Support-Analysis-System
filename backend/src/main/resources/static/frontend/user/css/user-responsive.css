@@ -1,0 +1,66 @@
+/* ==========================================================================
+   USER PORTAL - RESPONSIVE & MOBILE APP STYLES (user-responsive.css)
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .user-sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .user-sidebar.show {
+    transform: translateX(0);
+  }
+
+  .user-main {
+    margin-left: 0;
+    padding-bottom: calc(var(--bottom-nav-height) + 1rem);
+  }
+
+  .user-navbar {
+    padding: 0 1rem;
+  }
+
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  .fab-submit {
+    display: flex;
+  }
+
+  .content-body {
+    padding: 1rem;
+  }
+
+  .welcome-banner {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .welcome-banner h2 {
+    font-size: 1.35rem;
+  }
+  
+  .metric-number {
+    font-size: 1.6rem;
+  }
+}
+
+/* Sidebar Backdrop overlay for mobile */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1039;
+  display: none;
+}
+
+.sidebar-backdrop.show {
+  display: block;
+}

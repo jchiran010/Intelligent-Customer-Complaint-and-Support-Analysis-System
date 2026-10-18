@@ -28,4 +28,16 @@ itemsToCopy.forEach(item => {
   }
 });
 
+// Also create direct shortcuts for /admin and /user routes for flat cloud hosting compatibility
+const userSrc = path.join(__dirname, 'frontend', 'user');
+const adminSrc = path.join(__dirname, 'frontend', 'admin');
+if (fs.existsSync(userSrc)) {
+  fs.cpSync(userSrc, path.join(targetDir, 'user'), { recursive: true, force: true });
+  console.log('Copied frontend/user -> public/user');
+}
+if (fs.existsSync(adminSrc)) {
+  fs.cpSync(adminSrc, path.join(targetDir, 'admin'), { recursive: true, force: true });
+  console.log('Copied frontend/admin -> public/admin');
+}
+
 console.log('Vercel Build Success: public directory populated with all application assets.');

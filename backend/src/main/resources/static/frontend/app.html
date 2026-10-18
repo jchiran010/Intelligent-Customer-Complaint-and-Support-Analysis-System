@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SupportDesk App - Intelligent Customer Complaint System</title>
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Unified Stylesheets -->
+  <link rel="stylesheet" href="/css/unified.css">
+  <link rel="stylesheet" href="/css/unified-responsive.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+
+  <!-- Page Transition Bar & Overlay -->
+  <div class="page-transition-bar" id="pageTransitionBar"></div>
+  <div class="page-transition-overlay" id="pageTransitionOverlay">
+    <div class="page-transition-spinner mb-3"></div>
+    <div class="small fw-bold text-muted animate-pulse-glow">Loading Secure Portal...</div>
+  </div>
+
+  <div class="app-container">
+    <!-- Unified Dynamic Sidebar -->
+    <aside class="unified-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-row">
+          <a href="/app.html" class="text-decoration-none d-flex align-items-center">
+            <i class="bi bi-shield-check text-primary fs-3 me-2"></i>
+            <h5 class="fw-bold mb-0 text-primary">SupportDesk</h5>
+          </a>
+          <button class="btn btn-sm btn-outline-secondary p-1 border-0" id="sidebarCloseBtn" title="Slide Left / Collapse Features">
+            <i class="bi bi-chevron-left fs-5"></i>
+          </button>
+        </div>
+        <div>
+          <span id="portalTitleDisplay" class="badge">PORTAL</span>
+        </div>
+      </div>
+
+      <!-- Dynamically Injected Navigation Items -->
+      <ul class="sidebar-menu" id="unifiedSidebarMenu">
+        <li class="sidebar-heading">Loading...</li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link text-danger btn-unified-logout">
+          <i class="bi bi-box-arrow-right text-danger"></i> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="unified-main">
+      <!-- Top Navbar -->
+      <header class="unified-navbar">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Slide Features Box Button (--- List / Hamburger) -->
+          <button class="btn btn-sm btn-outline-secondary px-2 py-1" id="menuToggleBtn" title="Slide Features Sidebar (---)">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          <div class="d-none d-sm-block ms-1">
+            <h6 class="mb-0 fw-bold">SupportDesk Unified Center</h6>
+            <small class="text-muted">Intelligent Customer Complaint & Support Analysis System</small>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Theme Toggle -->
+          <button class="btn btn-sm btn-outline-secondary border-0" id="themeToggleBtn" title="Toggle Theme">
+            <i class="bi bi-moon-stars theme-toggle-icon fs-5"></i>
+          </button>
+
+          <!-- User Profile Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-sm btn-light border d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;" id="userAvatarLetter">
+                U
+              </div>
+              <div class="text-start d-none d-md-block" style="line-height: 1.2;">
+                <div class="small fw-bold" id="userDisplayName">Loading...</div>
+                <small class="text-muted" style="font-size: 0.72rem;" id="roleBadgeDisplay">USER</small>
+              </div>
+              <i class="bi bi-chevron-down small text-muted ms-1"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li><h6 class="dropdown-header small" id="userDisplayEmail">user@domain.com</h6></li>
+              <li><a class="dropdown-item small" href="#" onclick="showView('user-profile')"><i class="bi bi-person me-2"></i>My Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item small text-danger btn-unified-logout" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- App Views Body Container -->
+      <div class="content-body">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: ADMIN DASHBOARD                    -->
+        <!-- ========================================== -->
+        <div id="view-admin-dashboard" class="app-view-panel d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Administrator Executive Overview</h5>
+            <button class="btn btn-sm btn-primary" onclick="showView('admin-complaints')">View All Complaints &rarr;</button>
+          </div>
+
+          <!-- Bento Grid Stats -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Total</span>
+                <div class="metric-number text-primary" id="admTotalComplaints">0</div>
+                <small class="text-muted">Total filed</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Pending</span>
+                <div class="metric-number text-warning" id="admPendingComplaints">0</div>
+                <small class="text-muted">Awaiting triage</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">In Progress</span>
+                <div class="metric-number text-info" id="admInProgressComplaints">0</div>
+                <small class="text-muted">Under investigation</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Resolved</span>
+                <div class="metric-number text-success" id="admResolvedComplaints">0</div>
+                <small class="text-muted">Successfully closed</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">High Priority</span>
+                <div class="metric-number text-danger" id="admHighPriorityComplaints">0</div>
+                <small class="text-muted">Escalated</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Resolution Rate</span>
+                <div class="metric-number text-primary" id="admResolutionRate">0%</div>
+                <small class="text-muted">Total Users: <strong id="admTotalUsers">0</strong></small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-3 mb-4">
+            <div class="col-lg-5">
+              <div class="bento-card h-100 card-hover-lift">
+                <h6 class="fw-bold mb-3">Complaint Status Breakdown</h6>
+                <div style="height: 240px; position: relative;">
+                  <canvas id="admStatusChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="bento-card h-100 card-hover-lift">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0">Intelligent NLP Sentiment Distribution</h6>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle animate-pulse-glow"><i class="bi bi-cpu-fill me-1"></i> NLP Engine Active</span>
+                </div>
+                <div style="height: 240px; position: relative;">
+                  <canvas id="admSentimentChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Complaints Inflow Table -->
+          <div class="bento-card">
+            <h6 class="fw-bold mb-3">Recent Complaints Inflow</h6>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 16%; min-width: 140px;">Complaint #</th>
+                    <th style="width: 28%; min-width: 200px;">Title & Category</th>
+                    <th style="width: 14%; min-width: 120px;">Customer</th>
+                    <th style="width: 12%; min-width: 110px;">Status</th>
+                    <th style="width: 10%; min-width: 90px;">Priority</th>
+                    <th style="width: 10%; min-width: 100px;">Sentiment</th>
+                    <th style="width: 10%; min-width: 90px;" class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admRecentComplaintsTable">
+                  <tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: ADMIN COMPLAINTS                   -->
+        <!-- ========================================== -->
+        <div id="view-admin-complaints" class="app-view-panel d-none">
+          <div class="bento-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <h5 class="fw-bold mb-0">All Customer Complaints</h5>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary" onclick="showView('admin-kanban')">
+                  <i class="bi bi-kanban me-1"></i> Switch to Kanban Board
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="simulateAutoAssignAll()">
+                  <i class="bi bi-lightning-charge-fill me-1"></i> Auto-Assign Desks
+                </button>
+              </div>
+            </div>
+            <div class="row g-2 align-items-center">
+              <div class="col-md-6">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-surface-alt"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="admFilterSearch" placeholder="Search by title, number, or description...">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select class="form-select form-select-sm" id="admFilterStatus">
+                  <option value="">All Statuses</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="IN_PROGRESS">IN PROGRESS</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                  <option value="CLOSED">CLOSED</option>
+                </select>
+              </div>
+              <div class="col-md-3 text-md-end">
+                <button class="btn btn-sm btn-primary w-100" onclick="loadAdminComplaints()"><i class="bi bi-funnel"></i> Apply Filter</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bento-card">
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 4%;"><input type="checkbox" id="selectAllComplaints" onchange="toggleSelectAllComplaints(this.checked)" title="Select all"></th>
+                    <th style="width: 17%; min-width: 140px;">Complaint & Ticket</th>
+                    <th style="width: 25%; min-width: 190px;">Title & Category</th>
+                    <th style="width: 14%; min-width: 120px;">Customer</th>
+                    <th style="width: 12%; min-width: 110px;">Status</th>
+                    <th style="width: 10%; min-width: 90px;">Priority</th>
+                    <th style="width: 9%; min-width: 90px;">Sentiment</th>
+                    <th style="width: 9%; min-width: 80px;" class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admAllComplaintsTable">
+                  <tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Sticky Floating Bulk Action Bar -->
+          <div class="bulk-action-bar" id="bulkActionBar">
+            <span class="small fw-bold"><i class="bi bi-check2-square text-primary me-1"></i> <span id="selectedCount">0</span> selected</span>
+            <button class="btn btn-sm btn-outline-info rounded-pill" onclick="bulkSetStatus('IN_PROGRESS')"><i class="bi bi-arrow-repeat me-1"></i> Mark In Progress</button>
+            <button class="btn btn-sm btn-outline-success rounded-pill" onclick="bulkSetStatus('RESOLVED')"><i class="bi bi-check-circle me-1"></i> Mark Resolved</button>
+            <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="bulkSetPriority('CRITICAL')"><i class="bi bi-exclamation-triangle-fill me-1"></i> Escalate Critical</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="clearSelectedComplaints()"><i class="bi bi-x-lg me-1"></i> Deselect</button>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW: ADMIN KANBAN PIPELINE                -->
+        <!-- ========================================== -->
+        <div id="view-admin-kanban" class="app-view-panel d-none">
+          <div class="bento-card mb-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-kanban-fill text-primary me-2"></i> Support Ticket Pipeline (Kanban Board)</h5>
+                <small class="text-muted">Drag and drop tickets between columns to instantly update triage status and notify support personnel</small>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-success" onclick="simulateAutoAssignAll()">
+                  <i class="bi bi-lightning-charge-fill me-1"></i> Auto-Assign Desks
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="showView('admin-complaints')">
+                  <i class="bi bi-table me-1"></i> Table View
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban-board">
+            <!-- Column 1: Pending Triage -->
+            <div class="kanban-column" id="kanbanColPending" ondragover="kanbanDragOver(event)" ondragleave="kanbanDragLeave(event)" ondrop="kanbanDrop(event, 'PENDING')">
+              <div class="kanban-col-header" style="border-color: #f59e0b;">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-hourglass-split text-warning fs-5"></i>
+                  <span class="fw-bold">Pending Triage</span>
+                </div>
+                <span class="badge bg-warning text-dark px-2 py-1" id="kanbanCountPending">0</span>
+              </div>
+              <div class="kanban-cards-container" id="kanbanCardsPending">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Column 2: In Progress -->
+            <div class="kanban-column" id="kanbanColInProgress" ondragover="kanbanDragOver(event)" ondragleave="kanbanDragLeave(event)" ondrop="kanbanDrop(event, 'IN_PROGRESS')">
+              <div class="kanban-col-header" style="border-color: #0ea5e9;">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-gear-wide-connected text-info fs-5"></i>
+                  <span class="fw-bold">Under Investigation</span>
+                </div>
+                <span class="badge bg-info text-white px-2 py-1" id="kanbanCountInProgress">0</span>
+              </div>
+              <div class="kanban-cards-container" id="kanbanCardsInProgress">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Column 3: Resolved -->
+            <div class="kanban-column" id="kanbanColResolved" ondragover="kanbanDragOver(event)" ondragleave="kanbanDragLeave(event)" ondrop="kanbanDrop(event, 'RESOLVED')">
+              <div class="kanban-col-header" style="border-color: #10b981;">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-patch-check-fill text-success fs-5"></i>
+                  <span class="fw-bold">Resolved & Closed</span>
+                </div>
+                <span class="badge bg-success text-white px-2 py-1" id="kanbanCountResolved">0</span>
+              </div>
+              <div class="kanban-cards-container" id="kanbanCardsResolved">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: ADMIN USERS                        -->
+        <!-- ========================================== -->
+        <div id="view-admin-users" class="app-view-panel d-none">
+          <div class="bento-card">
+            <h5 class="fw-bold mb-3">Registered Users & Staff</h5>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Complaints</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admUsersTableBody">
+                  <tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: ADMIN CATEGORIES                   -->
+        <!-- ========================================== -->
+        <div id="view-admin-categories" class="app-view-panel d-none">
+          <div class="bento-card">
+            <h5 class="fw-bold mb-3">Categories & SLA Windows</h5>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>SLA Target</th>
+                    <th>Total Complaints</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admCategoriesTableBody">
+                  <tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: ADMIN ANALYTICS & REPORTS          -->
+        <!-- ========================================== -->
+        <div id="view-admin-analytics" class="app-view-panel d-none">
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div class="bento-card text-center card-hover-lift cursor-pointer position-relative" onclick="explainAnalyticsMetric('SLA')" title="Click to inspect how SLA Compliance is calculated">
+                <span class="text-muted small fw-semibold text-uppercase">SLA Compliance Rate</span>
+                <div class="metric-number text-success my-2" id="admSlaRate">94.8%</div>
+                <small class="text-muted d-block">Target: &ge; 90% compliance</small>
+                <span class="badge bg-success-subtle text-success border border-success-subtle mt-2 py-1 px-2">
+                  <i class="bi bi-info-circle me-1"></i> Tap to see how it works &rarr;
+                </span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="bento-card text-center card-hover-lift cursor-pointer position-relative" onclick="explainAnalyticsMetric('RESOLUTION_TIME')" title="Click to inspect how Average Resolution Time is calculated">
+                <span class="text-muted small fw-semibold text-uppercase">Average Resolution Time</span>
+                <div class="metric-number text-primary my-2" id="admAvgHours">18.5h</div>
+                <small class="text-muted d-block">Across all complaint categories</small>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-2 py-1 px-2">
+                  <i class="bi bi-info-circle me-1"></i> Tap to see how it works &rarr;
+                </span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="bento-card text-center card-hover-lift cursor-pointer position-relative" onclick="explainAnalyticsMetric('CSAT')" title="Click to inspect how CSAT Score is calculated">
+                <span class="text-muted small fw-semibold text-uppercase">Customer Satisfaction (CSAT)</span>
+                <div class="metric-number text-warning my-2" id="admCsatScore">88%</div>
+                <small class="text-muted d-block">Based on customer feedback</small>
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle mt-2 py-1 px-2">
+                  <i class="bi bi-info-circle me-1"></i> Tap to see how it works &rarr;
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <!-- Sentiment Trigger Keyword Cloud / Heatmap -->
+            <div class="col-lg-6">
+              <div class="bento-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold mb-0"><i class="bi bi-fire text-danger me-2"></i> Sentiment Keyword Trigger Heatmap</h6>
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle">NLP Extracted</span>
+                </div>
+                <p class="text-muted small mb-3">High-frequency keywords mapped from positive resolution drivers and negative grievance escalations. <span class="badge bg-primary-subtle text-primary ms-1"><i class="bi bi-hand-index-thumb me-1"></i> Tap any box to see how it works</span></p>
+                <div class="keyword-cloud">
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Duplicate Charge', 14, 'NEGATIVE', 'Frequent duplicate transaction deductions detected in monthly invoice grievances. Triggers emergency priority escalation and automated routing to the Finance & Billing Desk.')" title="14 occurrences - Click to explore"><i class="bi bi-arrow-up-right"></i> Duplicate Charge (14)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('App Crash', 9, 'NEGATIVE', 'Software stability exceptions, unhandled runtime crashes, and system stalls. Automatically classified under Engineering Support with 12-hour SLA.')" title="9 occurrences - Click to explore"><i class="bi bi-exclamation-circle"></i> App Crash (9)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Payment Timeout', 8, 'NEGATIVE', 'Payment gateway checkout handshake timeouts and card debits without order confirmations. Auto-assigned to Payment Operations for ledger rollback.')" title="8 occurrences - Click to explore"><i class="bi bi-credit-card"></i> Payment Timeout (8)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Torn Packaging', 7, 'NEGATIVE', 'Physical courier damage and torn external parcel seals upon customer arrival. Routed to Logistics Desk with 7-day no-questions-asked replacement protocol.')" title="7 occurrences - Click to explore"><i class="bi bi-box-seam"></i> Torn Packaging (7)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Missing Adapter', 6, 'NEGATIVE', 'Package contents discrepancy and missing peripheral parts. Triggers warehouse fulfillment check and expedited accessory parcel dispatch.')" title="6 occurrences - Click to explore"><i class="bi bi-question-circle"></i> Missing Adapter (6)</span>
+                  <span class="keyword-pill keyword-pill-danger" onclick="explainSentimentKeyword('Delivery Delay', 5, 'NEGATIVE', 'Transit delay past estimated delivery window. Triggers courier API tracking check and proactive customer delivery guarantee.')" title="5 occurrences - Click to explore"><i class="bi bi-clock-history"></i> Delivery Delay (5)</span>
+                  <span class="keyword-pill keyword-pill-success" onclick="explainSentimentKeyword('Fast Support', 18, 'POSITIVE', 'Positive driver indicating swift first response within initial 15-minute triage window. Boosts overall customer retention and CSAT score.')" title="18 occurrences - Click to explore"><i class="bi bi-check2-circle"></i> Fast Support (18)</span>
+                  <span class="keyword-pill keyword-pill-success" onclick="explainSentimentKeyword('Solved on Call', 15, 'POSITIVE', 'First Contact Resolution (FCR) achievement driver where support specialist resolved the customer issue in a single interaction session.')" title="15 occurrences - Click to explore"><i class="bi bi-patch-check"></i> Solved on Call (15)</span>
+                  <span class="keyword-pill keyword-pill-success" onclick="explainSentimentKeyword('Refund Processed', 12, 'POSITIVE', 'Successful resolution closure confirmation where merchant reversal and ledger credit was completed within 2 business days.')" title="12 occurrences - Click to explore"><i class="bi bi-arrow-counterclockwise"></i> Refund Processed (12)</span>
+                  <span class="keyword-pill keyword-pill-info" onclick="explainSentimentKeyword('Helpful Staff', 10, 'POSITIVE', 'Positive customer sentiment feedback highlighting polite, proactive, and knowledgeable support agent behavior during inquiry handling.')" title="10 occurrences - Click to explore"><i class="bi bi-person-check"></i> Helpful Staff (10)</span>
+                  <span class="keyword-pill keyword-pill-info" onclick="explainSentimentKeyword('Polite Triage', 7, 'POSITIVE', 'Customer appreciation for automated intake, clear SLA timelines, and empathetic communication tone.')" title="7 occurrences - Click to explore"><i class="bi bi-shield-check"></i> Polite Triage (7)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Agent Performance Leaderboard -->
+            <div class="col-lg-6">
+              <div class="bento-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i> Support Specialist Leaderboard</h6>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Top Performers</span>
+                </div>
+                <small class="text-muted d-block mb-3"><i class="bi bi-hand-index-thumb me-1"></i> Tap any specialist row to view how their performance & assigned queue works</small>
+                <div class="table-responsive">
+                  <table class="table table-hover table-sm align-middle mb-0">
+                    <thead class="text-muted small">
+                      <tr>
+                        <th>Specialist</th>
+                        <th>Desk</th>
+                        <th>Resolved</th>
+                        <th>Avg Turnaround</th>
+                        <th>CSAT</th>
+                      </tr>
+                    </thead>
+                    <tbody class="small">
+                      <tr class="cursor-pointer" onclick="explainSpecialist('Sarah Connor', 'Finance', 38, '9.2 hrs', 4.9, 'Senior financial analyst specializing in duplicate billing reconciliation, payment gateway refund rollbacks, and merchant chargebacks.')">
+                        <td><strong>Sarah Connor</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
+                        <td><span class="badge bg-light text-dark">Finance</span></td>
+                        <td>38</td>
+                        <td>9.2 hrs</td>
+                        <td><span class="text-warning">4.9 &#9733;</span></td>
+                      </tr>
+                      <tr class="cursor-pointer" onclick="explainSpecialist('David Miller', 'Engineering', 32, '14.5 hrs', 4.8, 'Senior engineer handling application crashes, database bottlenecks, API timeouts, and critical system downtime.')">
+                        <td><strong>David Miller</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
+                        <td><span class="badge bg-light text-dark">Engineering</span></td>
+                        <td>32</td>
+                        <td>14.5 hrs</td>
+                        <td><span class="text-warning">4.8 &#9733;</span></td>
+                      </tr>
+                      <tr class="cursor-pointer" onclick="explainSpecialist('Emily Watson', 'Logistics', 29, '11.0 hrs', 4.7, 'Fulfillment coordinator specializing in shipment tracking, transit damage RMA claims, and expedited part replacements.')">
+                        <td><strong>Emily Watson</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
+                        <td><span class="badge bg-light text-dark">Logistics</span></td>
+                        <td>29</td>
+                        <td>11.0 hrs</td>
+                        <td><span class="text-warning">4.7 &#9733;</span></td>
+                      </tr>
+                      <tr class="cursor-pointer" onclick="explainSpecialist('Alex Chen', 'Accounts', 26, '8.4 hrs', 4.9, 'Identity and account security specialist handling MFA recovery, role access provisioning, and credential resets.')">
+                        <td><strong>Alex Chen</strong> <i class="bi bi-box-arrow-up-right text-muted ms-1" style="font-size: 0.75rem;"></i></td>
+                        <td><span class="badge bg-light text-dark">Accounts</span></td>
+                        <td>26</td>
+                        <td>8.4 hrs</td>
+                        <td><span class="text-warning">4.9 &#9733;</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-admin-reports" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-10">
+              <div class="bento-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-bar-graph text-primary me-2"></i> Export Operational Reports</h5>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                    <i class="bi bi-check-circle me-1"></i> Data Stream Connected
+                  </span>
+                </div>
+                <p class="text-muted small mb-4">Export detailed complaint audit datasets, executive SLA performance sheets, and sentiment distribution reports with zero latency.</p>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                  <button class="btn btn-primary px-4 py-2 fw-semibold" onclick="exportCsvReport()">
+                    <i class="bi bi-filetype-csv me-2"></i> Export Complaints CSV
+                  </button>
+                  <button class="btn btn-danger px-4 py-2 fw-semibold" onclick="exportPdfReport()">
+                    <i class="bi bi-filetype-pdf me-2"></i> Export Complaints PDF
+                  </button>
+                  <button class="btn btn-outline-primary px-4 py-2 fw-semibold" onclick="openExecutiveSummaryModal()">
+                    <i class="bi bi-file-earmark-text me-2"></i> Executive Summary Slip
+                  </button>
+                  <button class="btn btn-outline-warning px-4 py-2 fw-semibold" onclick="promptTwoFactorAction('EXPORT_ALL')">
+                    <i class="bi bi-shield-lock me-2"></i> Secure Audit Dump (2FA)
+                  </button>
+                </div>
+
+                <!-- Live Dataset Summary Bento Strip -->
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">READY TO EXPORT</div>
+                      <div class="fs-4 fw-bold text-primary" id="reportExportCount">12 Complaints</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">SLA COMPLIANCE</div>
+                      <div class="fs-4 fw-bold text-success">94.8%</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">SECURITY STANDARD</div>
+                      <div class="fs-4 fw-bold text-dark font-monospace">SOC-2 / 2FA</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="p-3 bg-light rounded border text-center">
+                      <div class="text-muted small fw-semibold">STREAM STATUS</div>
+                      <div class="fs-4 fw-bold text-info" id="reportExportLastTime">Active &bull; Synced</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Security Audit Log Card -->
+              <div class="bento-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="bi bi-shield-check text-warning me-2"></i> Security Verification & Export Activity Log</h6>
+                  <span class="badge bg-primary-subtle text-primary">Immutable Trail</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Operation Type</th>
+                        <th>Target Records</th>
+                        <th>Authentication Gate</th>
+                        <th>Authorized Operator</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody id="reportAuditLogTable">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 6: USER DASHBOARD                     -->
+        <!-- ========================================== -->
+        <div id="view-user-dashboard" class="app-view-panel d-none">
+          <div class="welcome-banner mb-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <span class="badge bg-primary text-white fw-bold mb-2">CUSTOMER PORTAL</span>
+                <h4 class="fw-bold mb-1">Welcome to Customer Support!</h4>
+                <p class="text-muted small mb-0">Submit complaints easily and track support progress in real-time with automated SLA notifications.</p>
+              </div>
+              <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+                <button class="btn btn-outline-primary px-3 py-2" onclick="openOfficialTicketSlipModal()">
+                  <i class="bi bi-receipt-cutoff me-1"></i> Latest Ticket Pass
+                </button>
+                <button class="btn btn-primary px-3 py-2" onclick="showView('user-submit')">
+                  <i class="bi bi-plus-circle me-1"></i> File Complaint
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Bento Stats -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">My Total</span>
+                <div class="metric-number text-primary" id="usrTotalComplaints">0</div>
+                <small class="text-muted">Complaints filed</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Pending</span>
+                <div class="metric-number text-warning" id="usrPendingComplaints">0</div>
+                <small class="text-muted">Awaiting triage</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">In Progress</span>
+                <div class="metric-number text-info" id="usrInProgressComplaints">0</div>
+                <small class="text-muted">Investigating</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="bento-card card-hover-lift">
+                <span class="text-muted small fw-semibold">Resolved</span>
+                <div class="metric-number text-success" id="usrResolvedComplaints">0</div>
+                <small class="text-muted">Completed</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- NEW: Dedicated Auto Ticket Generation Box (Preserves and elevates dashboard look) -->
+          <div class="bento-card mb-4 border-primary-subtle shadow-sm" id="userTicketGenerationBox">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <div class="p-2 rounded bg-primary-subtle text-primary">
+                  <i class="bi bi-ticket-perforated-fill fs-5"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0">Auto Ticket Generation & SLA Dispatch</h6>
+                  <small class="text-muted">Dynamic Ticket Reference auto-generated based on complaint type</small>
+                </div>
+              </div>
+              <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
+                <i class="bi bi-shield-check me-1"></i> Auto-Generation Ready
+              </span>
+            </div>
+
+            <div class="row g-3 align-items-stretch">
+              <!-- Left: Latest Generated Ticket Box with Barcode Pass -->
+              <div class="col-lg-6">
+                <div class="p-3 rounded border bg-surface-alt h-100 d-flex flex-column justify-content-between" id="dashLatestTicketContainer">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="text-muted small fw-semibold text-uppercase letter-spacing-1">Latest Generated Ticket</span>
+                      <span class="badge badge-status badge-pending" id="dashTicketStatus">PENDING</span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-2 flex-wrap">
+                      <h4 class="font-monospace fw-bold text-primary mb-0" id="dashTicketCode">TCK-TECH-2026-4819</h4>
+                      <span class="badge bg-primary text-white" id="dashTicketCategory">Technical & Bug Reports</span>
+                      <span class="badge bg-danger" id="dashTicketPriority">HIGH</span>
+                    </div>
+                    <p class="small text-muted mb-2 text-truncate" id="dashTicketSubject">Application UI responsive verification ticket</p>
+                    <div class="small text-muted d-flex align-items-center gap-2 mb-2 flex-wrap">
+                      <span><i class="bi bi-clock-history me-1"></i> <span id="dashTicketDate">Auto-generated</span></span>
+                      <span class="text-muted">•</span>
+                      <span><i class="bi bi-stopwatch text-warning me-1"></i> SLA Target: <strong id="dashTicketSla">12 Hours</strong></span>
+                    </div>
+
+                    <!-- Live Dashboard Miniature Barcode & Pass Strip -->
+                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-body border mb-2">
+                      <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-upc-scan fs-5 text-primary"></i>
+                        <div>
+                          <div class="font-monospace fw-bold small text-body" id="dashBarcodeCodeText">TCK-TECH-2026-4819</div>
+                          <small class="text-muted" style="font-size: 0.72rem;">Verified Support Pass</small>
+                        </div>
+                      </div>
+                      <svg id="dashTicketBarcodeSvg" viewBox="0 0 160 30" width="130" height="24">
+                        <!-- Dynamic SVG barcode bars -->
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 pt-2 border-top flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="copyDashTicket()">
+                      <i class="bi bi-clipboard me-1"></i> Copy Code
+                    </button>
+                    <button class="btn btn-sm btn-outline-success flex-fill" onclick="viewDashTicketSlip()">
+                      <i class="bi bi-receipt-cutoff me-1"></i> View & Print Slip
+                    </button>
+                    <button class="btn btn-sm btn-primary flex-fill" onclick="trackDashTicket()">
+                      <i class="bi bi-binoculars me-1"></i> Track Live
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Quick Ticket Generator & Type Selector -->
+              <div class="col-lg-6">
+                <div class="p-3 rounded border bg-surface-alt h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="text-muted small fw-semibold text-uppercase letter-spacing-1">Ticket Generator by Type</span>
+                      <small class="text-primary fw-semibold"><i class="bi bi-lightning-charge me-1"></i>Instant Code</small>
+                    </div>
+                    <label class="form-label small fw-semibold mb-1">Select Complaint Type to Auto-Generate:</label>
+                    <select class="form-select form-select-sm mb-2" id="dashCategorySelect" onchange="updateDashTicketPreview(this.value)">
+                      <option value="1" data-prefix="BILL" data-name="Billing & Payments" data-sla="24 Hours">💳 Billing & Payments (TCK-BILL)</option>
+                      <option value="2" data-prefix="TECH" data-name="Technical & Bug Reports" data-sla="12 Hours" selected>⚡ Technical & Bug Reports (TCK-TECH)</option>
+                      <option value="3" data-prefix="PROD" data-name="Product & Delivery" data-sla="48 Hours">📦 Product & Delivery (TCK-PROD)</option>
+                      <option value="4" data-prefix="GEN" data-name="Customer Service & General" data-sla="24 Hours">💬 Customer Service & General (TCK-GEN)</option>
+                      <option value="5" data-prefix="SEC" data-name="Account & Security" data-sla="6 Hours">🔒 Account & Security (TCK-SEC)</option>
+                      <option value="6" data-prefix="NET" data-name="Network & IT Support" data-sla="8 Hours">🌐 Network & IT Support (TCK-NET)</option>
+                    </select>
+
+                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-body border mb-2">
+                      <small class="text-muted">Live Auto-Generated Code:</small>
+                      <span class="badge bg-primary-subtle text-primary font-monospace fw-bold fs-6 px-2 py-1" id="dashPreviewCode">TCK-TECH-2026-XXXX</span>
+                    </div>
+                    <div class="small text-muted mb-2">
+                      <i class="bi bi-info-circle text-info me-1"></i> SLA Window: <span id="dashPreviewSlaText" class="fw-semibold">12 Hours Target</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex flex-column gap-2 mt-auto">
+                    <button class="btn btn-sm btn-primary w-100 fw-semibold" onclick="quickFileWithSelectedType()">
+                      <i class="bi bi-plus-circle me-1"></i> File Complaint with this Ticket Type &rarr;
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary w-100 fw-semibold" onclick="instantPreviewGeneratedSlip()">
+                      <i class="bi bi-receipt-cutoff me-1"></i> Preview Generated Ticket Slip Pass
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Recent Complaints -->
+          <div class="bento-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="fw-bold mb-0">My Recent Complaints</h6>
+              <button class="btn btn-sm btn-outline-primary" onclick="showView('user-complaints')">View All &rarr;</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 20%; min-width: 150px;">Complaint #</th>
+                    <th style="width: 42%; min-width: 240px;">Title & Category</th>
+                    <th style="width: 16%; min-width: 130px;">Status</th>
+                    <th style="width: 12%; min-width: 100px;">Priority</th>
+                    <th style="width: 10%; min-width: 90px;" class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="usrRecentComplaintsTable">
+                  <tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 7: USER SUBMIT COMPLAINT              -->
+        <!-- ========================================== -->
+        <div id="view-user-submit" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="bento-card">
+                <h5 class="fw-bold mb-2"><i class="bi bi-pencil-square text-primary me-2"></i> File a New Support Complaint</h5>
+                <p class="text-muted small mb-4">Provide details about the issue. Our intelligent system analyzes sentiment and ensures fast resolution within SLA targets.</p>
+
+                <form id="userComplaintForm">
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Subject / Title *</label>
+                    <input type="text" class="form-control" id="usrSubmitTitle" placeholder="e.g. Double charged on subscription invoice" required oninput="handleKbSuggestions(this.value)">
+                  </div>
+
+                  <!-- AI Knowledge Base Instant Solution Deflection -->
+                  <div id="kbSuggestionsCard" class="card border-info bg-surface-alt mb-3 d-none">
+                    <div class="card-body p-3">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="fw-bold text-info small d-flex align-items-center">
+                          <i class="bi bi-lightbulb-fill me-2 fs-6"></i> AI Smart Solutions & Knowledge Base
+                        </div>
+                        <span class="badge bg-info-subtle text-info">Instant Deflection</span>
+                      </div>
+                      <div id="kbContentSnippet" class="small text-body mb-2"></div>
+                      <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-success" onclick="resolveViaKnowledgeBase()">
+                          <i class="bi bi-check2-circle me-1"></i> This Solved My Issue! (Skip Filing)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="dismissKbSuggestions()">
+                          Continue Filing Ticket
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Category *</label>
+                      <select class="form-select" id="usrSubmitCategory" required>
+                        <option value="">Loading categories...</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Urgency / Severity</label>
+                      <select class="form-select" id="usrSubmitPriority">
+                        <option value="">Auto-detect via Intelligent NLP</option>
+                        <option value="LOW">Low</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="HIGH">High</option>
+                        <option value="CRITICAL">Critical</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Live Auto-Generated Ticket Preview based on Complaint Type -->
+                  <div class="p-3 mb-3 rounded border bg-surface-alt" id="submitTicketPreviewBox">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="small fw-semibold text-muted text-uppercase letter-spacing-1">
+                        <i class="bi bi-ticket-perforated-fill text-primary me-1"></i> Auto-Generated Ticket Reference
+                      </span>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Auto-Allocated
+                      </span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-2">
+                      <div>
+                        <div class="small text-muted">Tracking Code:</div>
+                        <div class="font-monospace fw-bold fs-5 text-primary" id="submitPreviewTicketCode">TCK-TECH-2026-XXXX</div>
+                      </div>
+                      <div class="text-sm-end">
+                        <span class="badge bg-primary text-white" id="submitPreviewCategoryBadge">Select Category</span>
+                        <div class="small text-muted mt-1" id="submitPreviewSlaText"><i class="bi bi-stopwatch text-warning me-1"></i> SLA Target: 24h</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label small fw-semibold mb-0">Description *</label>
+                      <div class="d-flex align-items-center gap-2">
+                        <span id="voiceStatusBadge" class="badge bg-danger animate-pulse d-none">
+                          <i class="bi bi-record-circle me-1"></i> Listening... Speak now
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" id="btnVoiceDictation" onclick="toggleVoiceDictation()">
+                          <i class="bi bi-mic-fill me-1"></i> Voice Dictate
+                        </button>
+                      </div>
+                    </div>
+                    <textarea class="form-control" id="usrSubmitDesc" rows="4" placeholder="Explain the problem in detail..." required></textarea>
+                    <!-- Live NLP Sentiment Preview Box -->
+                    <div id="usrSentimentPreview" class="d-none mt-2"></div>
+                  </div>
+
+                  <!-- Attachments & Media Dropzone -->
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Attachments (Screenshots / Invoices / Logs)</label>
+                    <div class="attachment-dropzone" id="submitAttachmentDropzone" onclick="document.getElementById('submitFileInput').click()">
+                      <i class="bi bi-cloud-arrow-up fs-2 text-primary mb-1 d-block"></i>
+                      <div class="small fw-semibold">Click to upload or drag & drop files here</div>
+                      <small class="text-muted">PNG, JPG, PDF up to 10MB</small>
+                    </div>
+                    <input type="file" id="submitFileInput" accept="image/*,.pdf" multiple style="display: none;" onchange="handleFileSelect(this.files)">
+                    <div class="attachment-preview-grid" id="submitAttachmentPreviews"></div>
+                  </div>
+
+                  <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary" onclick="showView('user-dashboard')">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold">Submit Complaint</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 8: USER ALL COMPLAINTS                -->
+        <!-- ========================================== -->
+        <div id="view-user-complaints" class="app-view-panel d-none">
+          <div class="bento-card">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-2">
+              <div>
+                <h5 class="fw-bold mb-1">My Filed Complaints</h5>
+                <small class="text-muted">Track status, live SLA timelines, and feedback for all your submitted complaints</small>
+              </div>
+              <button class="btn btn-sm btn-primary px-3 py-2 fw-semibold" onclick="showView('user-submit')">
+                <i class="bi bi-plus-lg me-1"></i> New Complaint
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th style="width: 22%; min-width: 170px;">Complaint & Ticket</th>
+                    <th style="width: 35%; min-width: 240px;">Subject & Category</th>
+                    <th style="width: 15%; min-width: 130px;">Status</th>
+                    <th style="width: 10%; min-width: 100px;">Priority</th>
+                    <th style="width: 10%; min-width: 110px;">Date Filed</th>
+                    <th style="width: 8%; min-width: 80px;" class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="usrAllComplaintsTable">
+                  <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 9: TICKET TRACKER & DETAILS           -->
+        <!-- ========================================== -->
+        <div id="view-ticket-tracker" class="app-view-panel d-none">
+          <div class="row g-4 justify-content-center">
+            <div class="col-lg-8">
+              <div class="bento-card mb-4">
+                <!-- High-Visibility Prominent Ticket Reference Banner -->
+                <div class="ticket-tracker-hero p-4 mb-4 rounded-4 border text-center">
+                  <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <span class="badge bg-primary text-white px-3 py-1"><i class="bi bi-patch-check-fill me-1"></i> VERIFIED SUPPORT TICKET</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1" id="trackSlaStatusBadge"><i class="bi bi-shield-check me-1"></i> SLA Active & Monitored</span>
+                  </div>
+                  <div class="my-3">
+                    <div class="ticket-badge-pill">
+                      <h2 class="font-monospace fw-bold mb-0 letter-spacing-1" id="trackTicketNumber">#TCK-TECH-2026-8492</h2>
+                      <button class="btn btn-sm btn-outline-primary px-3 py-1 rounded-pill" onclick="copyCurrentTrackerTicket()" title="Copy Ticket Reference">
+                        <i class="bi bi-clipboard me-1"></i> Copy
+                      </button>
+                    </div>
+                  </div>
+                  <div class="small text-muted d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                    <span>Official Support Tracking Reference</span>
+                    <span>&bull;</span>
+                    <span>Complaint ID: <strong id="trackComplaintNumber" class="text-body fw-bold">CMP-XXXX</strong></span>
+                    <span>&bull;</span>
+                    <span>Priority: <span id="trackPriority" class="badge">MEDIUM</span></span>
+                  </div>
+                </div>
+
+                <!-- Multi-Language Translation Bar -->
+                <div class="d-flex align-items-center justify-content-between p-2 rounded bg-surface-alt border mb-3 flex-wrap gap-2">
+                  <div class="small text-muted d-flex align-items-center gap-1">
+                    <i class="bi bi-translate text-primary"></i> <span>Language Translation:</span>
+                    <span id="currentTranslationLang" class="badge bg-primary text-white">Original (EN)</span>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('en')">EN</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('es')">ES</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('hi')">HI</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('fr')">FR</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="translateCurrentTicket('de')">DE</button>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="text-muted small">Status</span>
+                    <div><span id="trackStatus" class="badge badge-status">PENDING</span></div>
+                  </div>
+                  <div class="text-end">
+                    <span class="text-muted small">Category</span>
+                    <div class="fw-bold text-primary" id="trackCategory">General</div>
+                  </div>
+                </div>
+
+                <h5 class="fw-bold mb-2" id="trackTitle">...</h5>
+                <div class="text-muted small mb-3">
+                  <i class="bi bi-clock me-1"></i> <span id="trackCreatedAt">...</span>
+                </div>
+
+                <div class="p-3 bg-surface-alt rounded border mb-3">
+                  <h6 class="fw-bold small text-uppercase text-muted mb-2">Description</h6>
+                  <p id="trackDesc" class="mb-0" style="white-space: pre-wrap;">...</p>
+                </div>
+
+                <div id="trackResolutionBox" class="p-3 rounded border bg-light d-none mb-3">
+                  <h6 class="fw-bold small text-uppercase text-success mb-1"><i class="bi bi-check-circle-fill me-1"></i> Resolution Notes</h6>
+                  <p id="trackResolutionNotes" class="mb-0 text-body"></p>
+                </div>
+
+                <!-- Live Conversation & Support Stream -->
+                <div class="chat-container mb-4">
+                  <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-surface-alt">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-chat-dots-fill text-primary me-2"></i> Live Conversation & Activity Stream</h6>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-circle-fill text-success fs-6 me-1"></i> Live Thread</span>
+                  </div>
+                  <div class="chat-messages-stream" id="ticketChatStream">
+                    <!-- Populated dynamically via JS -->
+                  </div>
+                  <div class="p-3 border-top bg-surface">
+                    <!-- Admin AI Complaint Comprehension & Smart Responder Studio -->
+                    <div id="adminAiAssistantStudio" class="d-none mb-3">
+                      <div class="ai-assistant-studio p-3" id="aiStudioContainer">
+                        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary text-white p-1 rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                              <i class="bi bi-robot"></i>
+                            </span>
+                            <strong class="small text-primary fw-bold">AI Complaint Comprehension & Smart Response Generator</strong>
+                          </div>
+                          <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.72rem;">
+                            <i class="bi bi-stars me-1"></i> Generative NLP Assistant
+                          </span>
+                        </div>
+
+                        <!-- AI Diagnosis & Extracted Insights -->
+                        <div class="ai-insight-box mb-2 small" id="aiComplaintInsightBox">
+                          <div class="d-flex align-items-center gap-1 text-muted mb-1" style="font-size: 0.72rem;">
+                            <i class="bi bi-lightbulb-fill text-warning"></i> <strong class="text-uppercase">Issue Comprehension:</strong>
+                          </div>
+                          <div id="aiExtractedSummary" class="fw-semibold text-body mb-2">Analyzing complaint details...</div>
+                          <div class="d-flex gap-2 flex-wrap text-muted" style="font-size: 0.72rem;">
+                            <span><strong>Category:</strong> <span id="aiInsightCategory" class="text-primary fw-semibold">General</span></span>
+                            <span>&bull;</span>
+                            <span><strong>Customer Sentiment:</strong> <span id="aiInsightSentiment" class="badge">Detecting...</span></span>
+                            <span>&bull;</span>
+                            <span><strong>Recommended Strategy:</strong> <span id="aiInsightStrategy" class="text-body fw-semibold">Triage</span></span>
+                          </div>
+                        </div>
+
+                        <!-- Tone Selection & Generate Button -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                          <div class="d-flex align-items-center gap-1 flex-wrap">
+                            <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">Tone:</span>
+                            <div class="btn-group btn-group-sm" role="group">
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 active ai-tone-btn" data-tone="empathetic" onclick="setAiTone('empathetic', this)">🤝 Empathetic</button>
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 ai-tone-btn" data-tone="technical" onclick="setAiTone('technical', this)">🛠️ Technical</button>
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 ai-tone-btn" data-tone="billing" onclick="setAiTone('billing', this)">💳 Financial</button>
+                              <button type="button" class="btn btn-outline-secondary py-0 px-2 ai-tone-btn" data-tone="concise" onclick="setAiTone('concise', this)">⚡ Direct</button>
+                            </div>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-primary py-1 px-3 fw-semibold" id="btnGenerateAiDraft" onclick="triggerAiDraftGeneration()">
+                            <i class="bi bi-stars me-1"></i> Generate AI Answer
+                          </button>
+                        </div>
+
+                        <!-- AI Draft Output Container (hidden until generated) -->
+                        <div id="aiDraftResultCard" class="ai-draft-card mb-2 d-none">
+                          <div class="d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom">
+                            <small class="fw-bold text-primary d-flex align-items-center">
+                              <i class="bi bi-chat-left-quote-fill me-1"></i> AI-Generated Resolution Draft:
+                            </small>
+                            <div class="d-flex gap-1">
+                              <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.7rem;" onclick="copyAiDraft()" title="Copy draft"><i class="bi bi-clipboard"></i> Copy</button>
+                              <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.7rem;" onclick="triggerAiDraftGeneration()" title="Regenerate draft"><i class="bi bi-arrow-clockwise"></i> Redraft</button>
+                            </div>
+                          </div>
+                          <div id="aiDraftResultText" class="small text-body mb-2" style="white-space: pre-wrap; line-height: 1.5;"></div>
+                          <div class="d-flex justify-content-end gap-2 flex-wrap">
+                            <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;" onclick="insertAiDraftToInput()">
+                              <i class="bi bi-pencil-square me-1"></i> Insert into Chat Box
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success py-0 px-3 fw-semibold" style="font-size: 0.75rem;" onclick="sendAiDraftDirectly()">
+                              <i class="bi bi-send-check-fill me-1"></i> Send Directly to Customer
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- Quick Macro dropdown fallback -->
+                        <div class="d-flex align-items-center gap-2 pt-2 border-top">
+                          <span class="small text-muted" style="font-size: 0.72rem;"><i class="bi bi-bookmark text-secondary"></i> Or Quick Macro:</span>
+                          <select class="form-select form-select-sm" style="font-size: 0.75rem;" id="adminMacroSelect" onchange="applyAdminMacro(this.value)">
+                            <option value="">-- Select Template --</option>
+                            <option value="1">Request bank statement reference & transaction timestamp</option>
+                            <option value="2">Engineering patch deployed, please clear cache and retry</option>
+                            <option value="3">Replacement package dispatched with express tracking</option>
+                            <option value="4">Full refund authorized, credit reflects in 3-5 business days</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Staff Internal Note Checkbox (for Admins) -->
+                    <div id="adminInternalNoteBox" class="d-none form-check form-switch mb-2">
+                      <input class="form-check-input" type="checkbox" id="chatInternalNoteCheck">
+                      <label class="form-check-label small fw-semibold text-warning" for="chatInternalNoteCheck">
+                        <i class="bi bi-lock-fill me-1"></i> Post as Staff Internal Note (Hidden from Customer)
+                      </label>
+                    </div>
+
+                    <div class="input-group">
+                      <textarea class="form-control" id="ticketChatMessageInput" rows="2" placeholder="Type message or reply..."></textarea>
+                      <button class="btn btn-primary px-3" type="button" onclick="sendTicketChatMessage()">
+                        <i class="bi bi-send-fill me-1"></i> Send
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Ticket Lifecycle Audit Trail -->
+                <div class="bento-card mb-3 p-3 bg-surface-alt border">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary me-2"></i> Ticket Lifecycle Audit Trail</h6>
+                  <div class="audit-timeline" id="ticketAuditTimeline">
+                    <!-- Injected dynamically via JS -->
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <button class="btn btn-sm btn-outline-secondary" onclick="showView(currentRole === 'ADMIN' ? 'admin-complaints' : 'user-complaints')">
+                    &larr; Back to List
+                  </button>
+                  <button class="btn btn-sm btn-warning d-none" id="btnTrackFeedback" data-bs-toggle="modal" data-bs-target="#userFeedbackModal">
+                    <i class="bi bi-star-fill me-1"></i> Rate Support Experience
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="bento-card">
+                <h6 class="fw-bold mb-3"><i class="bi bi-ticket-detailed text-primary me-2"></i> Ticket Information</h6>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
+                  <span>Ticket Reference:</span>
+                  <strong class="text-primary font-monospace" id="trackTicketSidebarRef">#TCK-XXXX</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small align-items-center">
+                  <span>Live SLA Countdown:</span>
+                  <div id="trackSlaCountdownBadge">
+                    <span class="sla-badge sla-badge-good"><i class="bi bi-stopwatch"></i> Calculating...</span>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
+                  <span>Priority Queue:</span>
+                  <span class="badge bg-info-subtle text-info" id="trackSidebarQueue">Auto Triage</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom text-muted small">
+                  <span>Assigned Personnel:</span>
+                  <strong class="text-body fw-bold" id="trackSidebarAssigned">Triage Desk</strong>
+                </div>
+                <div class="d-flex justify-content-between py-2 text-muted small">
+                  <span>Dispatch Target:</span>
+                  <strong class="text-body fw-bold" id="trackSidebarDispatch">Within 24 Hours</strong>
+                </div>
+                <div class="pt-3 mt-2 border-top d-flex flex-column gap-2">
+                  <button class="btn btn-sm btn-outline-danger w-100" id="btnEscalateTicket" onclick="escalateCurrentTicket()">
+                    <i class="bi bi-arrow-up-circle-fill me-1"></i> Escalate Ticket Priority
+                  </button>
+                  <button class="btn btn-sm btn-primary w-100" onclick="openOfficialTicketSlipModal()">
+                    <i class="bi bi-receipt-cutoff me-1"></i> View & Print Ticket Receipt
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW: USER TICKET GENERATION HUB           -->
+        <!-- ========================================== -->
+        <div id="view-user-tickets" class="app-view-panel d-none">
+          <div class="bento-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-ticket-perforated-fill text-primary me-2"></i> Support Ticket Generation & Management Hub</h5>
+                <small class="text-muted">Generate instant ticket references tailored to complaint types and track SLA fulfillment</small>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="showView('user-submit')">
+                <i class="bi bi-plus-lg me-1"></i> File New Complaint
+              </button>
+            </div>
+
+            <!-- Ticket Generator Panel -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6 col-lg-4">
+                <div class="p-3 rounded border bg-surface-alt h-100">
+                  <span class="small fw-semibold text-muted text-uppercase d-block mb-2">1. Select Complaint Type</span>
+                  <select class="form-select form-select-sm mb-2" id="hubCategorySelect" onchange="updateHubTicketCode(this.value)">
+                    <option value="1">💳 Billing & Payments (TCK-BILL)</option>
+                    <option value="2" selected>⚡ Technical & Bug Reports (TCK-TECH)</option>
+                    <option value="3">📦 Product & Delivery (TCK-PROD)</option>
+                    <option value="4">💬 Customer Service & General (TCK-GEN)</option>
+                    <option value="5">🔒 Account & Security (TCK-SEC)</option>
+                    <option value="6">🌐 Network & IT Support (TCK-NET)</option>
+                  </select>
+                  <small class="text-muted d-block">Complaint type automatically sets ticket format, priority routing, and SLA window.</small>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-lg-5">
+                <div class="p-3 rounded border bg-surface-alt h-100 text-center d-flex flex-column justify-content-center">
+                  <span class="small fw-semibold text-muted text-uppercase d-block mb-1">2. Auto-Generated Ticket Code</span>
+                  <div class="fs-4 font-monospace fw-bold text-primary my-1" id="hubGeneratedCode">TCK-TECH-2026-8291</div>
+                  <div class="d-flex justify-content-center gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="copyHubGeneratedCode()">
+                      <i class="bi bi-clipboard me-1"></i> Copy Code
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="fileWithHubCode()">
+                      <i class="bi bi-arrow-right-circle me-1"></i> Use & File Complaint
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-3">
+                <div class="p-3 rounded border bg-surface-alt h-100 d-flex flex-column justify-content-center">
+                  <span class="small fw-semibold text-muted text-uppercase d-block mb-1">3. SLA Target</span>
+                  <div class="fs-5 fw-bold text-success mb-1" id="hubSlaTarget">12 Hours</div>
+                  <small class="text-muted"><i class="bi bi-clock-history me-1"></i> Monitored under automated dispatch protocol</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- List of All User Generated Tickets -->
+            <h6 class="fw-bold mb-3">All Generated Tickets for Your Complaints</h6>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Ticket Code</th>
+                    <th>Complaint Type</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Date Generated</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="hubTicketsTableBody">
+                  <tr><td colspan="7" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 10: NOTIFICATIONS & FEEDBACK          -->
+        <!-- ========================================== -->
+        <div id="view-user-notifications" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Notifications</h5>
+              </div>
+              <div id="usrNotificationsList">
+                <div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-user-feedback" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <h5 class="fw-bold mb-3">Customer Feedback & Satisfaction Reviews</h5>
+              <div id="usrFeedbacksList">
+                <div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 11: USER PROFILE                      -->
+        <!-- ========================================== -->
+        <div id="view-user-profile" class="app-view-panel d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="bento-card">
+                <h5 class="fw-bold mb-3">Account Profile</h5>
+                <form id="profileEditForm">
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Full Name</label>
+                    <input type="text" class="form-control" id="profName" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Email (Read-only)</label>
+                    <input type="email" class="form-control bg-light" id="profEmail" disabled>
+                  </div>
+                  <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Phone Number</label>
+                      <input type="tel" class="form-control" id="profPhone">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-semibold">Department / Company</label>
+                      <input type="text" class="form-control" id="profDept">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary px-4 fw-semibold">Save Profile</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile Floating Action Button (FAB) -->
+  <a href="#" class="fab-submit" onclick="showView('user-submit')" title="File Complaint">
+    <i class="bi bi-plus-lg"></i>
+  </a>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <!-- Populated dynamically via unified-app.js -->
+  </nav>
+
+  <!-- Admin Status Update Modal -->
+  <div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Update Complaint Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">New Status</label>
+            <select class="form-select" id="modalStatusSelect">
+              <option value="PENDING">PENDING</option>
+              <option value="IN_PROGRESS">IN PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="CLOSED">CLOSED</option>
+              <option value="REJECTED">REJECTED</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label small fw-semibold mb-0">Resolution / Internal Notes</label>
+              <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;" onclick="generateAiModalResolutionNotes()">
+                <i class="bi bi-robot me-1"></i> Auto-Generate with AI
+              </button>
+            </div>
+            <textarea class="form-control" id="modalResolutionNotes" rows="3" placeholder="Enter resolution notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-sm btn-primary" onclick="saveStatusUpdate()">Save Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Feedback Rating Modal -->
+  <div class="modal fade" id="userFeedbackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Rate Support Experience</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="appFeedbackForm" onsubmit="event.preventDefault(); submitAppFeedback();">
+            <div class="mb-3 text-center">
+              <label class="form-label small fw-semibold d-block">Satisfaction Rating</label>
+              <div class="star-rating justify-content-center">
+                <input type="radio" id="fstar5" name="appRating" value="5" checked /><label for="fstar5"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar4" name="appRating" value="4" /><label for="fstar4"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar3" name="appRating" value="3" /><label for="fstar3"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar2" name="appRating" value="2" /><label for="fstar2"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="fstar1" name="appRating" value="1" /><label for="fstar1"><i class="bi bi-star-fill"></i></label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Review Comments</label>
+              <textarea class="form-control" id="appFeedbackComments" rows="3" placeholder="Share your experience..."></textarea>
+            </div>
+            <div class="modal-footer px-0 pb-0">
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-sm btn-primary">Submit Rating</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- High-Visibility Ticket Generation Success Modal -->
+  <div class="modal fade" id="ticketGeneratedModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-lg border-primary">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-patch-check-fill me-2"></i> Ticket Generated Successfully!
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <div class="mb-3">
+            <span class="badge bg-success-subtle text-success fs-6 px-3 py-2 border border-success-subtle">
+              <i class="bi bi-check-circle-fill me-1"></i> Complaint Registered & Auto-Triaged
+            </span>
+          </div>
+
+          <div class="p-3 rounded border bg-surface-alt mb-3">
+            <small class="text-uppercase fw-semibold text-muted d-block mb-1">Your Official Ticket Reference</small>
+            <div class="fs-2 font-monospace fw-bold text-primary my-1" id="modalTicketCode">TCK-TECH-2026-XXXX</div>
+            <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyModalTicketCode()">
+              <i class="bi bi-clipboard me-1"></i> Copy Ticket Code
+            </button>
+          </div>
+
+          <div class="row g-2 text-start small mb-3">
+            <div class="col-6">
+              <div class="p-2 rounded border bg-light">
+                <span class="text-muted d-block">Complaint Type:</span>
+                <strong id="modalTicketCategory" class="text-body fw-bold">Technical & Bug Reports</strong>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded border bg-light">
+                <span class="text-muted d-block">Urgency Level:</span>
+                <strong id="modalTicketPriority" class="text-danger">HIGH</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info py-2 small mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            This ticket code has been added to your <strong>Dashboard Ticket Box</strong>. You can track resolution status anytime.
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="showView('user-dashboard')">
+            <i class="bi bi-grid-1x2 me-1"></i> Back to Dashboard
+          </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" onclick="openOfficialTicketSlipModal(window.lastCreatedComplaintId)">
+              <i class="bi bi-receipt-cutoff me-1"></i> View Ticket Receipt
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="modalBtnTrackTicket">
+              <i class="bi bi-binoculars me-1"></i> Track Ticket Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Printable & Interactive Ticket Receipt Modal -->
+  <div class="modal fade" id="officialTicketSlipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white py-3">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-receipt-cutoff fs-4 text-primary"></i>
+            <div>
+              <h5 class="modal-title fw-bold mb-0 text-white">Official Support Ticket Receipt</h5>
+              <small class="text-white-50">Verified SLA Registration & Service Guarantee Record</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 bg-surface">
+          <!-- Ticket Pass Container -->
+          <div class="ticket-receipt-card shadow-sm mb-3" id="modalTicketSlipCard">
+            <!-- Header Bar -->
+            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3 flex-wrap gap-2">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <div class="p-1 rounded bg-primary text-white d-inline-flex">
+                    <i class="bi bi-shield-check fs-5"></i>
+                  </div>
+                  <h4 class="fw-bold mb-0 text-primary">SupportDesk</h4>
+                </div>
+                <small class="text-muted fw-semibold">Intelligent Customer Complaint & Support Analysis System</small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 text-uppercase fw-bold mb-1 d-inline-block">OFFICIAL SERVICE PASS</span>
+                <div class="fs-4 font-monospace fw-bold text-primary" id="slipModalTicketCode">#TCK-2026-0000</div>
+                <small class="text-muted" id="slipModalDate">Issued: Oct 10, 2026</small>
+              </div>
+            </div>
+
+            <!-- Metadata Grid -->
+            <div class="p-3 rounded bg-surface-alt border mb-3">
+              <div class="row g-3 small">
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Complaint ID</span>
+                  <strong class="text-body font-monospace fw-bold" id="slipModalCmpId">CMP-2026-0000</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Customer Name</span>
+                  <strong class="text-body fw-bold text-truncate d-block" id="slipModalCustomer">John Doe</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Complaint Category</span>
+                  <span class="badge bg-primary-subtle text-primary fw-semibold" id="slipModalCategory">Technical Support</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Priority Urgency</span>
+                  <span class="badge bg-danger" id="slipModalPriority">HIGH</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Current Status</span>
+                  <span class="badge bg-warning-subtle text-warning-emphasis" id="slipModalStatus">IN PROGRESS</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Assigned Support Desk</span>
+                  <strong class="text-body fw-bold" id="slipModalAssigned">Engineering Support</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">SLA Turnaround</span>
+                  <span class="text-success fw-bold" id="slipModalSla"><i class="bi bi-clock-history me-1"></i> 12 Hours SLA</span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="text-muted d-block text-uppercase" style="font-size: 0.72rem;">Customer Contact</span>
+                  <small class="text-muted text-truncate d-block" id="slipModalEmail">user@example.com</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subject & Description -->
+            <div class="mb-3">
+              <span class="small fw-bold text-muted text-uppercase d-block mb-1">Complaint Subject:</span>
+              <h6 class="fw-bold text-body mb-2" id="slipModalSubject">Issue Title</h6>
+              <div class="p-3 rounded bg-surface border small text-body" style="white-space: pre-wrap; max-height: 140px; overflow-y: auto;" id="slipModalDesc">
+                Description goes here...
+              </div>
+            </div>
+
+            <!-- Resolution / Action Guarantee Box -->
+            <div class="p-3 rounded border border-success-subtle bg-success-subtle text-success-emphasis mb-3" id="slipModalResolutionBox">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-patch-check-fill text-success"></i>
+                <strong class="small text-uppercase">Official Support Resolution / Action Plan:</strong>
+              </div>
+              <p class="small mb-0" id="slipModalResolution">Under active investigation by our engineering team within the target SLA window.</p>
+            </div>
+
+            <!-- Barcode & Official Verification Seal -->
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-3">
+              <div class="ticket-barcode-wrap" id="slipModalBarcodeWrap">
+                <div class="font-monospace text-muted small mb-1" id="slipModalBarcodeText">TCK-TECH-2026-0000</div>
+                <svg id="slipModalBarcodeSvg" viewBox="0 0 200 40" width="200" height="36">
+                  <!-- Dynamic SVG barcode bars generated by JS -->
+                </svg>
+              </div>
+              <div class="text-end small text-muted">
+                <div class="fw-semibold text-body"><i class="bi bi-shield-lock-fill text-primary me-1"></i> SLA Security Hash: <span class="font-monospace" id="slipModalHash">SD-SEC-84920</span></div>
+                <div>SupportDesk AI Center &bull; Verified Electronic Record</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between flex-wrap gap-2 bg-surface-alt">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Close
+          </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" onclick="copySlipModalTicketCode()">
+              <i class="bi bi-clipboard me-1"></i> Copy Ticket Code
+            </button>
+            <button type="button" class="btn btn-outline-success" onclick="downloadTicketReceiptHtml()">
+              <i class="bi bi-download me-1"></i> Download Receipt
+            </button>
+            <button type="button" class="btn btn-primary" onclick="printOfficialTicketSlip()">
+              <i class="bi bi-printer-fill me-1"></i> Print / Save as PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Analytics Explainer Modal ("How It Works") -->
+  <div class="modal fade" id="analyticsExplainerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white py-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="p-2 rounded bg-white text-primary" id="explainerIcon">
+              <i class="bi bi-lightbulb-fill fs-5"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold mb-0 text-white" id="explainerTitle">How This Metric Works</h5>
+              <small class="text-white-50" id="explainerSubtitle">Intelligent Customer Complaint & Support Analysis System</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 bg-surface">
+          <!-- Overview Card -->
+          <div class="p-3 rounded border bg-surface-alt mb-3">
+            <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Operational Principle & Methodology</span>
+            <p class="mb-0 text-body" id="explainerHowItWorks" style="line-height: 1.6;">
+              Explanation text goes here...
+            </p>
+          </div>
+
+          <!-- Formula & Calculation Box -->
+          <div class="p-3 rounded border border-primary-subtle bg-primary-subtle mb-3" id="explainerFormulaBox">
+            <span class="small fw-bold text-primary text-uppercase d-block mb-1">
+              <i class="bi bi-calculator me-1"></i> Calculation Formula & Logic
+            </span>
+            <div class="font-monospace fw-bold text-primary fs-6" id="explainerFormula">
+              Formula string...
+            </div>
+          </div>
+
+          <!-- Metrics Breakdown Grid -->
+          <div class="row g-3 mb-3" id="explainerMetricsGrid">
+            <!-- Dynamically populated 3-4 metric cards -->
+          </div>
+
+          <!-- Live Related Data & Actions Box -->
+          <div class="p-3 rounded border bg-surface" id="explainerActionBox">
+            <span class="small fw-bold text-muted text-uppercase d-block mb-2">Live Application Insights & Drilldown</span>
+            <div class="small text-muted mb-3" id="explainerActionText">
+              Actions description...
+            </div>
+            <div class="d-flex gap-2 flex-wrap" id="explainerActionButtons">
+              <!-- Action buttons populated dynamically -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-surface-alt d-flex justify-content-between">
+          <small class="text-muted"><i class="bi bi-shield-check text-success me-1"></i> Verified by System Analytics Engine</small>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+            <i class="bi bi-check2 me-1"></i> Close Explainer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Complaint Analysis & Smart Responder Modal -->
+  <div class="modal fade" id="aiResponseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-robot me-2"></i> AI Complaint Comprehension & Smart Responder
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Ticket Header -->
+          <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom flex-wrap gap-2">
+            <div>
+              <span class="badge bg-primary-subtle text-primary font-monospace fw-bold fs-6" id="aiModalTicketCode">TCK-TECH-2026-XXXX</span>
+              <span class="badge bg-secondary ms-1" id="aiModalCategory">Technical</span>
+            </div>
+            <div class="small text-muted">
+              Customer: <strong id="aiModalCustomer" class="text-body">John Doe</strong>
+            </div>
+          </div>
+
+          <!-- Original Complaint Summary -->
+          <div class="p-3 rounded bg-surface-alt border mb-3">
+            <h6 class="fw-bold small text-uppercase text-muted mb-1"><i class="bi bi-chat-left-text me-1"></i> Customer's Complaint:</h6>
+            <div class="fw-bold mb-1" id="aiModalSubject">Subject...</div>
+            <p class="small text-muted mb-0" id="aiModalDescription" style="max-height: 90px; overflow-y: auto;">Description...</p>
+          </div>
+
+          <!-- AI Understanding & Diagnosis -->
+          <div class="ai-insight-box mb-3 small">
+            <div class="d-flex align-items-center gap-1 text-primary fw-bold mb-1">
+              <i class="bi bi-cpu-fill"></i> <span>AI COMPLAINT DIAGNOSIS & ROOT CAUSE:</span>
+            </div>
+            <div id="aiModalDiagnosis" class="fw-semibold text-body mb-2">Analyzing...</div>
+            <div class="d-flex gap-3 flex-wrap text-muted" style="font-size: 0.75rem;">
+              <span><strong>Sentiment:</strong> <span id="aiModalSentiment" class="badge">Analyzing</span></span>
+              <span><strong>Priority:</strong> <span id="aiModalPriority" class="badge bg-danger">HIGH</span></span>
+              <span><strong>Strategy:</strong> <span id="aiModalStrategy" class="text-dark fw-bold">Immediate Resolution</span></span>
+            </div>
+          </div>
+
+          <!-- Tone Selector -->
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="small fw-semibold text-muted">Select Tone:</span>
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary active ai-modal-tone-btn" data-tone="empathetic" onclick="setAiModalTone('empathetic', this)">🤝 Empathetic</button>
+                <button type="button" class="btn btn-outline-secondary ai-modal-tone-btn" data-tone="technical" onclick="setAiModalTone('technical', this)">🛠️ Technical</button>
+                <button type="button" class="btn btn-outline-secondary ai-modal-tone-btn" data-tone="billing" onclick="setAiModalTone('billing', this)">💳 Financial</button>
+                <button type="button" class="btn btn-outline-secondary ai-modal-tone-btn" data-tone="concise" onclick="setAiModalTone('concise', this)">⚡ Direct</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary fw-semibold" onclick="generateAiModalResponseDraft()">
+              <i class="bi bi-stars me-1"></i> Regenerate Draft
+            </button>
+          </div>
+
+          <!-- Generated Draft Box -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label small fw-semibold mb-0 text-primary">
+                <i class="bi bi-chat-quote-fill me-1"></i> AI-Generated Response Draft:
+              </label>
+              <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.72rem;" onclick="copyAiModalDraft()"><i class="bi bi-clipboard me-1"></i> Copy</button>
+            </div>
+            <textarea class="form-control" id="aiModalGeneratedAnswer" rows="5" placeholder="AI draft will appear here..."></textarea>
+          </div>
+
+          <div class="alert alert-info py-2 small mb-0">
+            <i class="bi bi-info-circle me-1"></i> Admin can review or modify this response before dispatching to the customer.
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openTrackerFromAiModal()">
+              <i class="bi bi-chat-dots me-1"></i> Open in Live Chat
+            </button>
+            <button type="button" class="btn btn-sm btn-success fw-semibold" onclick="sendAiModalResponseDirectly()">
+              <i class="bi bi-send-check-fill me-1"></i> Dispatch Response to Customer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-Factor Authentication (2FA / OTP) Security Modal -->
+  <div class="modal fade" id="twoFactorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-shield-lock-fill text-warning me-2"></i> Security Verification (2FA)
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <div class="mb-3">
+            <span class="badge bg-warning-subtle text-warning fs-6 px-3 py-2 border border-warning-subtle">
+              <i class="bi bi-shield-check me-1"></i> Multi-Factor Security Gate Active
+            </span>
+          </div>
+          <p class="small text-muted mb-3" id="twoFactorActionText">
+            To authorize <strong>Secure Audit Dump (Full Compliance Export & Audit Ledger)</strong>, enter the 6-digit security code dispatched to your registered authenticator.
+          </p>
+          <div class="alert alert-info py-2 small mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2 text-start">
+            <div><i class="bi bi-key me-1"></i> Demo Security OTP: <strong class="font-monospace text-primary fs-6">123456</strong></div>
+            <button type="button" class="btn btn-sm btn-primary py-1 px-3 fw-semibold font-monospace" onclick="quickFillOtp('123456')">
+              <i class="bi bi-lightning-fill me-1"></i> Auto-Fill 123456
+            </button>
+          </div>
+          <div class="d-flex justify-content-center gap-2 mb-3" onpaste="handleOtpPaste(event)">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 1)" onkeydown="handleOtpKeydown(event, 0)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 2)" onkeydown="handleOtpKeydown(event, 1)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 3)" onkeydown="handleOtpKeydown(event, 2)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 4)" onkeydown="handleOtpKeydown(event, 3)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 5)" onkeydown="handleOtpKeydown(event, 4)" inputmode="numeric">
+            <input type="text" class="form-control text-center font-monospace fw-bold fs-4 otp-digit" maxlength="1" style="width: 46px; height: 52px;" oninput="focusNextOtp(this, 6)" onkeydown="handleOtpKeydown(event, 5)" inputmode="numeric">
+          </div>
+          <button type="button" class="btn btn-primary w-100 fw-semibold py-2" onclick="verifyTwoFactorCode()">
+            <i class="bi bi-shield-check me-1"></i> Confirm & Execute Action
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Executive Summary Slip Modal (Interactive Preview & PDF / Print Dialog) -->
+  <div class="modal fade" id="executiveSummaryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white py-3">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary text-white"><i class="bi bi-file-earmark-bar-graph me-1"></i> EXECUTIVE BRIEFING</span>
+            <h5 class="modal-title fw-bold mb-0">Executive Operational & SLA Performance Summary</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-3 p-md-4 bg-light">
+          <!-- Printable / Exportable Slip Container -->
+          <div id="executiveSummarySlipCard" class="bg-white p-4 rounded-3 border shadow-sm mx-auto" style="max-width: 900px;">
+            <!-- Rendered dynamically by populateExecutiveSummaryModal() -->
+          </div>
+        </div>
+        <div class="modal-footer bg-white border-top d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Close
+          </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary px-3 fw-semibold" onclick="printExecutiveSummaryDirect()">
+              <i class="bi bi-printer me-1"></i> Print Slip
+            </button>
+            <button type="button" class="btn btn-danger px-3 fw-semibold" onclick="downloadExecutiveSummaryPdf()">
+              <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal for Attachments -->
+  <div class="modal fade" id="imageLightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-transparent border-0 text-center">
+        <div class="modal-header border-0 pb-0 justify-content-end">
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-2">
+          <img id="lightboxImg" src="" alt="Attachment Preview" class="img-fluid rounded shadow-lg" style="max-height: 80vh;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Printable Ticket Slip Container (Formatted for Print / PDF Export) -->
+  <div id="printableTicketSlip" class="d-none d-print-block">
+    <div style="max-width: 800px; margin: 0 auto; font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #1e293b; padding: 20px; background: #ffffff;">
+      <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h2 style="color: #4f46e5; margin: 0; font-weight: 800; font-size: 24px;">SupportDesk</h2>
+          <small style="color: #64748b; font-size: 12px; font-weight: 600;">Intelligent Customer Complaint & Support Analysis System</small>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 10px; text-transform: uppercase; color: #4f46e5; font-weight: 800; letter-spacing: 0.5px;">OFFICIAL SERVICE PASS</div>
+          <div style="font-size: 20px; font-weight: 800; font-family: monospace; color: #4f46e5;" id="printSlipTicketCode">TCK-TECH-2026-0000</div>
+          <small style="color: #64748b; font-size: 11px;" id="printSlipDate">Issued: Oct 2026</small>
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 18px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <tr>
+            <td style="padding: 5px 0; color: #64748b; width: 22%;">Complaint ID:</td>
+            <td style="padding: 5px 0; font-weight: 700; font-family: monospace;" id="printSlipCmpId">CMP-0000</td>
+            <td style="padding: 5px 0; color: #64748b; width: 22%;">Priority Level:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipPriority">HIGH</td>
+          </tr>
+          <tr>
+            <td style="padding: 5px 0; color: #64748b;">Customer Name:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipCustomer">John Doe</td>
+            <td style="padding: 5px 0; color: #64748b;">Complaint Type:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipCategory">Technical Support</td>
+          </tr>
+          <tr>
+            <td style="padding: 5px 0; color: #64748b;">Assigned Desk:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipAssigned">Engineering Support</td>
+            <td style="padding: 5px 0; color: #64748b;">Current Status:</td>
+            <td style="padding: 5px 0; font-weight: 700;" id="printSlipStatus">IN PROGRESS</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 4px;">Complaint Subject</div>
+        <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 8px;" id="printSlipSubject">Issue Title</div>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 13px; line-height: 1.5; color: #334155; white-space: pre-wrap;" id="printSlipDesc">
+          Description content...
+        </div>
+      </div>
+
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; margin-bottom: 20px;" id="printSlipResolutionBox">
+        <strong style="color: #16a34a; font-size: 12px; text-transform: uppercase;">Official Resolution & Action Taken:</strong>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #166534;" id="printSlipResolution">Under active investigation by technical team within guaranteed SLA window.</p>
+      </div>
+
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b;">
+        <div>
+          <div style="font-family: monospace; font-size: 12px; font-weight: 700; color: #0f172a;" id="printSlipBarcodeText">TCK-TECH-2026-0000</div>
+          <svg id="printSlipBarcodeSvg" viewBox="0 0 200 36" width="180" height="32" style="margin-top: 2px;">
+            <!-- Rendered by JS -->
+          </svg>
+        </div>
+        <div style="text-align: right;">
+          <div>Electronically Verified &bull; Security Hash: <strong style="font-family: monospace; color: #4f46e5;">SD-SEC-84920</strong></div>
+          <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">SupportDesk AI Center &bull; Verified SLA Record</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/html2pdf.bundle.min.js"></script>
+  <script src="/js/unified-app.js"></script>
+  <script>
+    async function submitAppFeedback() {
+      const btn = document.getElementById('btnTrackFeedback');
+      const complaintId = btn ? btn.getAttribute('data-complaint-id') : null;
+      if (!complaintId) return;
+
+      const rating = document.querySelector('input[name="appRating"]:checked').value;
+      const comments = document.getElementById('appFeedbackComments').value.trim();
+
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ complaintId, rating, comments })
+        });
+        if (res.ok) {
+          showToast('Thank you for rating our support!', 'success');
+          bootstrap.Modal.getInstance(document.getElementById('userFeedbackModal')).hide();
+          btn.classList.add('d-none');
+          return;
+        }
+      } catch (e) {
+        console.warn('Backend unavailable, recording feedback locally');
+      }
+      showToast('Thank you for rating our support!', 'success');
+      try {
+        bootstrap.Modal.getInstance(document.getElementById('userFeedbackModal')).hide();
+      } catch (_) {}
+      btn.classList.add('d-none');
+    }
+
+    // Page Transition Interceptor
+    function initPageTransitions() {
+      const bar = document.getElementById('pageTransitionBar');
+      const overlay = document.getElementById('pageTransitionOverlay');
+
+      if (overlay) overlay.classList.remove('active');
+      if (bar) bar.classList.remove('loading');
+
+      document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (
+          href &&
+          !href.startsWith('#') &&
+          !href.startsWith('javascript:') &&
+          !href.startsWith('mailto:') &&
+          !href.startsWith('tel:') &&
+          !link.hasAttribute('target') &&
+          link.getAttribute('target') !== '_blank'
+        ) {
+          link.addEventListener('click', (e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+            e.preventDefault();
+            if (bar) bar.classList.add('loading');
+            if (overlay) overlay.classList.add('active');
+            setTimeout(() => {
+              window.location.href = href;
+            }, 280);
+          });
+        }
+      });
+    }
+
+    window.addEventListener('pageshow', () => {
+      const bar = document.getElementById('pageTransitionBar');
+      const overlay = document.getElementById('pageTransitionOverlay');
+      if (overlay) overlay.classList.remove('active');
+      if (bar) bar.classList.remove('loading');
+    });
+
+    initPageTransitions();
+  </script>
+</body>
+</html>

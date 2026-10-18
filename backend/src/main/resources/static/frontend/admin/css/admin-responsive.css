@@ -1,0 +1,71 @@
+/* ==========================================================================
+   ADMIN PORTAL - RESPONSIVE & MOBILE APP STYLES (admin-responsive.css)
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .admin-sidebar.show {
+    transform: translateX(0);
+  }
+
+  .admin-main {
+    margin-left: 0;
+    padding-bottom: calc(var(--bottom-nav-height) + 1rem);
+  }
+
+  .admin-navbar {
+    padding: 0 1rem;
+  }
+
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  .content-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .metric-number {
+    font-size: 1.75rem;
+  }
+
+  .table-responsive {
+    border: 0;
+  }
+
+  .table-custom th, .table-custom td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.82rem;
+  }
+
+  .bento-card {
+    padding: 1.15rem;
+  }
+
+  .chart-wrapper {
+    height: 230px;
+  }
+}
+
+/* Sidebar Backdrop overlay for mobile */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1039;
+  display: none;
+}
+
+.sidebar-backdrop.show {
+  display: block;
+}
