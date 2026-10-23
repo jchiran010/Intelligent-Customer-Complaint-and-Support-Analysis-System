@@ -35,7 +35,8 @@ USER appuser
 
 # Cloud platforms automatically pass PORT environment variable
 ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=default
 EXPOSE 8080
 
-# Execute with dynamic port assignment
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]
+# Execute with dynamic port assignment and container memory awareness
+ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Dserver.port=${PORT} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar app.jar"]

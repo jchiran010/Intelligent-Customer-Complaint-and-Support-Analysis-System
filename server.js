@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // Run build.js if public directory is missing
@@ -81,14 +81,26 @@ const server = http.createServer((req, res) => {
 
   // Reverse proxy /api requests to Spring Boot backend
   if (pathname.startsWith('/api/')) {
-    const backendReq = http.request({
-      hostname: '127.0.0.1',
-      port: 8080,
+    const backendTarget = process.env.BACKEND_URL || 'http://127.0.0.1:8080';
+    let targetParsed;
+    try {
+      targetParsed = new URL(backendTarget);
+    } catch (e) {
+      targetParsed = { hostname: '127.0.0.1', port: '8080', protocol: 'http:', host: '127.0.0.1:8080' };
+    }
+
+    const isHttps = targetParsed.protocol === 'https:';
+    const client = isHttps ? require('https') : http;
+    const targetPort = targetParsed.port || (isHttps ? 443 : 80);
+
+    const backendReq = client.request({
+      hostname: targetParsed.hostname,
+      port: targetPort,
       path: req.url,
       method: req.method,
       headers: {
         ...req.headers,
-        host: '127.0.0.1:8080'
+        host: targetParsed.host || `${targetParsed.hostname}:${targetPort}`
       }
     }, (backendRes) => {
       res.writeHead(backendRes.statusCode, backendRes.headers);
@@ -99,7 +111,8 @@ const server = http.createServer((req, res) => {
       res.writeHead(502, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         error: 'Backend Unavailable',
-        message: 'Spring Boot backend is offline or starting up on port 8080'
+        message: 'Spring Boot backend is offline or starting up',
+        target: backendTarget
       }));
     });
 

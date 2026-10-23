@@ -53,6 +53,9 @@ public class SecurityConfig {
                     "/", "/index.html", "/manifest.json",
                     "/login", "/login.html",
                     "/app", "/app.html",
+                    "/docs", "/documentation", "/documentation.html",
+                    "/health", "/api/health", "/actuator/**",
+                    "/Intelligent_Customer_Complaint_System_Comprehensive_Documentation.pdf",
                     "/css/**", "/js/**", "/images/**",
                     "/admin/css/**", "/admin/js/**",
                     "/user/css/**", "/user/js/**"

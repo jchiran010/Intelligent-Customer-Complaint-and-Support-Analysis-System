@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const targetDir = path.join(__dirname, 'public');
+const backendStaticDir = path.join(__dirname, 'backend', 'src', 'main', 'resources', 'static');
 
 if (!fs.existsSync(targetDir)) {
   fs.mkdirSync(targetDir, { recursive: true });
@@ -26,6 +27,11 @@ itemsToCopy.forEach(item => {
     fs.cpSync(src, dest, { recursive: true, force: true });
     console.log(`Copied ${item} -> public/${item}`);
   }
+  if (fs.existsSync(backendStaticDir) && fs.existsSync(src)) {
+    const backendDest = path.join(backendStaticDir, item);
+    fs.cpSync(src, backendDest, { recursive: true, force: true });
+    console.log(`Synced ${item} -> backend/src/main/resources/static/${item}`);
+  }
 });
 
 // Also create direct shortcuts for /admin and /user routes for flat cloud hosting compatibility
@@ -40,4 +46,4 @@ if (fs.existsSync(adminSrc)) {
   console.log('Copied frontend/admin -> public/admin');
 }
 
-console.log('Vercel Build Success: public directory populated with all application assets.');
+console.log('Build Success: public and static assets synchronized for deployment.');

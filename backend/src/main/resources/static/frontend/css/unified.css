@@ -1567,15 +1567,55 @@ body.sidebar-collapsed .unified-main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem;
-  background: #ffffff;
-  border: 1px dashed #cbd5e1;
-  border-radius: var(--radius-sm);
+  padding: 0.85rem 1.25rem !important;
+  background: #ffffff !important;
+  border: 2px dashed #64748b !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16) !important;
 }
 
 .ticket-barcode-wrap svg {
   max-width: 260px;
   height: 48px;
+}
+
+.ticket-barcode-wrap .slip-barcode-text,
+.ticket-barcode-wrap #slipModalBarcodeText,
+.ticket-barcode-wrap .font-monospace {
+  color: #0f172a !important; /* Always solid high-contrast dark navy on white pass */
+  font-weight: 800 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.08em !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+.ticket-barcode-wrap svg rect {
+  fill: #0f172a !important; /* Crisp dark barcode bars */
+}
+
+/* Ensure barcode in dark theme is never bleached or faded */
+[data-theme="dark"] .ticket-barcode-wrap,
+[data-bs-theme="dark"] .ticket-barcode-wrap {
+  background: #ffffff !important;
+  border: 2px dashed #475569 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .ticket-barcode-wrap .slip-barcode-text,
+[data-theme="dark"] .ticket-barcode-wrap #slipModalBarcodeText,
+[data-theme="dark"] .ticket-barcode-wrap .font-monospace,
+[data-bs-theme="dark"] .ticket-barcode-wrap .slip-barcode-text,
+[data-bs-theme="dark"] .ticket-barcode-wrap #slipModalBarcodeText,
+[data-bs-theme="dark"] .ticket-barcode-wrap .font-monospace {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+}
+
+[data-theme="dark"] .ticket-barcode-wrap svg rect,
+[data-bs-theme="dark"] .ticket-barcode-wrap svg rect {
+  fill: #0f172a !important;
 }
 
 /* ==========================================================================
@@ -1657,6 +1697,276 @@ body.sidebar-collapsed .unified-main {
   0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
   40% { transform: scale(1); opacity: 1; }
 }
+
+/* ==========================================================================
+   OFFICIAL TICKET RECEIPT MODAL & ACCESSIBILITY CONTRAST ENHANCEMENTS
+   ========================================================================== */
+
+/* Responsive Modal Scrollable Boundary */
+#officialTicketSlipModal.modal-dialog-scrollable .modal-content,
+#officialTicketSlipModal .modal-dialog-scrollable .modal-content {
+  max-height: calc(100vh - 3rem) !important;
+}
+
+#officialTicketSlipModal .modal-body {
+  max-height: calc(100vh - 12rem);
+  overflow-y: auto;
+}
+
+.slip-meta-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+/* Modal dark mode surface contrast */
+[data-theme="dark"] #officialTicketSlipModal .modal-content,
+[data-bs-theme="dark"] #officialTicketSlipModal .modal-content {
+  background: #0f172a !important;
+  border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] #officialTicketSlipModal .modal-body,
+[data-bs-theme="dark"] #officialTicketSlipModal .modal-body {
+  background: #0f172a !important;
+}
+
+[data-theme="dark"] #modalTicketSlipCard,
+[data-bs-theme="dark"] #modalTicketSlipCard {
+  background: #131d31 !important;
+  border: 1px solid #293548 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .ticket-slip-meta-box,
+[data-bs-theme="dark"] .ticket-slip-meta-box {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] .slip-meta-label,
+[data-bs-theme="dark"] .slip-meta-label {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] #officialTicketSlipModal strong.text-body,
+[data-theme="dark"] #officialTicketSlipModal h6.text-body,
+[data-bs-theme="dark"] #officialTicketSlipModal strong.text-body,
+[data-bs-theme="dark"] #officialTicketSlipModal h6.text-body {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] #slipModalEmail,
+[data-bs-theme="dark"] #slipModalEmail {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] #slipModalCategory,
+[data-bs-theme="dark"] #slipModalCategory {
+  background: rgba(56, 189, 248, 0.22) !important;
+  color: #38bdf8 !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.55) !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] #slipModalPriority.bg-danger,
+[data-bs-theme="dark"] #slipModalPriority.bg-danger {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.45) !important;
+}
+
+[data-theme="dark"] #slipModalPriority.bg-warning,
+[data-bs-theme="dark"] #slipModalPriority.bg-warning {
+  background: #d97706 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="dark"] #slipModalPriority.bg-secondary,
+[data-bs-theme="dark"] #slipModalPriority.bg-secondary {
+  background: #475569 !important;
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] #slipModalStatus,
+[data-bs-theme="dark"] #slipModalStatus {
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] #slipModalSla,
+[data-bs-theme="dark"] #slipModalSla {
+  color: #4ade80 !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.35) !important;
+}
+
+[data-theme="dark"] #slipModalSubject,
+[data-bs-theme="dark"] #slipModalSubject {
+  color: #f8fafc !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] #slipModalDesc,
+[data-bs-theme="dark"] #slipModalDesc {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f1f5f9 !important;
+  font-size: 0.92rem !important;
+  line-height: 1.6 !important;
+}
+
+[data-theme="dark"] #slipModalResolutionBox,
+[data-bs-theme="dark"] #slipModalResolutionBox {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border: 1.5px solid rgba(34, 197, 94, 0.45) !important;
+  color: #d1fae5 !important;
+}
+
+[data-theme="dark"] #slipModalResolutionBox strong,
+[data-theme="dark"] #slipModalResolutionBox i,
+[data-bs-theme="dark"] #slipModalResolutionBox strong,
+[data-bs-theme="dark"] #slipModalResolutionBox i {
+  color: #4ade80 !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="dark"] #slipModalResolution,
+[data-bs-theme="dark"] #slipModalResolution {
+  color: #f0fdf4 !important;
+  font-size: 0.92rem !important;
+  font-weight: 500 !important;
+}
+
+[data-theme="dark"] #slipModalTicketCode,
+[data-bs-theme="dark"] #slipModalTicketCode {
+  color: #38bdf8 !important;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
+}
+
+[data-theme="dark"] #slipModalHash,
+[data-bs-theme="dark"] #slipModalHash {
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+}
+
+/* Dashboard live barcode SVG contrast */
+[data-theme="dark"] #dashTicketBarcodeSvg rect,
+[data-bs-theme="dark"] #dashTicketBarcodeSvg rect {
+  fill: #38bdf8 !important; /* Glowing electric sky-blue barcode bars */
+}
+
+/* High-Contrast Action Buttons for Dark Theme */
+.slip-modal-footer,
+[data-theme="dark"] .slip-modal-footer,
+[data-bs-theme="dark"] .slip-modal-footer,
+[data-theme="dark"] #officialTicketSlipModal .modal-footer,
+[data-bs-theme="dark"] #officialTicketSlipModal .modal-footer {
+  background: #0b1120 !important;
+  border-top: 1px solid #1e293b !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary,
+[data-bs-theme="dark"] .btn-outline-secondary,
+.slip-btn-close,
+[data-theme="dark"] .slip-btn-close {
+  color: #f1f5f9 !important;
+  border-color: #64748b !important;
+  background-color: rgba(100, 116, 139, 0.22) !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover,
+[data-bs-theme="dark"] .btn-outline-secondary:hover,
+.slip-btn-close:hover,
+[data-theme="dark"] .slip-btn-close:hover {
+  color: #ffffff !important;
+  border-color: #94a3b8 !important;
+  background-color: rgba(148, 163, 184, 0.4) !important;
+}
+
+[data-theme="dark"] .btn-outline-primary,
+[data-bs-theme="dark"] .btn-outline-primary,
+.slip-btn-copy,
+[data-theme="dark"] .slip-btn-copy {
+  color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.16) !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .btn-outline-primary:hover,
+[data-bs-theme="dark"] .btn-outline-primary:hover,
+.slip-btn-copy:hover,
+[data-theme="dark"] .slip-btn-copy:hover {
+  color: #ffffff !important;
+  border-color: #38bdf8 !important;
+  background-color: #0284c7 !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.45) !important;
+}
+
+[data-theme="dark"] .btn-outline-success,
+[data-bs-theme="dark"] .btn-outline-success,
+.slip-btn-download,
+[data-theme="dark"] .slip-btn-download {
+  color: #4ade80 !important;
+  border-color: #22c55e !important;
+  background-color: rgba(34, 197, 94, 0.2) !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .btn-outline-success:hover,
+[data-bs-theme="dark"] .btn-outline-success:hover,
+.slip-btn-download:hover,
+[data-theme="dark"] .slip-btn-download:hover {
+  color: #ffffff !important;
+  border-color: #4ade80 !important;
+  background-color: #16a34a !important;
+  box-shadow: 0 0 14px rgba(74, 222, 128, 0.45) !important;
+}
+
+[data-theme="dark"] .btn-outline-warning,
+[data-bs-theme="dark"] .btn-outline-warning {
+  color: #fbbf24 !important;
+  border-color: #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .btn-outline-danger,
+[data-bs-theme="dark"] .btn-outline-danger {
+  color: #f87171 !important;
+  border-color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.18) !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .btn-primary,
+[data-bs-theme="dark"] .btn-primary,
+.slip-btn-print,
+[data-theme="dark"] .slip-btn-print {
+  background-color: #4f46e5 !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.45) !important;
+}
+
+[data-theme="dark"] .btn-primary:hover,
+[data-bs-theme="dark"] .btn-primary:hover,
+.slip-btn-print:hover,
+[data-theme="dark"] .slip-btn-print:hover {
+  background-color: #4338ca !important;
+  border-color: #4f46e5 !important;
+  box-shadow: 0 0 16px rgba(79, 70, 229, 0.6) !important;
+}
+
 
 
 

@@ -28,18 +28,36 @@ public class WebRoutingController {
     }
 
     private ResponseEntity<Resource> serveHtml(String relativePath) {
+        // 1. Try filesystem under frontend directory
         Path path = getFrontendPath().resolve(relativePath).normalize();
         Resource resource = new FileSystemResource(path.toFile());
-        if (!resource.exists()) {
-            return ResponseEntity.notFound().build();
+        if (resource.exists()) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(resource);
         }
-        return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_HTML)
-                .body(resource);
+
+        // 2. Try classpath under static/ (when executed from packaged JAR in Docker/Cloud)
+        Resource cpResource = new org.springframework.core.io.ClassPathResource("static/" + relativePath);
+        if (cpResource.exists()) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(cpResource);
+        }
+
+        // 3. Try classpath under static/frontend/
+        Resource cpFrontendResource = new org.springframework.core.io.ClassPathResource("static/frontend/" + relativePath);
+        if (cpFrontendResource.exists()) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(cpFrontendResource);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
     // ==========================================
-    // UNIFIED HOMEPAGE & PORTAL HUB
+    // UNIFIED HOMEPAGE, DOCS & PORTAL HUB
     // ==========================================
 
     @GetMapping({"/", "/index.html"})
@@ -58,6 +76,18 @@ public class WebRoutingController {
     @ResponseBody
     public ResponseEntity<Resource> unifiedApp() {
         return serveHtml("app.html");
+    }
+
+    @GetMapping({"/docs", "/documentation", "/documentation.html"})
+    @ResponseBody
+    public ResponseEntity<Resource> documentation() {
+        return serveHtml("documentation.html");
+    }
+
+    @GetMapping({"/health", "/api/health"})
+    @ResponseBody
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("{\"status\":\"UP\",\"system\":\"Intelligent Customer Complaint & Support Analysis System\"}");
     }
 
     // ==========================================

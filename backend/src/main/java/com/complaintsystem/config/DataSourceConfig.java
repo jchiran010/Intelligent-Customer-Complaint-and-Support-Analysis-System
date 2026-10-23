@@ -29,10 +29,43 @@ public class DataSourceConfig {
     @Bean
     @Primary
     public DataSource dataSource() {
-        boolean mysqlAvailable = isPortAvailable("localhost", 3306, 1500);
+        if (mysqlUrl != null && mysqlUrl.startsWith("jdbc:h2:")) {
+            log.info(">>> Explicit H2 database URL configured: {}", mysqlUrl);
+            return DataSourceBuilder.create()
+                    .driverClassName("org.h2.Driver")
+                    .url(mysqlUrl)
+                    .username(mysqlUser != null ? mysqlUser : "sa")
+                    .password(mysqlPass != null ? mysqlPass : "")
+                    .build();
+        }
+
+        String targetHost = "localhost";
+        int targetPort = 3306;
+
+        if (mysqlUrl != null && mysqlUrl.startsWith("jdbc:mysql://")) {
+            try {
+                String clean = mysqlUrl.substring("jdbc:mysql://".length());
+                int slashIdx = clean.indexOf('/');
+                String hostPort = slashIdx > 0 ? clean.substring(0, slashIdx) : clean;
+                int qIdx = hostPort.indexOf('?');
+                if (qIdx > 0) hostPort = hostPort.substring(0, qIdx);
+
+                if (hostPort.contains(":")) {
+                    String[] parts = hostPort.split(":");
+                    targetHost = parts[0];
+                    targetPort = Integer.parseInt(parts[1]);
+                } else if (!hostPort.trim().isEmpty()) {
+                    targetHost = hostPort.trim();
+                }
+            } catch (Exception e) {
+                log.warn("Could not parse host/port from mysqlUrl, defaulting to localhost:3306");
+            }
+        }
+
+        boolean mysqlAvailable = isPortAvailable(targetHost, targetPort, 2000);
 
         if (mysqlAvailable) {
-            log.info(">>> MySQL instance detected on localhost:3306. Connecting to MySQL database 'complaint_db'...");
+            log.info(">>> MySQL instance detected on {}:{}. Connecting to MySQL database...", targetHost, targetPort);
             return DataSourceBuilder.create()
                     .driverClassName("com.mysql.cj.jdbc.Driver")
                     .url(mysqlUrl)
@@ -40,7 +73,7 @@ public class DataSourceConfig {
                     .password(mysqlPass)
                     .build();
         } else {
-            log.warn(">>> MySQL service was not detected on localhost:3306.");
+            log.warn(">>> MySQL service was not detected on {}:{}.", targetHost, targetPort);
             log.info(">>> Initializing resilient embedded MySQL-compatible database for immediate operation.");
             log.info(">>> When MySQL is started, the application will automatically connect to MySQL on the next run.");
             return DataSourceBuilder.create()
