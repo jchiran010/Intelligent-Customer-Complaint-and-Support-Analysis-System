@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Intelligent Customer Complaint & Support Analysis System - Enterprise Support Platform",
+  "homepage": "https://intelligent-complaint-system-xar2.onrender.com/",
   "scripts": {
     "build": "node build.js",
     "start": "node server.js"

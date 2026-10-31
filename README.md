@@ -1,5 +1,7 @@
 # Intelligent Customer Complaint & Support Analysis System
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render%20Cloud-46E3B7.svg?style=for-the-badge&logo=render)](https://intelligent-complaint-system-xar2.onrender.com/)
+
 [![Java](https://img.shields.io/badge/Java-21-orange.svg?logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-brightgreen.svg?logo=springboot)](https://spring.io/projects/spring-boot)
 [![Spring Security](https://img.shields.io/badge/Spring%20Security-6.2-blue.svg?logo=springsecurity)](https://spring.io/projects/spring-security)
@@ -8,6 +10,20 @@
 [![Chart.js](https://img.shields.io/badge/Chart.js-4.4-ff6384.svg?logo=chartdotjs)](https://www.chartjs.org/)
 
 An enterprise-grade, production-style web application unifying customer self-service, real-time ticket tracking, automated NLP sentiment triage, and executive support intelligence in one cohesive system.
+
+---
+
+## 🌐 Live Cloud Deployment
+
+The application is deployed and running live on **Render Cloud**:
+
+* 🚀 **Live Production Link**: **[https://intelligent-complaint-system-xar2.onrender.com/](https://intelligent-complaint-system-xar2.onrender.com/)**
+* 📊 **App & Dashboard**: [https://intelligent-complaint-system-xar2.onrender.com/app.html](https://intelligent-complaint-system-xar2.onrender.com/app.html)
+* 🔐 **Login & Registration**: [https://intelligent-complaint-system-xar2.onrender.com/login.html](https://intelligent-complaint-system-xar2.onrender.com/login.html)
+* 📖 **System Documentation**: [https://intelligent-complaint-system-xar2.onrender.com/docs](https://intelligent-complaint-system-xar2.onrender.com/docs)
+* 💓 **Health Endpoint**: [https://intelligent-complaint-system-xar2.onrender.com/health](https://intelligent-complaint-system-xar2.onrender.com/health)
+
+> **Note on Free Tier:** When visiting after a period of inactivity, Render takes ~30–50 seconds to wake up (spin up) the container. Once awake, the application responds instantly.
 
 ---
 
@@ -125,9 +141,16 @@ Once started, the backend server and static frontend will be available at:
 
 ## 🌐 Application Portals
 
-* **Homepage & AI Simulator**: [http://localhost:8080/](http://localhost:8080/)
-* **Unified Web App Shell**: [http://localhost:8080/app.html](http://localhost:8080/app.html)
-* **Tabbed Sign In**: [http://localhost:8080/login.html](http://localhost:8080/login.html)
+### Live Cloud (Render Production)
+* **Live Homepage**: [https://intelligent-complaint-system-xar2.onrender.com/](https://intelligent-complaint-system-xar2.onrender.com/)
+* **Live Web App & Dashboard**: [https://intelligent-complaint-system-xar2.onrender.com/app.html](https://intelligent-complaint-system-xar2.onrender.com/app.html)
+* **Live Sign In & Registration**: [https://intelligent-complaint-system-xar2.onrender.com/login.html](https://intelligent-complaint-system-xar2.onrender.com/login.html)
+* **Live System Documentation**: [https://intelligent-complaint-system-xar2.onrender.com/docs](https://intelligent-complaint-system-xar2.onrender.com/docs)
+
+### Local Development
+* **Local Homepage**: [http://localhost:3000/](http://localhost:3000/) (or `http://localhost:8080/`)
+* **Local Web App Shell**: [http://localhost:3000/app.html](http://localhost:3000/app.html) (or `http://localhost:8080/app.html`)
+* **Local Sign In**: [http://localhost:3000/login.html](http://localhost:3000/login.html) (or `http://localhost:8080/login.html`)
 
 ---
 
