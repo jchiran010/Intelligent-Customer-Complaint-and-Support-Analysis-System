@@ -395,8 +395,8 @@
       <code>github.com/jchiran010/Intelligent-Customer-Complaint-and-Support-Analysis-System</code>
     </div>
     <div class="cover-meta-item">
-      <strong>Production Deployment Target:</strong>
-      Vercel Edge Cloud (Automated Static & Serverless Pipeline)
+      <strong>Production Deployment:</strong>
+      Render Cloud: <a href="https://intelligent-complaint-system-xar2.onrender.com/" target="_blank" style="color: #4f46e5; font-weight: 700;">https://intelligent-complaint-system-xar2.onrender.com/</a>
     </div>
     <div class="cover-meta-item">
       <strong>Documentation Version & Date:</strong>
@@ -918,7 +918,18 @@ public DataSource dataSource() {
 <div class="page-break"></div>
 <h1>Chapter 9: DevOps, Build Automation & Cloud Deployment</h1>
 
-<h2>9.1 Vercel Edge Cloud Deployment Architecture</h2>
+<h2>9.1 Live Production Deployment on Render Cloud</h2>
+<p>
+  The full-stack application (Java 21 Spring Boot 3 + Single-Page Frontend) is deployed and running live on Render:
+</p>
+<div class="code-box" style="background: #f8fafc; border-left: 4px solid #10b981; padding: 12px 16px; margin-bottom: 16px;">
+  <strong>Live Production URL:</strong> <a href="https://intelligent-complaint-system-xar2.onrender.com/" target="_blank" style="color: #059669; font-weight: 700; text-decoration: underline;">https://intelligent-complaint-system-xar2.onrender.com/</a><br>
+  <strong>Service Type:</strong> Dockerized Web Service (Multi-stage Eclipse Temurin 21 JRE runtime)<br>
+  <strong>Health Check Endpoint:</strong> <code>https://intelligent-complaint-system-xar2.onrender.com/health</code><br>
+  <strong>Automatic Database Fallback:</strong> Resilient embedded MySQL-compatible H2 engine initialized when standalone MySQL is absent.
+</div>
+
+<h2>9.2 Vercel Edge Cloud Deployment Architecture</h2>
 <p>
   To eliminate Vercel build errors, we engineered a dedicated automation pipeline:
 </p>
